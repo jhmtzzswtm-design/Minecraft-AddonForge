@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft AddonForge</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- JSZip for Exporting ZIP/MCADDON -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        mc: {
+                            dark: '#121316',
+                            card: '#1c1e22',
+                            border: '#2a2d34',
+                            accent: '#10b981', // Emerald
+                            accentHover: '#059669',
+                            obsidian: '#18181b',
+                            gold: '#fbbf24',
+                            redstone: '#ef4444'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121316;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d34;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f4451;
+        }
+        
+        /* Pixel art pattern overlay for MC vibe */
+        .mc-pattern {
+            background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+    </style>
+</head>
+<body class="bg-mc-dark text-slate-200 font-sans min-h-screen flex flex-col mc-pattern selection:bg-emerald-500/30 selection:text-emerald-400">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-mc-border bg-mc-card/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-900/30 border border-emerald-300/20">
+                    <i data-lucide="box" class="w-6 h-6 text-slate-950"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-wide text-white flex items-center gap-2">
+                        AddonForge <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Bedrock v1.20+</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Minecraft アドオンジェネレーター</p>
+                </div>
+            </div>
+
+            <!-- Quick Action Header Controls -->
+            <div class="flex items-center gap-3">
+                <button id="exportBtn" class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98]">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>.mcaddon を出力</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Sidebar: Controls & Configuration -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+            
+            <!-- Type Selector & Presets Block -->
+            <div class="bg-mc-card border border-mc-border rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                        <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> 作成タイプとプリセット
+                    </h2>
+                    <span id="addonNamespaceBadge" class="text-xs font-mono text-slate-400 bg-mc-dark px-2.5 py-1 rounded-md border border-mc-border">namespace: custom</span>
+                </div>
+
+                <!-- Tabs for Item / Block / Mob -->
+                <div class="grid grid-cols-3 gap-2 p-1.5 bg-mc-dark/70 rounded-xl border border-mc-border/80 mb-5">
+                    <button id="typeItemTab" class="type-tab-btn active flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all bg-emerald-500 text-slate-950 shadow-md">
+                        <i data-lucide="sword" class="w-4 h-4"></i> アイテム
+                    </button>
+                    <button id="typeBlockTab" class="type-tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white">
+                        <i data-lucide="boxes" class="w-4 h-4"></i> ブロック
+                    </button>
+                    <button id="typeMobTab" class="type-tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white">
+                        <i data-lucide="ghost" class="w-4 h-4"></i> モブ (Entity)
+                    </button>
+                </div>
+
+                <!-- Presets selection -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                    <span class="text-xs text-slate-400 whitespace-nowrap">プリセット読み込み:</span>
+                    <div id="presetsContainer" class="flex items-center gap-2">
+                        <!-- Dynamic preset buttons inserted here via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Form Container -->
+            <div class="bg-mc-card border border-mc-border rounded-2xl p-6 shadow-xl flex-1">
+                <form id="addonForm" onsubmit="event.preventDefault();" class="space-y-6">
+                    
+                    <!-- Basic Information Section -->
+                    <div>
+                        <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2 border-b border-mc-border pb-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i> 基本情報
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">表示名 (Identifier Name)</label>
+                                <input type="text" id="itemName" value="Ruby Sword" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors font-sans" placeholder="例: ルビーの剣">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">ID (Identifier ID)</label>
+                                <div class="flex items-center">
+                                    <span class="bg-mc-dark border border-r-0 border-mc-border rounded-l-xl px-3 py-2.5 text-xs text-slate-500 font-mono">custom:</span>
+                                    <input type="text" id="itemId" value="ruby_sword" class="w-full bg-mc-dark border border-mc-border rounded-r-xl px-3.5 py-2.5 text-sm text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 transition-colors" placeholder="ruby_sword">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Appearance & Texture Section -->
+                    <div>
+                        <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2 border-b border-mc-border pb-2">
+                            <i data-lucide="palette" class="w-4 h-4 text-emerald-400"></i> 見ため・カラー設定
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">テーマカラー</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="color" id="primaryColor" value="#ef4444" class="w-10 h-10 rounded-xl bg-transparent cursor-pointer border border-mc-border p-1">
+                                    <span id="colorHexText" class="text-xs font-mono text-slate-400">#ef4444</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">テクスチャ アイコン</label>
+                                <select id="textureIcon" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+                                    <option value="sword">剣 (Sword)</option>
+                                    <option value="axe">斧 (Axe)</option>
+                                    <option value="pickaxe">ツルハシ (Pickaxe)</option>
+                                    <option value="ingot">インゴット (Ingot)</option>
+                                    <option value="gem">宝石 (Gem)</option>
+                                    <option value="cube">立方体ブロック (Block)</option>
+                                    <option value="spawn_egg">スポーン卵 (Egg)</option>
+                                </select>
+                            </div>
+                            <!-- Live Texture Canvas Preview -->
+                            <div class="flex flex-col items-center justify-center p-3 bg-mc-dark/60 rounded-xl border border-mc-border/60">
+                                <span class="text-[10px] uppercase tracking-wider text-slate-500 mb-1 font-bold">2D Texture Preview</span>
+                                <canvas id="textureCanvas" width="48" height="48" class="w-12 h-12 image-render-pixelated border border-mc-border rounded bg-black/40 shadow-inner"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Properties Section (Adjusts based on Item/Block/Mob) -->
+                    <div>
+                        <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2 border-b border-mc-border pb-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i> パラメータ & 挙動設定
+                        </h3>
+
+                        <div id="dynamicPropertiesContainer" class="space-y-4">
+                            <!-- Injected by JavaScript based on active Category -->
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Live JSON Preview & Pack Explorer -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <div class="bg-mc-card border border-mc-border rounded-2xl shadow-xl flex flex-col h-full min-h-[500px]">
+                
+                <!-- JSON Preview Header / Tabs -->
+                <div class="border-b border-mc-border p-4 flex items-center justify-between flex-wrap gap-2">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="code-2" class="w-4 h-4 text-emerald-400"></i>
+                        <span class="text-sm font-bold text-white">JSON Preview</span>
+                    </div>
+
+                    <!-- Behavior / Resource file view toggle -->
+                    <div class="flex items-center gap-1 bg-mc-dark p-1 rounded-xl border border-mc-border text-xs">
+                        <button id="viewBehaviorBtn" class="px-3 py-1.5 rounded-lg font-mono font-medium transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            behavior.json
+                        </button>
+                        <button id="viewResourceBtn" class="px-3 py-1.5 rounded-lg font-mono font-medium transition-all text-slate-400 hover:text-white">
+                            resource.json
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Code Block Area -->
+                <div class="relative flex-1 p-4 bg-mc-dark/90 font-mono text-xs overflow-hidden flex flex-col">
+                    <div class="flex justify-between items-center pb-2 text-slate-500 border-b border-mc-border/40 text-[11px]">
+                        <span id="currentFilePath">behavior_packs/BP/items/ruby_sword.json</span>
+                        <button id="copyJsonBtn" class="flex items-center gap-1 hover:text-white transition-colors">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            <span>コピー</span>
+                        </button>
+                    </div>
+
+                    <pre class="flex-1 overflow-auto pt-3 text-emerald-300/90 leading-relaxed selection:bg-emerald-500/30"><code id="jsonCodeOutput"></code></pre>
+                </div>
+
+                <!-- Info Banner Footer -->
+                <div class="p-4 bg-mc-card border-t border-mc-border rounded-b-2xl text-xs text-slate-400 flex items-start gap-3">
+                    <i data-lucide="info" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="font-semibold text-slate-300">Minecraft Bedrockアドオン連携</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">ダウンロードした <code class="text-emerald-400 font-mono">.mcaddon</code> ファイルをダブルクリックすると、自動的にMinecraftが起動しインポートされます。</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-emerald-500 text-slate-950 px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center gap-2 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50">
+        <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+        <span id="toastMsg">クリップボードにコピーしました！</span>
+    </div>
+
+    <script>
+        // State variables
+        let currentType = 'item'; // 'item', 'block', 'mob'
+        let currentCodeTab = 'behavior'; // 'behavior', 'resource'
+
+        // Default Presets Configuration
+        const PRESETS = {
+            item: [
+                {
+                    name: 'ルビーの剣',
+                    id: 'ruby_sword',
+                    color: '#ef4444',
+                    icon: 'sword',
+                    properties: {
+                        damage: 8,
+                        durability: 1200,
+                        maxStack: 1,
+                        handEquipped: true,
+                        canDestroyInCreative: false
+                    }
+                },
+                {
+                    name: '魔法のルビー',
+                    id: 'magic_ruby',
+                    color: '#f43f5e',
+                    icon: 'gem',
+                    properties: {
+                        damage: 0,
+                        durability: 0,
+                        maxStack: 64,
+                        foil: true, // Glow effect
+                        foilType: 'glint'
+                    }
+                }
+            ],
+            block: [
+                {
+                    name: 'ルビー鉱石',
+                    id: 'ruby_ore',
+                    color: '#b91c1c',
+                    icon: 'cube',
+                    properties: {
+                        destroyTime: 3.0,
+                        explosionResistance: 6.0,
+                        friction: 0.6,
+                        lightEmission: 2
+                    }
+                },
+                {
+                    name: '発光ネオンブロック',
+                    id: 'neon_block',
+                    color: '#10b981',
+                    icon: 'cube',
+                    properties: {
+                        destroyTime: 1.0,
+                        explosionResistance: 2.0,
+                        friction: 0.6,
+                        lightEmission: 15
+                    }
+                }
+            ],
+            mob: [
+                {
+                    name: 'ルビーゴーレム (Boss)',
+                    id: 'ruby_golem',
+                    color: '#991b1b',
+                    icon: 'spawn_egg',
+                    properties: {
+                        health: 150,
+                        movementSpeed: 0.25,
+                        attackDamage: 12,
+                        isBoss: true,
+                        family: 'monster'
+                    }
+                }
+            ]
+        };
+
+        // Form fields DOM references
+        const typeItemTab = document.getElementById('typeItemTab');
+        const typeBlockTab = document.getElementById('typeBlockTab');
+        const typeMobTab = document.getElementById('typeMobTab');
+        const presetsContainer = document.getElementById('presetsContainer');
+        const dynamicPropertiesContainer = document.getElementById('dynamicPropertiesContainer');
+        
+        const itemNameInput = document.getElementById('itemName');
+        const itemIdInput = document.getElementById('itemId');
+        const primaryColorInput = document.getElementById('primaryColor');
+        const colorHexText = document.getElementById('colorHexText');
+        const textureIconSelect = document.getElementById('textureIcon');
+        const textureCanvas = document.getElementById('textureCanvas');
+        const jsonCodeOutput = document.getElementById('jsonCodeOutput');
+        const currentFilePath = document.getElementById('currentFilePath');
+
+        const viewBehaviorBtn = document.getElementById('viewBehaviorBtn');
+        const viewResourceBtn = document.getElementById('viewResourceBtn');
+        const copyJsonBtn = document.getElementById('copyJsonBtn');
+        const exportBtn = document.getElementById('exportBtn');
+
+        // Initial setup on Window load
+        window.onload = function() {
+            lucide.createIcons();
+            setupEventListeners();
+            loadPresets();
+            renderDynamicProperties();
+            drawTexturePreview();
+            updateJsonPreview();
+        };
+
+        function setupEventListeners() {
+            // Type Switcher
+            typeItemTab.addEventListener('click', () => switchType('item'));
+            typeBlockTab.addEventListener('click', () => switchType('block'));
+            typeMobTab.addEventListener('click', () => switchType('mob'));
+
+            // Code Preview File Toggle
+            viewBehaviorBtn.addEventListener('click', () => {
+                currentCodeTab = 'behavior';
+                updateCodeTabUI();
+                updateJsonPreview();
+            });
+            viewResourceBtn.addEventListener('click', () => {
+                currentCodeTab = 'resource';
+                updateCodeTabUI();
+                updateJsonPreview();
+            });
+
+            // Form Inputs live update listeners
+            [itemNameInput, itemIdInput, primaryColorInput, textureIconSelect].forEach(el => {
+                el.addEventListener('input', () => {
+                    if (el === primaryColorInput) {
+                        colorHexText.textContent = primaryColorInput.value;
+                        drawTexturePreview();
+                    }
+                    if (el === textureIconSelect) {
+                        drawTexturePreview();
+                    }
+                    updateJsonPreview();
+                });
+            });
+
+            // Auto format item ID slug
+            itemNameInput.addEventListener('input', () => {
+                const autoId = itemNameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
+                if (autoId) itemIdInput.value = autoId;
+                updateJsonPreview();
+            });
+
+            // Copy JSON
+            copyJsonBtn.addEventListener('click', () => {
+                const code = jsonCodeOutput.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('JSONをコピーしました！');
+                }).catch(() => {
+                    // Fallback
+                    const textArea = document.createElement("textarea");
+                    textArea.value = code;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showToast('JSONをコピーしました！');
+                });
+            });
+
+            // Export .mcaddon ZIP
+            exportBtn.addEventListener('click', generateMcAddonFile);
+        }
+
+        function switchType(type) {
+            currentType = type;
+            
+            // Update Tab UI
+            [typeItemTab, typeBlockTab, typeMobTab].forEach(tab => {
+                tab.className = "type-tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white";
+            });
+
+            let activeTab = typeItemTab;
+            if (type === 'block') activeTab = typeBlockTab;
+            if (type === 'mob') activeTab = typeMobTab;
+
+            activeTab.className = "type-tab-btn active flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all bg-emerald-500 text-slate-950 shadow-md";
+
+            // Apply first preset of chosen type
+            loadPresets();
+            applyPreset(PRESETS[type][0]);
+        }
+
+        function updateCodeTabUI() {
+            if (currentCodeTab === 'behavior') {
+                viewBehaviorBtn.className = "px-3 py-1.5 rounded-lg font-mono font-medium transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                viewResourceBtn.className = "px-3 py-1.5 rounded-lg font-mono font-medium transition-all text-slate-400 hover:text-white";
+            } else {
+                viewResourceBtn.className = "px-3 py-1.5 rounded-lg font-mono font-medium transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                viewBehaviorBtn.className = "px-3 py-1.5 rounded-lg font-mono font-medium transition-all text-slate-400 hover:text-white";
+            }
+        }
+
+        function loadPresets() {
+            presetsContainer.innerHTML = '';
+            PRESETS[currentType].forEach(preset => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'px-3 py-1 rounded-lg bg-mc-dark hover:bg-slate-800 text-slate-300 border border-mc-border text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1.5';
+                btn.innerHTML = `<span class="w-2 h-2 rounded-full" style="background-color: ${preset.color}"></span>${preset.name}`;
+                btn.onclick = () => applyPreset(preset);
+                presetsContainer.appendChild(btn);
+            });
+        }
+
+        function applyPreset(preset) {
+            itemNameInput.value = preset.name;
+            itemIdInput.value = preset.id;
+            primaryColorInput.value = preset.color;
+            colorHexText.textContent = preset.color;
+            textureIconSelect.value = preset.icon;
+
+            renderDynamicProperties(preset.properties);
+            drawTexturePreview();
+            updateJsonPreview();
+        }
+
+        function renderDynamicProperties(defaults = {}) {
+            dynamicPropertiesContainer.innerHTML = '';
+
+            if (currentType === 'item') {
+                const damage = defaults.damage !== undefined ? defaults.damage : 5;
+                const durability = defaults.durability !== undefined ? defaults.durability : 500;
+                const maxStack = defaults.maxStack !== undefined ? defaults.maxStack : 1;
+                const foil = defaults.foil || false;
+
+                dynamicPropertiesContainer.innerHTML = `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">攻撃力 (Attack Damage)</label>
+                            <input type="number" id="propDamage" value="${damage}" min="0" max="100" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">耐久値 (Durability)</label>
+                            <input type="number" id="propDurability" value="${durability}" min="0" max="5000" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">スタック上限 (Max Stack Size)</label>
+                            <input type="number" id="propMaxStack" value="${maxStack}" min="1" max="64" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div class="flex items-center pt-5">
+                            <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300">
+                                <input type="checkbox" id="propFoil" ${foil ? 'checked' : ''} class="w-4 h-4 rounded border-mc-border bg-mc-dark text-emerald-500 focus:ring-emerald-500/20">
+                                エンチャントの輝き (Foil Effect)
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else if (currentType === 'block') {
+                const destroyTime = defaults.destroyTime !== undefined ? defaults.destroyTime : 1.5;
+                const explosionResistance = defaults.explosionResistance !== undefined ? defaults.explosionResistance : 3.0;
+                const lightEmission = defaults.lightEmission !== undefined ? defaults.lightEmission : 0;
+
+                dynamicPropertiesContainer.innerHTML = `
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">採掘速度/硬度 (Destroy Time)</label>
+                            <input type="number" step="0.1" id="propDestroyTime" value="${destroyTime}" min="0" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">爆発耐性 (Explosion Resistance)</label>
+                            <input type="number" step="0.5" id="propExplosionRes" value="${explosionResistance}" min="0" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">発光度 (Light Emission 0-15)</label>
+                            <input type="number" id="propLight" value="${lightEmission}" min="0" max="15" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                `;
+            } else if (currentType === 'mob') {
+                const health = defaults.health !== undefined ? defaults.health : 20;
+                const movementSpeed = defaults.movementSpeed !== undefined ? defaults.movementSpeed : 0.25;
+                const attackDamage = defaults.attackDamage !== undefined ? defaults.attackDamage : 3;
+                const isBoss = defaults.isBoss || false;
+
+                dynamicPropertiesContainer.innerHTML = `
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">体力 (Max Health)</label>
+                            <input type="number" id="propHealth" value="${health}" min="1" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">移動速度 (Movement Speed)</label>
+                            <input type="number" step="0.05" id="propSpeed" value="${movementSpeed}" min="0" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">攻撃力 (Attack Damage)</label>
+                            <input type="number" id="propMobAttack" value="${attackDamage}" min="0" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300">
+                            <input type="checkbox" id="propIsBoss" ${isBoss ? 'checked' : ''} class="w-4 h-4 rounded border-mc-border bg-mc-dark text-emerald-500 focus:ring-emerald-500/20">
+                            ボス体力バーを表示する (Boss Bar UI)
+                        </label>
+                    </div>
+                `;
+            }
+
+            // Bind update events to dynamic elements
+            dynamicPropertiesContainer.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', updateJsonPreview);
+            });
+        }
+
+        function drawTexturePreview() {
+            const ctx = textureCanvas.getContext('2d');
+            const color = primaryColorInput.value;
+            const icon = textureIconSelect.value;
+
+            ctx.clearRect(0, 0, 48, 48);
+
+            // Background pixel grid preview
+            ctx.fillStyle = '#1e2025';
+            ctx.fillRect(0, 0, 48, 48);
+
+            ctx.fillStyle = color;
+
+            if (icon === 'sword') {
+                // Diagonal Sword shape
+                for (let i = 0; i < 7; i++) {
+                    ctx.fillRect(32 - i*4, 8 + i*4, 6, 6);
+                }
+                ctx.fillStyle = '#475569'; // Hilt
+                ctx.fillRect(12, 32, 6, 6);
+                ctx.fillRect(8, 36, 6, 6);
+            } else if (icon === 'gem') {
+                // Diamond / Gem shape
+                ctx.fillRect(16, 12, 16, 24);
+                ctx.fillRect(12, 16, 24, 16);
+            } else if (icon === 'cube') {
+                // Block Cube shape
+                ctx.fillRect(8, 8, 32, 32);
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.fillRect(24, 8, 16, 32);
+            } else if (icon === 'spawn_egg') {
+                // Egg shape
+                ctx.fillRect(16, 8, 16, 32);
+                ctx.fillRect(12, 12, 24, 24);
+            } else {
+                // Generic Item
+                ctx.fillRect(12, 12, 24, 24);
+            }
+        }
+
+        function generateAddonJSON() {
+            const id = itemIdInput.value || 'custom_item';
+            const name = itemNameInput.value || 'Custom Item';
+            const fullId = `custom:${id}`;
+
+            if (currentType === 'item') {
+                const damage = parseInt(document.getElementById('propDamage')?.value || 0);
+                const durability = parseInt(document.getElementById('propDurability')?.value || 100);
+                const maxStack = parseInt(document.getElementById('propMaxStack')?.value || 64);
+                const foil = document.getElementById('propFoil')?.checked || false;
+
+                const behaviorJSON = {
+                    "format_version": "1.20.50",
+                    "minecraft:item": {
+                        "description": {
+                            "identifier": fullId,
+                            "menu_category": { "category": "items" }
+                        },
+                        "components": {
+                            "minecraft:display_name": { "value": name },
+                            "minecraft:icon": { "texture": id },
+                            "minecraft:max_stack_size": maxStack,
+                            "minecraft:hand_equipped": damage > 0,
+                            "minecraft:foil": foil
+                        }
+                    }
+                };
+
+                if (damage > 0) {
+                    behaviorJSON["minecraft:item"].components["minecraft:damage"] = damage;
+                }
+                if (durability > 0) {
+                    behaviorJSON["minecraft:item"].components["minecraft:durability"] = { "max_durability": durability };
+                }
+
+                const resourceJSON = {
+                    "resource_pack_name": "AddonForge RP",
+                    "texture_data": {
+                        [id]: { "textures": `textures/items/${id}` }
+                    }
+                };
+
+                return { behaviorJSON, resourceJSON, fileName: `${id}.json` };
+
+            } else if (currentType === 'block') {
+                const destroyTime = parseFloat(document.getElementById('propDestroyTime')?.value || 1.0);
+                const explosionRes = parseFloat(document.getElementById('propExplosionRes')?.value || 3.0);
+                const lightEmission = parseInt(document.getElementById('propLight')?.value || 0);
+
+                const behaviorJSON = {
+                    "format_version": "1.20.50",
+                    "minecraft:block": {
+                        "description": {
+                            "identifier": fullId,
+                            "menu_category": { "category": "construction" }
+                        },
+                        "components": {
+                            "minecraft:destructible_by_mining": { "seconds_to_destroy": destroyTime },
+                            "minecraft:explosion_resistance": explosionRes,
+                            "minecraft:light_emission": lightEmission,
+                            "minecraft:friction": 0.6
+                        }
+                    }
+                };
+
+                const resourceJSON = {
+                    "format_version": "1.20.50",
+                    "minecraft:client_entity": {
+                        "description": {
+                            "identifier": fullId,
+                            "textures": { "default": `textures/blocks/${id}` }
+                        }
+                    }
+                };
+
+                return { behaviorJSON, resourceJSON, fileName: `${id}.json` };
+
+            } else if (currentType === 'mob') {
+                const health = parseInt(document.getElementById('propHealth')?.value || 20);
+                const speed = parseFloat(document.getElementById('propSpeed')?.value || 0.25);
+                const attack = parseInt(document.getElementById('propMobAttack')?.value || 3);
+                const isBoss = document.getElementById('propIsBoss')?.checked || false;
+
+                const behaviorJSON = {
+                    "format_version": "1.20.50",
+                    "minecraft:entity": {
+                        "description": {
+                            "identifier": fullId,
+                            "is_spawnable": true,
+                            "is_summonable": true
+                        },
+                        "components": {
+                            "minecraft:health": { "value": health, "max": health },
+                            "minecraft:movement": { "value": speed },
+                            "minecraft:attack": { "damage": attack },
+                            "minecraft:boss": isBoss ? { "name": name, "hud_range": 30 } : undefined
+                        }
+                    }
+                };
+
+                const resourceJSON = {
+                    "format_version": "1.20.50",
+                    "minecraft:client_entity": {
+                        "description": {
+                            "identifier": fullId,
+                            "materials": { "default": "entity_alphatest" },
+                            "textures": { "default": `textures/entity/${id}` },
+                            "render_controllers": [ "controller.render.default" ]
+                        }
+                    }
+                };
+
+                return { behaviorJSON, resourceJSON, fileName: `${id}.json` };
+            }
+        }
+
+        function updateJsonPreview() {
+            const data = generateAddonJSON();
+            const id = itemIdInput.value || 'custom_item';
+
+            if (currentCodeTab === 'behavior') {
+                currentFilePath.textContent = `behavior_packs/BP/${currentType}s/${id}.json`;
+                jsonCodeOutput.textContent = JSON.stringify(data.behaviorJSON, null, 2);
+            } else {
+                currentFilePath.textContent = `resource_packs/RP/${currentType}s/${id}.json`;
+                jsonCodeOutput.textContent = JSON.stringify(data.resourceJSON, null, 2);
+            }
+        }
+
+        function generateMcAddonFile() {
+            const data = generateAddonJSON();
+            const id = itemIdInput.value || 'addon';
+
+            const zip = new JSZip();
+
+            // Behavior Pack Folder Structure
+            const bp = zip.folder("AddonForge_BP");
+            bp.file("manifest.json", JSON.stringify({
+                "format_version": 2,
+                "header": {
+                    "name": "AddonForge Behavior Pack",
+                    "description": "Created with Minecraft AddonForge",
+                    "uuid": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+                    "version": [1, 0, 0],
+                    "min_engine_version": [1, 20, 50]
+                },
+                "modules": [
+                    {
+                        "type": "data",
+                        "uuid": "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e",
+                        "version": [1, 0, 0]
+                    }
+                ]
+            }, null, 2));
+
+            bp.folder(`${currentType}s`).file(`${id}.json`, JSON.stringify(data.behaviorJSON, null, 2));
+
+            // Resource Pack Folder Structure
+            const rp = zip.folder("AddonForge_RP");
+            rp.file("manifest.json", JSON.stringify({
+                "format_version": 2,
+                "header": {
+                    "name": "AddonForge Resource Pack",
+                    "description": "Created with Minecraft AddonForge",
+                    "uuid": "c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f",
+                    "version": [1, 0, 0],
+                    "min_engine_version": [1, 20, 50]
+                },
+                "modules": [
+                    {
+                        "type": "resources",
+                        "uuid": "d4e5f6a7-b89c-0d1e-2f3a-4b5c6d7e8f9a",
+                        "version": [1, 0, 0]
+                    }
+                ]
+            }, null, 2));
+
+            rp.folder(`${currentType}s`).file(`${id}.json`, JSON.stringify(data.resourceJSON, null, 2));
+
+            // Export as .mcaddon file
+            zip.generateAsync({ type: "blob" }).then(content => {
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(content);
+                a.download = `${id}_addon.mcaddon`;
+                a.click();
+                showToast(`${id}_addon.mcaddon を出力しました！`);
+            });
+        }
+
+        // Notification Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

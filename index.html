@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="ja" class="dark">
 <head>
-    
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="manifest" href="site.webmanifest">
 
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
-<link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="manifest" href="site.webmanifest">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Minecraft AddonForge">
+    <meta name="theme-color" content="#121316">
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Minecraft AddonForge">
-<meta name="theme-color" content="#121316">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Minecraft AddonForge</title>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -27,7 +27,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- JSZip for Exporting ZIP/MCADDON -->
+    <!-- JSZip CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script>
@@ -37,14 +37,16 @@
                 extend: {
                     colors: {
                         mc: {
-                            dark: '#121316',
-                            card: '#1c1e22',
-                            border: '#2a2d34',
-                            accent: '#10b981', // Emerald
-                            accentHover: '#059669',
-                            obsidian: '#18181b',
-                            gold: '#fbbf24',
-                            redstone: '#ef4444'
+                            dark: '#0d0e11',
+                            card: '#16181d',
+                            sidebar: '#121317',
+                            editor: '#1a1c23',
+                            border: '#262933',
+                            emerald: '#10b981',
+                            bp: '#3b82f6',
+                            rp: '#ec4899',
+                            gold: '#f59e0b',
+                            danger: '#ef4444'
                         }
                     },
                     fontFamily: {
@@ -56,771 +58,1695 @@
         }
     </script>
     <style>
-        /* Custom scrollbars */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #121316;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2a2d34;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3f4451;
-        }
-        
-        /* Pixel art pattern overlay for MC vibe */
-        .mc-pattern {
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0d0e11; }
+        ::-webkit-scrollbar-thumb { background: #262933; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b3f4f; }
+        .mc-bg-grid {
             background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
-            background-size: 16px 16px;
+            background-size: 20px 20px;
+        }
+        .glass-panel {
+            background: rgba(22, 24, 29, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .code-textarea {
+            tab-size: 2;
+            resize: none;
+            outline: none;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .image-render-pixelated {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
         }
     </style>
 </head>
-<body class="bg-mc-dark text-slate-200 font-sans min-h-screen flex flex-col mc-pattern selection:bg-emerald-500/30 selection:text-emerald-400">
+<body class="bg-mc-dark text-slate-200 font-sans min-h-screen flex flex-col mc-bg-grid selection:bg-emerald-500/30 selection:text-emerald-400">
 
-    <!-- Header Navigation -->
-    <header class="border-b border-mc-border bg-mc-card/80 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-900/30 border border-emerald-300/20">
-                    <i data-lucide="box" class="w-6 h-6 text-slate-950"></i>
+    <!-- ヘッダー -->
+    <header class="border-b border-mc-border glass-panel sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 overflow-hidden">
+            <!-- 左上ロゴ -->
+            <button onclick="requestReturnHome()" class="flex items-center gap-2 sm:gap-3 shrink-0 hover:opacity-80 transition-opacity text-left group">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-900/30 border border-emerald-300/20 group-hover:scale-105 transition-transform">
+                    <i data-lucide="hammer" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-950"></i>
                 </div>
-                <div>
-                    <h1 class="font-extrabold text-lg tracking-wide text-white flex items-center gap-2">
-                        AddonForge <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Bedrock v1.20+</span>
+                <div class="truncate">
+                    <h1 class="font-extrabold text-sm sm:text-lg tracking-wide text-white flex items-center gap-2 leading-tight truncate">
+                        Minecraft AddonForge
                     </h1>
-                    <p class="text-xs text-slate-400">Minecraft アドオンジェネレーター</p>
+                    <p class="text-[10px] sm:text-[11px] text-slate-400 hidden sm:block truncate">Unified Bedrock Pack Editor & Export Studio</p>
                 </div>
-            </div>
+            </button>
 
-            <!-- Quick Action Header Controls -->
-            <div class="flex items-center gap-3">
-                <button id="exportBtn" class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition-all shadow-lg shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98]">
+            <!-- 右上アクションエリア -->
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="triggerFileInput()" class="flex items-center justify-center gap-1.5 bg-mc-card hover:bg-mc-border border border-mc-border text-slate-200 active:scale-95 font-medium px-2.5 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-md">
+                    <i data-lucide="folder-open" class="w-4 h-4 text-emerald-400"></i>
+                    <span class="hidden sm:inline">パックを読み込む</span>
+                    <span class="sm:hidden">開く</span>
+                </button>
+                <input type="file" id="fileInput" accept=".mcaddon,.mcpack,.zip,application/zip,application/x-zip-compressed" class="hidden" multiple>
+
+                <!-- ファイルを開いている時のみ表示 -->
+                <button id="exportBtn" onclick="openExportModal()" disabled class="hidden flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:hover:bg-emerald-500 disabled:cursor-not-allowed text-slate-950 font-bold px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95">
                     <i data-lucide="download" class="w-4 h-4"></i>
-                    <span>.mcaddon を出力</span>
+                    <span>出力</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Left Sidebar: Controls & Configuration -->
-        <div class="lg:col-span-7 flex flex-col gap-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 flex flex-col justify-start gap-4 sm:gap-6">
+
+        <!-- 初期ホーム領域（上寄せエリア） -->
+        <div id="homeView" class="flex flex-col gap-4">
+            <div>
+                <button onclick="createNewAddon()" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-3 rounded-xl text-sm transition-all shadow-lg active:scale-95">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    <span>新規作成</span>
+                </button>
+            </div>
+
+            <!-- ドロップゾーン -->
+            <div id="dropzone" class="border-2 border-dashed border-mc-border hover:border-emerald-500/60 bg-mc-card/60 hover:bg-mc-card transition-all rounded-2xl p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-4 cursor-pointer group shadow-xl">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform shadow-lg">
+                    <i data-lucide="box" class="w-7 h-7 sm:w-8 sm:h-8"></i>
+                </div>
+                <div>
+                    <p class="text-sm sm:text-lg font-bold text-white mb-1">ここにファイルをドラッグ＆ドロップ または タップして選択して開く</p>
+                    <p class="text-xs text-slate-400">対応フォーマット: <span class="font-mono text-emerald-400">.mcaddon</span>, <span class="font-mono text-emerald-400">.mcpack</span>, <span class="font-mono text-emerald-400">.zip</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="editorView" class="hidden flex-1 flex flex-col gap-4">
             
-            <!-- Type Selector & Presets Block -->
-            <div class="bg-mc-card border border-mc-border rounded-2xl p-5 shadow-xl">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                        <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i> 作成タイプとプリセット
-                    </h2>
-                    <span id="addonNamespaceBadge" class="text-xs font-mono text-slate-400 bg-mc-dark px-2.5 py-1 rounded-md border border-mc-border">namespace: custom</span>
-                </div>
-
-                <!-- Tabs for Item / Block / Mob -->
-                <div class="grid grid-cols-3 gap-2 p-1.5 bg-mc-dark/70 rounded-xl border border-mc-border/80 mb-5">
-                    <button id="typeItemTab" class="type-tab-btn active flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all bg-emerald-500 text-slate-950 shadow-md">
-                        <i data-lucide="sword" class="w-4 h-4"></i> アイテム
-                    </button>
-                    <button id="typeBlockTab" class="type-tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white">
-                        <i data-lucide="boxes" class="w-4 h-4"></i> ブロック
-                    </button>
-                    <button id="typeMobTab" class="type-tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white">
-                        <i data-lucide="ghost" class="w-4 h-4"></i> モブ (Entity)
-                    </button>
-                </div>
-
-                <!-- Presets selection -->
-                <div class="flex items-center gap-2 overflow-x-auto pb-1">
-                    <span class="text-xs text-slate-400 whitespace-nowrap">プリセット読み込み:</span>
-                    <div id="presetsContainer" class="flex items-center gap-2">
-                        <!-- Dynamic preset buttons inserted here via JS -->
-                    </div>
+            <div id="validationAlert" class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-3 sm:p-4 flex items-center justify-between gap-3 text-red-400 text-xs sm:text-sm">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 text-red-400"></i>
+                    <span id="validationAlertText">必須項目に未入力があります。</span>
                 </div>
             </div>
 
-            <!-- Dynamic Form Container -->
-            <div class="bg-mc-card border border-mc-border rounded-2xl p-6 shadow-xl flex-1">
-                <form id="addonForm" onsubmit="event.preventDefault();" class="space-y-6">
+            <!-- タブ・モード切り替え -->
+            <div class="flex flex-wrap items-center justify-between border-b border-mc-border pb-3 gap-3">
+                <div class="flex gap-2 p-1 bg-mc-card border border-mc-border rounded-xl">
+                    <button id="tabBtnBP" onclick="switchPackTab('bp')" class="px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-2 bg-mc-bp/20 text-mc-bp border border-mc-bp/30">
+                        <div id="bpHeaderIconThumb" class="w-4 h-4 sm:w-5 sm:h-5 rounded bg-mc-dark flex items-center justify-center overflow-hidden border border-mc-bp/30 shrink-0">
+                            <i data-lucide="cpu" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-mc-bp"></i>
+                        </div>
+                        <span>Behavior Pack (BP)</span>
+                    </button>
+                    <button id="tabBtnRP" onclick="switchPackTab('rp')" class="px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-2 text-slate-400 hover:text-white border border-transparent">
+                        <div id="rpHeaderIconThumb" class="w-4 h-4 sm:w-5 sm:h-5 rounded bg-mc-dark flex items-center justify-center overflow-hidden border border-slate-700 shrink-0">
+                            <i data-lucide="palette" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400"></i>
+                        </div>
+                        <span>Resource Pack (RP)</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-1 bg-mc-card p-1 border border-mc-border rounded-xl text-xs font-semibold">
+                    <button id="modeBtnManifest" onclick="switchViewMode('manifest')" class="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                        <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                        <span>マニフェスト</span>
+                    </button>
+                    <button id="modeBtnFiles" onclick="switchViewMode('files')" class="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5">
+                        <i data-lucide="folder-tree" class="w-3.5 h-3.5"></i>
+                        <span>ファイル階層・編集</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- マニフェスト編集画面 -->
+            <div id="manifestEditorView" class="bg-mc-card border border-mc-border rounded-2xl p-4 sm:p-6 flex flex-col gap-6 shadow-xl">
+                
+                <form id="manifestForm" onsubmit="event.preventDefault()" class="flex flex-col gap-6 text-xs">
                     
-                    <!-- Basic Information Section -->
-                    <div>
-                        <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2 border-b border-mc-border pb-2">
-                            <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i> 基本情報
+                    <!-- 基本情報ヘッダー -->
+                    <div class="flex items-center gap-3 sm:gap-4 pb-5 border-b border-mc-border">
+                        <div class="relative group cursor-pointer shrink-0" onclick="triggerIconUpload()" title="タップしてパックアイコン画像を変更">
+                            <div id="manifestPackIcon" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-mc-dark border-2 border-mc-border overflow-hidden flex items-center justify-center shadow-lg group-hover:border-emerald-500 transition-all">
+                                <i data-lucide="image" class="w-7 h-7 sm:w-8 sm:h-8 text-slate-600"></i>
+                            </div>
+                            <div class="absolute inset-0 bg-black/70 rounded-2xl opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-[10px] text-white font-bold transition-opacity">
+                                <i data-lucide="camera" class="w-4 h-4 mb-0.5"></i>
+                                <span>変更</span>
+                            </div>
+                        </div>
+                        <input type="file" id="iconFileInput" accept="image/png" class="hidden" onchange="handleIconFileSelected(event)">
+
+                        <div class="min-w-0 flex-1">
+                            <span id="manifestPackTypeBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-md font-bold uppercase bg-mc-bp/20 text-mc-bp border border-mc-bp/30">BEHAVIOR PACK</span>
+                        </div>
+                    </div>
+
+                    <!-- 1. 必須項目エリア -->
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> 必須項目
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">表示名 (Identifier Name)</label>
-                                <input type="text" id="itemName" value="Ruby Sword" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors font-sans" placeholder="例: ルビーの剣">
+                                <label class="block font-bold text-slate-300 mb-1.5">パック名 <span class="text-red-400">*</span></label>
+                                <input type="text" id="mInputName" oninput="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-white font-mono text-xs focus:outline-none transition-colors" placeholder="例: Pack Name">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">ID (Identifier ID)</label>
-                                <div class="flex items-center">
-                                    <span class="bg-mc-dark border border-r-0 border-mc-border rounded-l-xl px-3 py-2.5 text-xs text-slate-500 font-mono">custom:</span>
-                                    <input type="text" id="itemId" value="ruby_sword" class="w-full bg-mc-dark border border-mc-border rounded-r-xl px-3.5 py-2.5 text-sm text-emerald-400 font-mono focus:outline-none focus:border-emerald-500 transition-colors" placeholder="ruby_sword">
+                                <label class="block font-bold text-slate-300 mb-1.5">UUID <span class="text-red-400">*</span></label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="mInputUuid" oninput="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-white font-mono text-xs focus:outline-none transition-colors" placeholder="UUID">
+                                    <button type="button" onclick="generateNewUuid()" title="UUIDを再生成" class="px-3 py-2 bg-mc-dark hover:bg-mc-border border border-mc-border rounded-xl text-slate-300 active:scale-95 transition-all shrink-0">
+                                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                    </button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-bold text-slate-300 mb-1.5">パックバージョン <span class="text-red-400">*</span></label>
+                                <input type="text" id="mInputVersion" oninput="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-white font-mono text-xs focus:outline-none" placeholder="1.0.0">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-300 mb-1.5">最小エンジンバージョン (Min Engine) <span class="text-red-400">*</span></label>
+                                <input type="text" id="mInputMinEngine" oninput="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-white font-mono text-xs focus:outline-none" placeholder="1.20.0">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Appearance & Texture Section -->
-                    <div>
-                        <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2 border-b border-mc-border pb-2">
-                            <i data-lucide="palette" class="w-4 h-4 text-emerald-400"></i> 見ため・カラー設定
+                    <!-- 2. 任意項目エリア -->
+                    <div class="flex flex-col gap-4 pt-4 border-t border-mc-border">
+                        <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-amber-400"></i> 任意項目
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">テーマカラー</label>
-                                <div class="flex items-center gap-3">
-                                    <input type="color" id="primaryColor" value="#ef4444" class="w-10 h-10 rounded-xl bg-transparent cursor-pointer border border-mc-border p-1">
-                                    <span id="colorHexText" class="text-xs font-mono text-slate-400">#ef4444</span>
-                                </div>
+
+                        <!-- 製作者 -->
+                        <div class="border border-mc-border rounded-xl p-3 bg-mc-dark/40">
+                            <div class="flex items-center justify-between">
+                                <label for="toggleAuthors" class="font-bold text-slate-200 cursor-pointer flex items-center gap-2">
+                                    <i data-lucide="user" class="w-4 h-4 text-amber-400"></i> 製作者 (Authors)
+                                </label>
+                                <input type="checkbox" id="toggleAuthors" onchange="toggleManifestSection('authors')" class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-1.5">テクスチャ アイコン</label>
-                                <select id="textureIcon" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
-                                    <option value="sword">剣 (Sword)</option>
-                                    <option value="axe">斧 (Axe)</option>
-                                    <option value="pickaxe">ツルハシ (Pickaxe)</option>
-                                    <option value="ingot">インゴット (Ingot)</option>
-                                    <option value="gem">宝石 (Gem)</option>
-                                    <option value="cube">立方体ブロック (Block)</option>
-                                    <option value="spawn_egg">スポーン卵 (Egg)</option>
-                                </select>
+                            <div id="sectionAuthors" class="hidden mt-3">
+                                <input type="text" id="mInputAuthors" oninput="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none" placeholder="カンマ区切り (例: Steve, Alex)">
                             </div>
-                            <!-- Live Texture Canvas Preview -->
-                            <div class="flex flex-col items-center justify-center p-3 bg-mc-dark/60 rounded-xl border border-mc-border/60">
-                                <span class="text-[10px] uppercase tracking-wider text-slate-500 mb-1 font-bold">2D Texture Preview</span>
-                                <canvas id="textureCanvas" width="48" height="48" class="w-12 h-12 image-render-pixelated border border-mc-border rounded bg-black/40 shadow-inner"></canvas>
+                        </div>
+
+                        <!-- 説明文 -->
+                        <div class="border border-mc-border rounded-xl p-3 bg-mc-dark/40">
+                            <div class="flex items-center justify-between">
+                                <label for="toggleDesc" class="font-bold text-slate-200 cursor-pointer flex items-center gap-2">
+                                    <i data-lucide="align-left" class="w-4 h-4 text-blue-400"></i> 説明文 (Description)
+                                </label>
+                                <input type="checkbox" id="toggleDesc" onchange="toggleManifestSection('desc')" class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
+                            </div>
+                            <div id="sectionDesc" class="hidden mt-3">
+                                <textarea id="mInputDesc" rows="2" oninput="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none" placeholder="アドオンの説明"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- RP連携 -->
+                        <div id="rpDependencyBox" class="hidden border border-mc-border rounded-xl p-3 bg-mc-dark/40">
+                            <div class="flex items-center justify-between">
+                                <label for="toggleRpDep" class="font-bold text-slate-200 cursor-pointer flex items-center gap-2">
+                                    <i data-lucide="link-2" class="w-4 h-4 text-mc-rp"></i> リソースパックとの連携 (RP Dependency)
+                                </label>
+                                <input type="checkbox" id="toggleRpDep" onchange="onManifestFormChange()" class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- ライセンス -->
+                        <div class="border border-mc-border rounded-xl p-3 bg-mc-dark/40">
+                            <div class="flex items-center justify-between">
+                                <label for="toggleLicense" class="font-bold text-slate-200 cursor-pointer flex items-center gap-2">
+                                    <i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i> ライセンス (License)
+                                </label>
+                                <input type="checkbox" id="toggleLicense" onchange="toggleManifestSection('license')" class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
+                            </div>
+                            <div id="sectionLicense" class="hidden mt-3">
+                                <input type="text" id="mInputLicense" oninput="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none" placeholder="MIT, CC-BY-4.0 等">
+                            </div>
+                        </div>
+
+                        <!-- Webサイト / URL -->
+                        <div class="border border-mc-border rounded-xl p-3 bg-mc-dark/40">
+                            <div class="flex items-center justify-between">
+                                <label for="toggleLink" class="font-bold text-slate-200 cursor-pointer flex items-center gap-2">
+                                    <i data-lucide="link" class="w-4 h-4 text-emerald-400"></i> Webサイト / URL
+                                </label>
+                                <input type="checkbox" id="toggleLink" onchange="toggleManifestSection('link')" class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
+                            </div>
+                            <div id="sectionLink" class="hidden mt-3">
+                                <input type="text" id="mInputLink" oninput="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none" placeholder="https://example.com">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Dynamic Properties Section (Adjusts based on Item/Block/Mob) -->
-                    <div>
-                        <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2 border-b border-mc-border pb-2">
-                            <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i> パラメータ & 挙動設定
-                        </h3>
+                    <!-- 3. Script API 設定エリア (BPのみ) -->
+                    <div id="scriptApiSection" class="flex flex-col gap-4 pt-4 border-t border-mc-border">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="code-2" class="w-4 h-4 text-mc-bp"></i> Script API 設定 (BP)
+                            </h3>
+                        </div>
 
-                        <div id="dynamicPropertiesContainer" class="space-y-4">
-                            <!-- Injected by JavaScript based on active Category -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="font-bold text-slate-300">エントリーポイント (.js の前のファイル名)</label>
+                                <button type="button" onclick="addScriptEntryInput()" class="px-2.5 py-1 bg-mc-bp/20 hover:bg-mc-bp/30 border border-mc-bp/40 text-mc-bp rounded-lg font-bold flex items-center gap-1 transition-all">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> 追加
+                                </button>
+                            </div>
+                            <div id="scriptEntriesContainer" class="flex flex-col gap-2"></div>
+                        </div>
+
+                        <div class="mt-2">
+                            <label class="block font-bold text-slate-300 mb-2">使用するモジュールとバージョン</label>
+                            <div id="modulesContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                         </div>
                     </div>
 
                 </form>
             </div>
-        </div>
 
-        <!-- Right Sidebar: Live JSON Preview & Pack Explorer -->
-        <div class="lg:col-span-5 flex flex-col gap-6">
-            
-            <div class="bg-mc-card border border-mc-border rounded-2xl shadow-xl flex flex-col h-full min-h-[500px]">
-                
-                <!-- JSON Preview Header / Tabs -->
-                <div class="border-b border-mc-border p-4 flex items-center justify-between flex-wrap gap-2">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="code-2" class="w-4 h-4 text-emerald-400"></i>
-                        <span class="text-sm font-bold text-white">JSON Preview</span>
+            <!-- File Tree & Editor View -->
+            <div id="filesEditorView" class="hidden grid-cols-1 md:grid-cols-12 gap-4 min-h-[550px] flex-1">
+                <div class="md:col-span-4 lg:col-span-3 bg-mc-card border border-mc-border rounded-2xl flex flex-col overflow-hidden shadow-xl">
+                    <div class="p-3 border-b border-mc-border bg-mc-sidebar flex items-center gap-3">
+                        <div id="treePackIconBox" class="w-10 h-10 rounded-xl bg-mc-dark border border-mc-border shrink-0 flex items-center justify-center overflow-hidden">
+                            <i data-lucide="package" class="w-5 h-5 text-slate-400"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h3 id="treePackTitleText" class="text-xs font-bold text-white truncate">パック未選択</h3>
+                            <p id="treePackDescText" class="text-[10px] text-slate-400 truncate">manifest.json</p>
+                        </div>
                     </div>
 
-                    <!-- Behavior / Resource file view toggle -->
-                    <div class="flex items-center gap-1 bg-mc-dark p-1 rounded-xl border border-mc-border text-xs">
-                        <button id="viewBehaviorBtn" class="px-3 py-1.5 rounded-lg font-mono font-medium transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                            behavior.json
-                        </button>
-                        <button id="viewResourceBtn" class="px-3 py-1.5 rounded-lg font-mono font-medium transition-all text-slate-400 hover:text-white">
-                            resource.json
-                        </button>
+                    <div class="px-3 py-2 border-b border-mc-border/60 bg-mc-dark/40 flex justify-between items-center text-[11px] font-semibold text-slate-400">
+                        <span>ファイル構成</span>
+                        <span id="treeFileCount" class="font-mono text-[10px] text-emerald-400">0 ファイル</span>
                     </div>
+
+                    <div id="treeContainer" class="p-2 overflow-y-auto max-h-[350px] md:max-h-none flex-1 text-xs font-mono"></div>
                 </div>
 
-                <!-- Code Block Area -->
-                <div class="relative flex-1 p-4 bg-mc-dark/90 font-mono text-xs overflow-hidden flex flex-col">
-                    <div class="flex justify-between items-center pb-2 text-slate-500 border-b border-mc-border/40 text-[11px]">
-                        <span id="currentFilePath">behavior_packs/BP/items/ruby_sword.json</span>
-                        <button id="copyJsonBtn" class="flex items-center gap-1 hover:text-white transition-colors">
-                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                            <span>コピー</span>
-                        </button>
+                <div class="md:col-span-8 lg:col-span-9 bg-mc-card border border-mc-border rounded-2xl flex flex-col overflow-hidden shadow-xl">
+                    <div class="p-3 border-b border-mc-border bg-mc-sidebar flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <i id="editorFileIcon" data-lucide="file-code" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                            <span id="editorFilePath" class="font-mono text-xs font-semibold text-white truncate">ファイルを選択してください</span>
+                            <span id="unsavedBadge" class="hidden text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold shrink-0">未保存</span>
+                        </div>
+
+                        <div id="editorControls" class="hidden flex items-center gap-2 shrink-0">
+                            <button onclick="formatCode()" id="formatBtn" title="コード整形" class="hidden p-1.5 px-2.5 rounded-lg bg-mc-dark hover:bg-mc-border text-slate-300 hover:text-white border border-mc-border text-xs flex items-center gap-1.5 transition-all">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+                                <span>コード整形</span>
+                            </button>
+                            <button onclick="saveCurrentFile()" class="p-1.5 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                                <span>適用</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <pre class="flex-1 overflow-auto pt-3 text-emerald-300/90 leading-relaxed selection:bg-emerald-500/30"><code id="jsonCodeOutput"></code></pre>
-                </div>
+                    <div class="flex-1 bg-mc-editor relative flex flex-col min-h-[350px]">
+                        <div id="editorPlaceholder" class="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500 gap-3">
+                            <i data-lucide="code" class="w-12 h-12 text-slate-600 stroke-1"></i>
+                            <p class="text-xs">ファイルを選択するとコードエディタが開きます</p>
+                        </div>
 
-                <!-- Info Banner Footer -->
-                <div class="p-4 bg-mc-card border-t border-mc-border rounded-b-2xl text-xs text-slate-400 flex items-start gap-3">
-                    <i data-lucide="info" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
-                    <div>
-                        <p class="font-semibold text-slate-300">Minecraft Bedrockアドオン連携</p>
-                        <p class="text-[11px] text-slate-400 mt-0.5">ダウンロードした <code class="text-emerald-400 font-mono">.mcaddon</code> ファイルをダブルクリックすると、自動的にMinecraftが起動しインポートされます。</p>
+                        <!-- テキスト / コードエディタ -->
+                        <div id="codeEditorArea" class="hidden flex-1 flex relative overflow-hidden font-mono text-xs leading-relaxed">
+                            <div id="lineNumbers" class="line-numbers w-10 py-3 pr-2 bg-mc-dark/80 border-r border-mc-border shrink-0 select-none text-[11px] font-mono leading-relaxed text-right text-slate-500">
+                                1
+                            </div>
+                            <textarea id="codeTextarea" spellcheck="false" class="code-textarea flex-1 p-3 bg-transparent text-slate-100 font-mono text-xs leading-relaxed focus:outline-none"></textarea>
+                        </div>
+
+                        <!-- 画像プレビュー -->
+                        <div id="imageViewerArea" class="hidden flex-1 flex flex-col items-center justify-center p-6 bg-black/40">
+                            <img id="imagePreview" src="" class="max-h-[350px] object-contain image-render-pixelated rounded-xl shadow-2xl border border-mc-border">
+                        </div>
+
+                        <!-- オーディオプレイヤー（追加） -->
+                        <div id="audioViewerArea" class="hidden flex-1 flex flex-col items-center justify-center p-6 bg-black/40 gap-4">
+                            <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shadow-xl">
+                                <i data-lucide="music" class="w-8 h-8"></i>
+                            </div>
+                            <div class="text-center">
+                                <p id="audioFileName" class="text-sm font-bold text-white mb-1 font-mono"></p>
+                                <p class="text-xs text-slate-400">Sound / Audio File</p>
+                            </div>
+                            <audio id="audioPreview" controls class="w-full max-w-md mt-2"></audio>
+                        </div>
+
+                        <!-- バイナリ/未対応ファイル表示（追加） -->
+                        <div id="binaryViewerArea" class="hidden flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500 gap-3">
+                            <i data-lucide="file-binary" class="w-12 h-12 text-slate-600 stroke-1"></i>
+                            <p class="text-xs text-slate-400">このファイル形式はプレビューまたはテキスト編集に対応していません</p>
+                        </div>
                     </div>
                 </div>
-
             </div>
 
         </div>
 
     </main>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-emerald-500 text-slate-950 px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center gap-2 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50">
-        <i data-lucide="check-circle-2" class="w-5 h-5"></i>
-        <span id="toastMsg">クリップボードにコピーしました！</span>
+    <!-- ローディングオーバーレイ -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center gap-4 text-center">
+        <div class="w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin shadow-lg"></div>
+        <div>
+            <p id="loadingTitle" class="text-lg font-bold text-white tracking-wide">読み込み中...</p>
+            <p id="loadingSub" class="text-xs text-slate-400 mt-1">アドオンパック構造を解析しています</p>
+        </div>
+    </div>
+
+    <!-- エクスポート選択モーダル -->
+    <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-mc-card border border-mc-border rounded-2xl w-full max-w-md p-6 flex flex-col gap-5 shadow-2xl relative animate-in fade-in zoom-in duration-150">
+            <div class="flex items-center justify-between border-b border-mc-border pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-base">パックを出力</h3>
+                </div>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-mc-border transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <p class="text-xs text-slate-300 font-medium">出力するファイルフォーマットを選択してください:</p>
+                
+                <div class="grid grid-cols-1 gap-2.5">
+                    <label class="flex items-start gap-3 p-3 rounded-xl border border-mc-border bg-mc-dark/60 hover:bg-mc-dark hover:border-emerald-500/50 cursor-pointer transition-all">
+                        <input type="radio" name="exportFormat" value="mcaddon" checked class="mt-0.5 accent-emerald-500">
+                        <div>
+                            <div class="font-bold text-white text-xs font-mono">.mcaddon</div>
+                            <div class="text-[11px] text-slate-400">BPとRPの両方を統合した統合パック（ダブルクリックで自動インポート）</div>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-3 rounded-xl border border-mc-border bg-mc-dark/60 hover:bg-mc-dark hover:border-emerald-500/50 cursor-pointer transition-all">
+                        <input type="radio" name="exportFormat" value="mcpack" class="mt-0.5 accent-emerald-500">
+                        <div>
+                            <div class="font-bold text-white text-xs font-mono">.mcpack</div>
+                            <div id="mcpackHelpText" class="text-[11px] text-slate-400">現在選択中のパック（BP/RP）を単体で出力</div>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-3 rounded-xl border border-mc-border bg-mc-dark/60 hover:bg-mc-dark hover:border-emerald-500/50 cursor-pointer transition-all">
+                        <input type="radio" name="exportFormat" value="zip" class="mt-0.5 accent-emerald-500">
+                        <div>
+                            <div class="font-bold text-white text-xs font-mono">.zip</div>
+                            <div class="text-[11px] text-slate-400">一般的なZIPアーカイブ（手動展開やデバッグ用）</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-mc-border">
+                <button onclick="closeExportModal()" class="px-4 py-2 bg-mc-dark hover:bg-mc-border border border-mc-border rounded-xl text-slate-300 text-xs font-bold transition-all">
+                    キャンセル
+                </button>
+                <button id="modalExportConfirmBtn" onclick="executeExport()" class="px-5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-1.5">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>ダウンロード</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ホームへ戻る確認モーダル -->
+    <div id="resetModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-mc-card border border-mc-border rounded-2xl w-full max-w-sm p-6 flex flex-col gap-4 shadow-2xl relative animate-in fade-in zoom-in duration-150 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20 mx-auto">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-white text-base mb-1">初期画面に戻りますか？</h3>
+                <p class="text-xs text-slate-400">未保存の編集内容や読み込まれたパックデータはすべてクリアされます。</p>
+            </div>
+            <div class="flex items-center justify-center gap-2 pt-2 border-t border-mc-border mt-2">
+                <button onclick="closeResetModal()" class="flex-1 py-2 bg-mc-dark hover:bg-mc-border border border-mc-border rounded-xl text-slate-300 text-xs font-bold transition-all">
+                    キャンセル
+                </button>
+                <button onclick="confirmReturnHome()" class="flex-1 py-2 bg-red-500 hover:bg-red-400 text-white font-bold text-xs rounded-xl transition-all shadow-md">
+                    戻る
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // State variables
-        let currentType = 'item'; // 'item', 'block', 'mob'
-        let currentCodeTab = 'behavior'; // 'behavior', 'resource'
-
-        // Default Presets Configuration
-        const PRESETS = {
-            item: [
-                {
-                    name: 'ルビーの剣',
-                    id: 'ruby_sword',
-                    color: '#ef4444',
-                    icon: 'sword',
-                    properties: {
-                        damage: 8,
-                        durability: 1200,
-                        maxStack: 1,
-                        handEquipped: true,
-                        canDestroyInCreative: false
-                    }
-                },
-                {
-                    name: '魔法のルビー',
-                    id: 'magic_ruby',
-                    color: '#f43f5e',
-                    icon: 'gem',
-                    properties: {
-                        damage: 0,
-                        durability: 0,
-                        maxStack: 64,
-                        foil: true, // Glow effect
-                        foilType: 'glint'
-                    }
-                }
+        const SCRIPT_MODULES_DATA = {
+            "@minecraft/server": [
+                "2.10.0", "2.9.0", "2.8.0", "2.7.0", "2.6.0", "2.5.0", "2.4.0", "2.3.0", "2.2.0", "2.1.0", "2.0.0", 
+                "1.14.0", "1.13.0", "1.12.0", "1.11.0", "1.10.0", "1.9.0", "1.8.0", "1.7.0", "1.6.0", "1.5.0", 
+                "1.4.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0", "2.12.0-beta", "2.10.0-rc", "1.14.0-beta", "1.13.0-beta", 
+                "1.12.0-beta", "1.11.0-beta", "1.10.0-beta"
             ],
-            block: [
-                {
-                    name: 'ルビー鉱石',
-                    id: 'ruby_ore',
-                    color: '#b91c1c',
-                    icon: 'cube',
-                    properties: {
-                        destroyTime: 3.0,
-                        explosionResistance: 6.0,
-                        friction: 0.6,
-                        lightEmission: 2
-                    }
-                },
-                {
-                    name: '発光ネオンブロック',
-                    id: 'neon_block',
-                    color: '#10b981',
-                    icon: 'cube',
-                    properties: {
-                        destroyTime: 1.0,
-                        explosionResistance: 2.0,
-                        friction: 0.6,
-                        lightEmission: 15
-                    }
-                }
+            "@minecraft/server-ui": [
+                "2.2.0", "2.1.0", "2.0.0", "1.3.0", "1.2.0", "1.1.0", "1.0.0", "2.4.0-beta", "2.3.0-rc", 
+                "1.3.0-beta", "1.2.0-beta", "1.1.0-beta", "1.0.0-beta"
             ],
-            mob: [
-                {
-                    name: 'ルビーゴーレム (Boss)',
-                    id: 'ruby_golem',
-                    color: '#991b1b',
-                    icon: 'spawn_egg',
-                    properties: {
-                        health: 150,
-                        movementSpeed: 0.25,
-                        attackDamage: 12,
-                        isBoss: true,
-                        family: 'monster'
-                    }
-                }
-            ]
+            "@minecraft/server-gametest": ["1.0.0-beta"],
+            "@minecraft/server-editor": ["1.0.0-beta"],
+            "@minecraft/server-admin": ["1.0.0-beta"],
+            "@minecraft/server-net": ["1.0.0-beta"],
+            "@minecraft/server-graphics": ["1.0.0-beta"],
+            "@minecraft/diagnostics": ["1.0.0-beta"],
+            "@minecraft/debug-utilities": ["1.0.0-beta"]
         };
 
-        // Form fields DOM references
-        const typeItemTab = document.getElementById('typeItemTab');
-        const typeBlockTab = document.getElementById('typeBlockTab');
-        const typeMobTab = document.getElementById('typeMobTab');
-        const presetsContainer = document.getElementById('presetsContainer');
-        const dynamicPropertiesContainer = document.getElementById('dynamicPropertiesContainer');
+        // 対応ファイルの分類
+        const TEXT_EXTENSIONS = ['json', 'js', 'ts', 'lang', 'txt', 'mcfunction', 'properties', 'geometry'];
+        const AUDIO_EXTENSIONS = ['ogg', 'wav', 'mp3'];
+        const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'tga'];
+
+        let currentTab = 'bp';
+        let currentViewMode = 'manifest';
+        let isPopulating = false;
         
-        const itemNameInput = document.getElementById('itemName');
-        const itemIdInput = document.getElementById('itemId');
-        const primaryColorInput = document.getElementById('primaryColor');
-        const colorHexText = document.getElementById('colorHexText');
-        const textureIconSelect = document.getElementById('textureIcon');
-        const textureCanvas = document.getElementById('textureCanvas');
-        const jsonCodeOutput = document.getElementById('jsonCodeOutput');
-        const currentFilePath = document.getElementById('currentFilePath');
+        let packsData = { bp: null, rp: null };
+        let activeFile = null;
 
-        const viewBehaviorBtn = document.getElementById('viewBehaviorBtn');
-        const viewResourceBtn = document.getElementById('viewResourceBtn');
-        const copyJsonBtn = document.getElementById('copyJsonBtn');
+        const homeView = document.getElementById('homeView');
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const iconFileInput = document.getElementById('iconFileInput');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const editorView = document.getElementById('editorView');
         const exportBtn = document.getElementById('exportBtn');
+        const validationAlert = document.getElementById('validationAlert');
 
-        // Initial setup on Window load
-        window.onload = function() {
+        const tabBtnBP = document.getElementById('tabBtnBP');
+        const tabBtnRP = document.getElementById('tabBtnRP');
+        const bpHeaderIconThumb = document.getElementById('bpHeaderIconThumb');
+        const rpHeaderIconThumb = document.getElementById('rpHeaderIconThumb');
+
+        const manifestEditorView = document.getElementById('manifestEditorView');
+        const filesEditorView = document.getElementById('filesEditorView');
+        const modeBtnManifest = document.getElementById('modeBtnManifest');
+        const modeBtnFiles = document.getElementById('modeBtnFiles');
+
+        const rpDependencyBox = document.getElementById('rpDependencyBox');
+        const toggleRpDep = document.getElementById('toggleRpDep');
+
+        const scriptApiSection = document.getElementById('scriptApiSection');
+        const scriptEntriesContainer = document.getElementById('scriptEntriesContainer');
+        const modulesContainer = document.getElementById('modulesContainer');
+
+        const mInputName = document.getElementById('mInputName');
+        const mInputUuid = document.getElementById('mInputUuid');
+        const mInputVersion = document.getElementById('mInputVersion');
+        const mInputMinEngine = document.getElementById('mInputMinEngine');
+        const mInputAuthors = document.getElementById('mInputAuthors');
+        const mInputDesc = document.getElementById('mInputDesc');
+        const mInputLicense = document.getElementById('mInputLicense');
+        const mInputLink = document.getElementById('mInputLink');
+
+        const toggleAuthors = document.getElementById('toggleAuthors');
+        const toggleDesc = document.getElementById('toggleDesc');
+        const toggleLicense = document.getElementById('toggleLicense');
+        const toggleLink = document.getElementById('toggleLink');
+
+        const sectionAuthors = document.getElementById('sectionAuthors');
+        const sectionDesc = document.getElementById('sectionDesc');
+        const sectionLicense = document.getElementById('sectionLicense');
+        const sectionLink = document.getElementById('sectionLink');
+
+        const manifestPackIcon = document.getElementById('manifestPackIcon');
+        const manifestPackTypeBadge = document.getElementById('manifestPackTypeBadge');
+
+        const treeContainer = document.getElementById('treeContainer');
+        const treeFileCount = document.getElementById('treeFileCount');
+        const treePackTitleText = document.getElementById('treePackTitleText');
+        const treePackDescText = document.getElementById('treePackDescText');
+        const treePackIconBox = document.getElementById('treePackIconBox');
+
+        const editorPlaceholder = document.getElementById('editorPlaceholder');
+        const codeEditorArea = document.getElementById('codeEditorArea');
+        const imageViewerArea = document.getElementById('imageViewerArea');
+        const audioViewerArea = document.getElementById('audioViewerArea');
+        const binaryViewerArea = document.getElementById('binaryViewerArea');
+
+        const audioPreview = document.getElementById('audioPreview');
+        const audioFileName = document.getElementById('audioFileName');
+
+        const codeTextarea = document.getElementById('codeTextarea');
+        const lineNumbers = document.getElementById('lineNumbers');
+        const editorFilePath = document.getElementById('editorFilePath');
+        const editorFileIcon = document.getElementById('editorFileIcon');
+        const editorControls = document.getElementById('editorControls');
+        const unsavedBadge = document.getElementById('unsavedBadge');
+
+        window.onload = () => {
+            renderModuleCheckboxes();
             lucide.createIcons();
-            setupEventListeners();
-            loadPresets();
-            renderDynamicProperties();
-            drawTexturePreview();
-            updateJsonPreview();
+            setupDragAndDrop();
+            setupCodeEditorEvents();
         };
 
-        function setupEventListeners() {
-            // Type Switcher
-            typeItemTab.addEventListener('click', () => switchType('item'));
-            typeBlockTab.addEventListener('click', () => switchType('block'));
-            typeMobTab.addEventListener('click', () => switchType('mob'));
-
-            // Code Preview File Toggle
-            viewBehaviorBtn.addEventListener('click', () => {
-                currentCodeTab = 'behavior';
-                updateCodeTabUI();
-                updateJsonPreview();
+        function generateUuid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
             });
-            viewResourceBtn.addEventListener('click', () => {
-                currentCodeTab = 'resource';
-                updateCodeTabUI();
-                updateJsonPreview();
-            });
-
-            // Form Inputs live update listeners
-            [itemNameInput, itemIdInput, primaryColorInput, textureIconSelect].forEach(el => {
-                el.addEventListener('input', () => {
-                    if (el === primaryColorInput) {
-                        colorHexText.textContent = primaryColorInput.value;
-                        drawTexturePreview();
-                    }
-                    if (el === textureIconSelect) {
-                        drawTexturePreview();
-                    }
-                    updateJsonPreview();
-                });
-            });
-
-            // Auto format item ID slug
-            itemNameInput.addEventListener('input', () => {
-                const autoId = itemNameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_');
-                if (autoId) itemIdInput.value = autoId;
-                updateJsonPreview();
-            });
-
-            // Copy JSON
-            copyJsonBtn.addEventListener('click', () => {
-                const code = jsonCodeOutput.textContent;
-                navigator.clipboard.writeText(code).then(() => {
-                    showToast('JSONをコピーしました！');
-                }).catch(() => {
-                    // Fallback
-                    const textArea = document.createElement("textarea");
-                    textArea.value = code;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    showToast('JSONをコピーしました！');
-                });
-            });
-
-            // Export .mcaddon ZIP
-            exportBtn.addEventListener('click', generateMcAddonFile);
         }
 
-        function switchType(type) {
-            currentType = type;
-            
-            // Update Tab UI
-            [typeItemTab, typeBlockTab, typeMobTab].forEach(tab => {
-                tab.className = "type-tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white";
-            });
-
-            let activeTab = typeItemTab;
-            if (type === 'block') activeTab = typeBlockTab;
-            if (type === 'mob') activeTab = typeMobTab;
-
-            activeTab.className = "type-tab-btn active flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all bg-emerald-500 text-slate-950 shadow-md";
-
-            // Apply first preset of chosen type
-            loadPresets();
-            applyPreset(PRESETS[type][0]);
+        function generateNewUuid() {
+            mInputUuid.value = generateUuid();
+            onManifestFormChange();
         }
 
-        function updateCodeTabUI() {
-            if (currentCodeTab === 'behavior') {
-                viewBehaviorBtn.className = "px-3 py-1.5 rounded-lg font-mono font-medium transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                viewResourceBtn.className = "px-3 py-1.5 rounded-lg font-mono font-medium transition-all text-slate-400 hover:text-white";
-            } else {
-                viewResourceBtn.className = "px-3 py-1.5 rounded-lg font-mono font-medium transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                viewBehaviorBtn.className = "px-3 py-1.5 rounded-lg font-mono font-medium transition-all text-slate-400 hover:text-white";
+        function triggerFileInput() { fileInput.click(); }
+        function triggerIconUpload() {
+            if (!packsData[currentTab]) {
+                alert("先にパックを読み込んでください。");
+                return;
+            }
+            iconFileInput.click();
+        }
+
+        /* --- 新規作成機能 --- */
+        function createNewAddon() {
+            showLoading(true, "新規パック作成中...");
+            setTimeout(() => {
+                const bpUuid = generateUuid();
+                const rpUuid = generateUuid();
+
+                const bpManifest = {
+                    format_version: 2,
+                    header: {
+                        name: "Pack Name",
+                        description: "",
+                        uuid: bpUuid,
+                        version: [1, 0, 0],
+                        min_engine_version: [1, 20, 0]
+                    },
+                    modules: [
+                        {
+                            type: "data",
+                            uuid: generateUuid(),
+                            version: [1, 0, 0]
+                        }
+                    ],
+                    dependencies: [
+                        {
+                            uuid: rpUuid,
+                            version: [1, 0, 0]
+                        }
+                    ]
+                };
+
+                const rpManifest = {
+                    format_version: 2,
+                    header: {
+                        name: "Pack Name",
+                        description: "",
+                        uuid: rpUuid,
+                        version: [1, 0, 0],
+                        min_engine_version: [1, 20, 0]
+                    },
+                    modules: [
+                        {
+                            type: "resources",
+                            uuid: generateUuid(),
+                            version: [1, 0, 0]
+                        }
+                    ]
+                };
+
+                packsData = {
+                    bp: {
+                        rootPrefix: "",
+                        manifest: bpManifest,
+                        files: [
+                            {
+                                path: "manifest.json",
+                                fullZipPath: "manifest.json",
+                                zipObj: null,
+                                modifiedContent: JSON.stringify(bpManifest, null, 2)
+                            }
+                        ],
+                        iconBlob: null,
+                        iconUrl: null
+                    },
+                    rp: {
+                        rootPrefix: "",
+                        manifest: rpManifest,
+                        files: [
+                            {
+                                path: "manifest.json",
+                                fullZipPath: "manifest.json",
+                                zipObj: null,
+                                modifiedContent: JSON.stringify(rpManifest, null, 2)
+                            }
+                        ],
+                        iconBlob: null,
+                        iconUrl: null
+                    }
+                };
+
+                currentTab = 'bp';
+                homeView.classList.add('hidden');
+                editorView.classList.remove('hidden');
+                exportBtn.classList.remove('hidden');
+
+                updatePackIconsAndHeader();
+                switchPackTab('bp');
+                showLoading(false);
+            }, 300);
+        }
+
+        /* --- 初期画面に戻る機能 --- */
+        function requestReturnHome() {
+            if (packsData.bp || packsData.rp) {
+                document.getElementById('resetModal').classList.remove('hidden');
             }
         }
 
-        function loadPresets() {
-            presetsContainer.innerHTML = '';
-            PRESETS[currentType].forEach(preset => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'px-3 py-1 rounded-lg bg-mc-dark hover:bg-slate-800 text-slate-300 border border-mc-border text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1.5';
-                btn.innerHTML = `<span class="w-2 h-2 rounded-full" style="background-color: ${preset.color}"></span>${preset.name}`;
-                btn.onclick = () => applyPreset(preset);
-                presetsContainer.appendChild(btn);
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.add('hidden');
+        }
+
+        function confirmReturnHome() {
+            closeResetModal();
+            packsData = { bp: null, rp: null };
+            activeFile = null;
+            fileInput.value = '';
+
+            editorView.classList.add('hidden');
+            homeView.classList.remove('hidden');
+            
+            exportBtn.classList.add('hidden');
+            exportBtn.disabled = true;
+
+            updatePackIconsAndHeader();
+        }
+
+        function setupDragAndDrop() {
+            dropzone.addEventListener('click', () => triggerFileInput());
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+            });
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener('dragover', () => dropzone.classList.add('border-emerald-500', 'bg-emerald-500/10'));
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-emerald-500', 'bg-emerald-500/10'));
+            });
+            dropzone.addEventListener('drop', (e) => {
+                if (e.dataTransfer.files.length) handleImportFiles(e.dataTransfer.files);
+            });
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) handleImportFiles(e.target.files);
             });
         }
 
-        function applyPreset(preset) {
-            itemNameInput.value = preset.name;
-            itemIdInput.value = preset.id;
-            primaryColorInput.value = preset.color;
-            colorHexText.textContent = preset.color;
-            textureIconSelect.value = preset.icon;
+        async function handleImportFiles(files) {
+            showLoading(true, "アドオンパック構造の解析中...");
+            packsData = { bp: null, rp: null };
+            activeFile = null;
 
-            renderDynamicProperties(preset.properties);
-            drawTexturePreview();
-            updateJsonPreview();
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    await parseAddonArchive(files[i]);
+                }
+
+                if (packsData.bp) currentTab = 'bp';
+                else if (packsData.rp) currentTab = 'rp';
+
+                updatePackIconsAndHeader();
+                switchPackTab(currentTab);
+
+                showLoading(false);
+                homeView.classList.add('hidden');
+                editorView.classList.remove('hidden');
+
+                exportBtn.classList.remove('hidden');
+
+            } catch (err) {
+                alert("ファイルの解析に失敗しました: " + err.message);
+                console.error(err);
+                showLoading(false);
+            }
         }
 
-        function renderDynamicProperties(defaults = {}) {
-            dynamicPropertiesContainer.innerHTML = '';
+        async function parseAddonArchive(file) {
+            const zip = new JSZip();
+            const archive = await zip.loadAsync(file);
 
-            if (currentType === 'item') {
-                const damage = defaults.damage !== undefined ? defaults.damage : 5;
-                const durability = defaults.durability !== undefined ? defaults.durability : 500;
-                const maxStack = defaults.maxStack !== undefined ? defaults.maxStack : 1;
-                const foil = defaults.foil || false;
+            const subMcpacks = Object.keys(archive.files).filter(p => p.toLowerCase().endsWith('.mcpack'));
 
-                dynamicPropertiesContainer.innerHTML = `
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">攻撃力 (Attack Damage)</label>
-                            <input type="number" id="propDamage" value="${damage}" min="0" max="100" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">耐久値 (Durability)</label>
-                            <input type="number" id="propDurability" value="${durability}" min="0" max="5000" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">スタック上限 (Max Stack Size)</label>
-                            <input type="number" id="propMaxStack" value="${maxStack}" min="1" max="64" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div class="flex items-center pt-5">
-                            <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300">
-                                <input type="checkbox" id="propFoil" ${foil ? 'checked' : ''} class="w-4 h-4 rounded border-mc-border bg-mc-dark text-emerald-500 focus:ring-emerald-500/20">
-                                エンチャントの輝き (Foil Effect)
-                            </label>
-                        </div>
-                    </div>
-                `;
-            } else if (currentType === 'block') {
-                const destroyTime = defaults.destroyTime !== undefined ? defaults.destroyTime : 1.5;
-                const explosionResistance = defaults.explosionResistance !== undefined ? defaults.explosionResistance : 3.0;
-                const lightEmission = defaults.lightEmission !== undefined ? defaults.lightEmission : 0;
+            if (subMcpacks.length > 0) {
+                for (const subPath of subMcpacks) {
+                    const subBlob = await archive.files[subPath].async("blob");
+                    const subZip = new JSZip();
+                    const subArchive = await subZip.loadAsync(subBlob);
+                    await scanAndExtractPacks(subArchive);
+                }
+            } else {
+                await scanAndExtractPacks(archive);
+            }
+        }
 
-                dynamicPropertiesContainer.innerHTML = `
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">採掘速度/硬度 (Destroy Time)</label>
-                            <input type="number" step="0.1" id="propDestroyTime" value="${destroyTime}" min="0" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">爆発耐性 (Explosion Resistance)</label>
-                            <input type="number" step="0.5" id="propExplosionRes" value="${explosionResistance}" min="0" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">発光度 (Light Emission 0-15)</label>
-                            <input type="number" id="propLight" value="${lightEmission}" min="0" max="15" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                    </div>
-                `;
-            } else if (currentType === 'mob') {
-                const health = defaults.health !== undefined ? defaults.health : 20;
-                const movementSpeed = defaults.movementSpeed !== undefined ? defaults.movementSpeed : 0.25;
-                const attackDamage = defaults.attackDamage !== undefined ? defaults.attackDamage : 3;
-                const isBoss = defaults.isBoss || false;
+        async function scanAndExtractPacks(zipArchive) {
+            const allFileKeys = Object.keys(zipArchive.files);
+            const manifestPaths = allFileKeys.filter(p => p.toLowerCase().endsWith('manifest.json'));
 
-                dynamicPropertiesContainer.innerHTML = `
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">体力 (Max Health)</label>
-                            <input type="number" id="propHealth" value="${health}" min="1" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">移動速度 (Movement Speed)</label>
-                            <input type="number" step="0.05" id="propSpeed" value="${movementSpeed}" min="0" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-1">攻撃力 (Attack Damage)</label>
-                            <input type="number" id="propMobAttack" value="${attackDamage}" min="0" class="w-full bg-mc-dark border border-mc-border rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                    </div>
-                    <div class="pt-2">
-                        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-300">
-                            <input type="checkbox" id="propIsBoss" ${isBoss ? 'checked' : ''} class="w-4 h-4 rounded border-mc-border bg-mc-dark text-emerald-500 focus:ring-emerald-500/20">
-                            ボス体力バーを表示する (Boss Bar UI)
+            for (const manifestPath of manifestPaths) {
+                const rootPrefix = manifestPath.substring(0, manifestPath.lastIndexOf('manifest.json'));
+                
+                let manifestText = "";
+                let manifest = {};
+
+                try {
+                    manifestText = await zipArchive.files[manifestPath].async("string");
+                    manifest = JSON.parse(manifestText);
+                    if (!manifest.header || !manifest.header.uuid) continue;
+                } catch (e) {
+                    continue;
+                }
+
+                const isRP = checkIsResourcePack(manifest, zipArchive, rootPrefix);
+                const packType = isRP ? 'rp' : 'bp';
+
+                let iconBlob = null;
+                let iconUrl = null;
+                const iconPath = allFileKeys.find(p => p.toLowerCase() === (rootPrefix + 'pack_icon.png').toLowerCase());
+                if (iconPath) {
+                    iconBlob = await zipArchive.files[iconPath].async("blob");
+                    iconUrl = URL.createObjectURL(iconBlob);
+                }
+
+                const packFiles = [];
+                for (const filePath of allFileKeys) {
+                    if (filePath.startsWith(rootPrefix) && !zipArchive.files[filePath].dir) {
+                        const relativePath = filePath.substring(rootPrefix.length);
+                        if (relativePath) {
+                            packFiles.push({
+                                path: relativePath,
+                                fullZipPath: filePath,
+                                zipObj: zipArchive.files[filePath],
+                                modifiedContent: null
+                            });
+                        }
+                    }
+                }
+
+                packsData[packType] = {
+                    rootPrefix: rootPrefix || "/",
+                    manifest: manifest,
+                    files: packFiles,
+                    iconBlob: iconBlob,
+                    iconUrl: iconUrl
+                };
+            }
+        }
+
+        function checkIsResourcePack(manifest, zipArchive, rootPrefix) {
+            if (manifest.modules && Array.isArray(manifest.modules)) {
+                for (const mod of manifest.modules) {
+                    if (mod.type === 'resources') return true;
+                    if (['data', 'script', 'client_data'].includes(mod.type)) return false;
+                }
+            }
+            const paths = Object.keys(zipArchive.files);
+            return paths.some(p => 
+                p.startsWith(rootPrefix + 'textures/') || 
+                p.startsWith(rootPrefix + 'models/') || 
+                p.startsWith(rootPrefix + 'sounds/') ||
+                p.startsWith(rootPrefix + 'ui/') ||
+                p.startsWith(rootPrefix + 'font/') ||
+                p.startsWith(rootPrefix + 'particles/')
+            );
+        }
+
+        async function handleIconFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const pack = packsData[currentTab];
+            if (!pack) return;
+
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+
+            pack.iconBlob = file;
+            pack.iconUrl = URL.createObjectURL(file);
+
+            let iconFile = pack.files.find(f => f.path.toLowerCase() === 'pack_icon.png');
+            if (iconFile) {
+                iconFile.modifiedContent = uint8Array;
+            } else {
+                pack.files.push({
+                    path: 'pack_icon.png',
+                    fullZipPath: (pack.rootPrefix === '/' ? '' : pack.rootPrefix) + 'pack_icon.png',
+                    zipObj: null,
+                    modifiedContent: uint8Array
+                });
+            }
+
+            updatePackIconsAndHeader();
+            populateManifestForm();
+            renderCurrentPackTree();
+            iconFileInput.value = '';
+        }
+
+        function updatePackIconsAndHeader() {
+            if (packsData.bp && packsData.bp.iconUrl) {
+                bpHeaderIconThumb.innerHTML = `<img src="${packsData.bp.iconUrl}" class="w-full h-full object-cover image-render-pixelated">`;
+            } else {
+                bpHeaderIconThumb.innerHTML = `<i data-lucide="cpu" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-mc-bp"></i>`;
+            }
+
+            if (packsData.rp && packsData.rp.iconUrl) {
+                rpHeaderIconThumb.innerHTML = `<img src="${packsData.rp.iconUrl}" class="w-full h-full object-cover image-render-pixelated">`;
+            } else {
+                rpHeaderIconThumb.innerHTML = `<i data-lucide="palette" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400"></i>`;
+            }
+            lucide.createIcons();
+        }
+
+        function switchPackTab(tab) {
+            currentTab = tab;
+
+            if (tab === 'bp') {
+                tabBtnBP.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-2 bg-mc-bp/20 text-mc-bp border border-mc-bp/30";
+                tabBtnRP.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-2 text-slate-400 hover:text-white border border-transparent";
+                scriptApiSection.classList.remove('hidden');
+            } else {
+                tabBtnRP.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-2 bg-mc-rp/20 text-mc-rp border border-mc-rp/30";
+                tabBtnBP.className = "px-3 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-2 text-slate-400 hover:text-white border border-transparent";
+                scriptApiSection.classList.add('hidden');
+            }
+
+            populateManifestForm();
+            renderCurrentPackTree();
+            validateAllPacks();
+        }
+
+        function switchViewMode(mode) {
+            currentViewMode = mode;
+            if (mode === 'manifest') {
+                manifestEditorView.classList.remove('hidden');
+                manifestEditorView.classList.add('flex');
+                filesEditorView.classList.add('hidden');
+                filesEditorView.classList.remove('grid');
+
+                modeBtnManifest.className = "px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5";
+                modeBtnFiles.className = "px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5";
+            } else {
+                manifestEditorView.classList.add('hidden');
+                manifestEditorView.classList.remove('flex');
+                filesEditorView.classList.remove('hidden');
+                filesEditorView.classList.add('grid');
+
+                modeBtnFiles.className = "px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5";
+                modeBtnManifest.className = "px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5";
+            }
+        }
+
+        function renderModuleCheckboxes() {
+            modulesContainer.innerHTML = '';
+            Object.keys(SCRIPT_MODULES_DATA).forEach((modName, idx) => {
+                const safeId = 'mod_' + idx;
+                const div = document.createElement('div');
+                div.className = "border border-mc-border rounded-xl p-3 bg-mc-dark/40 flex flex-col gap-2";
+                
+                let selectOptions = SCRIPT_MODULES_DATA[modName].map(v => `<option value="${v}">${v}</option>`).join('');
+
+                div.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <label for="${safeId}" class="font-bold text-slate-200 cursor-pointer flex items-center gap-2 truncate text-xs" title="${modName}">
+                            <input type="checkbox" id="${safeId}" data-module="${modName}" onchange="toggleModuleSelect('${safeId}')" class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
+                            <span class="truncate">${modName}</span>
                         </label>
                     </div>
+                    <div id="${safeId}_select_box" class="hidden mt-1">
+                        <select id="${safeId}_ver" onchange="onManifestFormChange()" class="w-full bg-mc-dark border border-mc-border focus:border-emerald-500 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs focus:outline-none">
+                            ${selectOptions}
+                        </select>
+                    </div>
                 `;
-            }
-
-            // Bind update events to dynamic elements
-            dynamicPropertiesContainer.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', updateJsonPreview);
+                modulesContainer.appendChild(div);
             });
         }
 
-        function drawTexturePreview() {
-            const ctx = textureCanvas.getContext('2d');
-            const color = primaryColorInput.value;
-            const icon = textureIconSelect.value;
+        function toggleModuleSelect(safeId) {
+            const chk = document.getElementById(safeId);
+            const box = document.getElementById(safeId + '_select_box');
+            if (chk.checked) box.classList.remove('hidden');
+            else box.classList.add('hidden');
+            onManifestFormChange();
+        }
 
-            ctx.clearRect(0, 0, 48, 48);
+        function addScriptEntryInput(val = '') {
+            const row = document.createElement('div');
+            row.className = "flex items-center gap-2 script-entry-row";
+            row.innerHTML = `
+                <div class="flex-1 flex items-center bg-mc-dark border border-mc-border focus-within:border-emerald-500 rounded-xl px-3 py-1.5 transition-colors">
+                    <span class="text-slate-500 font-mono text-xs select-none">scripts/</span>
+                    <input type="text" value="${escapeHtml(val)}" oninput="onManifestFormChange()" class="w-full bg-transparent text-white font-mono text-xs focus:outline-none script-entry-val" placeholder="main">
+                    <span class="text-slate-400 font-mono text-xs select-none">.js</span>
+                </div>
+                <button type="button" onclick="removeScriptEntryInput(this)" class="p-2 bg-mc-dark hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-mc-border rounded-xl transition-all shrink-0">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            `;
+            scriptEntriesContainer.appendChild(row);
+            lucide.createIcons();
+            onManifestFormChange();
+        }
 
-            // Background pixel grid preview
-            ctx.fillStyle = '#1e2025';
-            ctx.fillRect(0, 0, 48, 48);
+        function removeScriptEntryInput(btn) {
+            const row = btn.closest('.script-entry-row');
+            if (row) {
+                row.remove();
+                onManifestFormChange();
+            }
+        }
 
-            ctx.fillStyle = color;
+        function populateManifestForm() {
+            isPopulating = true;
+            const pack = packsData[currentTab];
+            if (!pack) {
+                manifestPackIcon.innerHTML = `<i data-lucide="package-x" class="w-8 h-8 text-slate-600"></i>`;
+                rpDependencyBox.classList.add('hidden');
+                isPopulating = false;
+                return;
+            }
 
-            if (icon === 'sword') {
-                // Diagonal Sword shape
-                for (let i = 0; i < 7; i++) {
-                    ctx.fillRect(32 - i*4, 8 + i*4, 6, 6);
-                }
-                ctx.fillStyle = '#475569'; // Hilt
-                ctx.fillRect(12, 32, 6, 6);
-                ctx.fillRect(8, 36, 6, 6);
-            } else if (icon === 'gem') {
-                // Diamond / Gem shape
-                ctx.fillRect(16, 12, 16, 24);
-                ctx.fillRect(12, 16, 24, 16);
-            } else if (icon === 'cube') {
-                // Block Cube shape
-                ctx.fillRect(8, 8, 32, 32);
-                ctx.fillStyle = 'rgba(0,0,0,0.2)';
-                ctx.fillRect(24, 8, 16, 32);
-            } else if (icon === 'spawn_egg') {
-                // Egg shape
-                ctx.fillRect(16, 8, 16, 32);
-                ctx.fillRect(12, 12, 24, 24);
+            const manifest = pack.manifest;
+            const header = manifest.header || {};
+            const metadata = manifest.metadata || {};
+
+            manifestPackTypeBadge.textContent = currentTab === 'bp' ? 'BEHAVIOR PACK' : 'RESOURCE PACK';
+            manifestPackTypeBadge.className = `text-[10px] font-mono px-2 py-0.5 rounded-md font-bold uppercase ${currentTab === 'bp' ? 'bg-mc-bp/20 text-mc-bp border border-mc-bp/30' : 'bg-mc-rp/20 text-mc-rp border border-mc-rp/30'}`;
+
+            if (pack.iconUrl) {
+                manifestPackIcon.innerHTML = `<img src="${pack.iconUrl}" class="w-full h-full object-cover image-render-pixelated">`;
             } else {
-                // Generic Item
-                ctx.fillRect(12, 12, 24, 24);
+                manifestPackIcon.innerHTML = `<i data-lucide="${currentTab === 'bp' ? 'cpu' : 'palette'}" class="w-7 h-7 sm:w-8 sm:h-8 ${currentTab === 'bp' ? 'text-mc-bp' : 'text-mc-rp'}"></i>`;
             }
-        }
 
-        function generateAddonJSON() {
-            const id = itemIdInput.value || 'custom_item';
-            const name = itemNameInput.value || 'Custom Item';
-            const fullId = `custom:${id}`;
+            mInputName.value = header.name || '';
+            mInputUuid.value = header.uuid || generateUuid();
+            mInputVersion.value = Array.isArray(header.version) ? header.version.join('.') : (header.version || '1.0.0');
+            mInputMinEngine.value = Array.isArray(header.min_engine_version) ? header.min_engine_version.join('.') : (header.min_engine_version || '1.20.0');
 
-            if (currentType === 'item') {
-                const damage = parseInt(document.getElementById('propDamage')?.value || 0);
-                const durability = parseInt(document.getElementById('propDurability')?.value || 100);
-                const maxStack = parseInt(document.getElementById('propMaxStack')?.value || 64);
-                const foil = document.getElementById('propFoil')?.checked || false;
-
-                const behaviorJSON = {
-                    "format_version": "1.20.50",
-                    "minecraft:item": {
-                        "description": {
-                            "identifier": fullId,
-                            "menu_category": { "category": "items" }
-                        },
-                        "components": {
-                            "minecraft:display_name": { "value": name },
-                            "minecraft:icon": { "texture": id },
-                            "minecraft:max_stack_size": maxStack,
-                            "minecraft:hand_equipped": damage > 0,
-                            "minecraft:foil": foil
-                        }
-                    }
-                };
-
-                if (damage > 0) {
-                    behaviorJSON["minecraft:item"].components["minecraft:damage"] = damage;
-                }
-                if (durability > 0) {
-                    behaviorJSON["minecraft:item"].components["minecraft:durability"] = { "max_durability": durability };
-                }
-
-                const resourceJSON = {
-                    "resource_pack_name": "AddonForge RP",
-                    "texture_data": {
-                        [id]: { "textures": `textures/items/${id}` }
-                    }
-                };
-
-                return { behaviorJSON, resourceJSON, fileName: `${id}.json` };
-
-            } else if (currentType === 'block') {
-                const destroyTime = parseFloat(document.getElementById('propDestroyTime')?.value || 1.0);
-                const explosionRes = parseFloat(document.getElementById('propExplosionRes')?.value || 3.0);
-                const lightEmission = parseInt(document.getElementById('propLight')?.value || 0);
-
-                const behaviorJSON = {
-                    "format_version": "1.20.50",
-                    "minecraft:block": {
-                        "description": {
-                            "identifier": fullId,
-                            "menu_category": { "category": "construction" }
-                        },
-                        "components": {
-                            "minecraft:destructible_by_mining": { "seconds_to_destroy": destroyTime },
-                            "minecraft:explosion_resistance": explosionRes,
-                            "minecraft:light_emission": lightEmission,
-                            "minecraft:friction": 0.6
-                        }
-                    }
-                };
-
-                const resourceJSON = {
-                    "format_version": "1.20.50",
-                    "minecraft:client_entity": {
-                        "description": {
-                            "identifier": fullId,
-                            "textures": { "default": `textures/blocks/${id}` }
-                        }
-                    }
-                };
-
-                return { behaviorJSON, resourceJSON, fileName: `${id}.json` };
-
-            } else if (currentType === 'mob') {
-                const health = parseInt(document.getElementById('propHealth')?.value || 20);
-                const speed = parseFloat(document.getElementById('propSpeed')?.value || 0.25);
-                const attack = parseInt(document.getElementById('propMobAttack')?.value || 3);
-                const isBoss = document.getElementById('propIsBoss')?.checked || false;
-
-                const behaviorJSON = {
-                    "format_version": "1.20.50",
-                    "minecraft:entity": {
-                        "description": {
-                            "identifier": fullId,
-                            "is_spawnable": true,
-                            "is_summonable": true
-                        },
-                        "components": {
-                            "minecraft:health": { "value": health, "max": health },
-                            "minecraft:movement": { "value": speed },
-                            "minecraft:attack": { "damage": attack },
-                            "minecraft:boss": isBoss ? { "name": name, "hud_range": 30 } : undefined
-                        }
-                    }
-                };
-
-                const resourceJSON = {
-                    "format_version": "1.20.50",
-                    "minecraft:client_entity": {
-                        "description": {
-                            "identifier": fullId,
-                            "materials": { "default": "entity_alphatest" },
-                            "textures": { "default": `textures/entity/${id}` },
-                            "render_controllers": [ "controller.render.default" ]
-                        }
-                    }
-                };
-
-                return { behaviorJSON, resourceJSON, fileName: `${id}.json` };
-            }
-        }
-
-        function updateJsonPreview() {
-            const data = generateAddonJSON();
-            const id = itemIdInput.value || 'custom_item';
-
-            if (currentCodeTab === 'behavior') {
-                currentFilePath.textContent = `behavior_packs/BP/${currentType}s/${id}.json`;
-                jsonCodeOutput.textContent = JSON.stringify(data.behaviorJSON, null, 2);
+            if (currentTab === 'bp' && packsData.rp && packsData.rp.manifest.header) {
+                rpDependencyBox.classList.remove('hidden');
+                const rpUuid = packsData.rp.manifest.header.uuid;
+                const hasRpDep = Array.isArray(manifest.dependencies) && manifest.dependencies.some(d => d.uuid === rpUuid);
+                toggleRpDep.checked = hasRpDep;
             } else {
-                currentFilePath.textContent = `resource_packs/RP/${currentType}s/${id}.json`;
-                jsonCodeOutput.textContent = JSON.stringify(data.resourceJSON, null, 2);
+                rpDependencyBox.classList.add('hidden');
+            }
+
+            if (metadata.authors && Array.isArray(metadata.authors) && metadata.authors.length > 0) {
+                toggleAuthors.checked = true;
+                sectionAuthors.classList.remove('hidden');
+                mInputAuthors.value = metadata.authors.join(', ');
+            } else {
+                toggleAuthors.checked = false;
+                sectionAuthors.classList.add('hidden');
+                mInputAuthors.value = '';
+            }
+
+            if (header.description) {
+                toggleDesc.checked = true;
+                sectionDesc.classList.remove('hidden');
+                mInputDesc.value = header.description;
+            } else {
+                toggleDesc.checked = false;
+                sectionDesc.classList.add('hidden');
+                mInputDesc.value = '';
+            }
+
+            if (metadata.license) {
+                toggleLicense.checked = true;
+                sectionLicense.classList.remove('hidden');
+                mInputLicense.value = metadata.license;
+            } else {
+                toggleLicense.checked = false;
+                sectionLicense.classList.add('hidden');
+                mInputLicense.value = '';
+            }
+
+            if (metadata.url) {
+                toggleLink.checked = true;
+                sectionLink.classList.remove('hidden');
+                mInputLink.value = metadata.url;
+            } else {
+                toggleLink.checked = false;
+                sectionLink.classList.add('hidden');
+                mInputLink.value = '';
+            }
+
+            scriptEntriesContainer.innerHTML = '';
+            Object.keys(SCRIPT_MODULES_DATA).forEach((_, idx) => {
+                const safeId = 'mod_' + idx;
+                const chk = document.getElementById(safeId);
+                if (chk) {
+                    chk.checked = false;
+                    document.getElementById(safeId + '_select_box').classList.add('hidden');
+                }
+            });
+
+            if (currentTab === 'bp') {
+                if (Array.isArray(manifest.modules)) {
+                    const scriptMods = manifest.modules.filter(m => m.type === 'script');
+                    scriptMods.forEach(m => {
+                        let rawEntry = m.entry || '';
+                        rawEntry = rawEntry.replace(/^scripts\//, '').replace(/\.js$/, '');
+                        if (rawEntry) addScriptEntryInput(rawEntry);
+                    });
+                }
+
+                if (Array.isArray(manifest.dependencies)) {
+                    manifest.dependencies.forEach(dep => {
+                        if (dep.module_name) {
+                            Object.keys(SCRIPT_MODULES_DATA).forEach((mName, idx) => {
+                                if (mName === dep.module_name) {
+                                    const safeId = 'mod_' + idx;
+                                    const chk = document.getElementById(safeId);
+                                    if (chk) {
+                                        chk.checked = true;
+                                        document.getElementById(safeId + '_select_box').classList.remove('hidden');
+                                        if (dep.version) {
+                                            const verStr = Array.isArray(dep.version) ? dep.version.join('.') : String(dep.version);
+                                            const select = document.getElementById(safeId + '_ver');
+                                            if (select) {
+                                                let exists = Array.from(select.options).some(opt => opt.value === verStr);
+                                                if (!exists) {
+                                                    const opt = document.createElement('option');
+                                                    opt.value = verStr;
+                                                    opt.textContent = verStr;
+                                                    select.insertBefore(opt, select.firstChild);
+                                                }
+                                                select.value = verStr;
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+
+            isPopulating = false;
+            lucide.createIcons();
+        }
+
+        function toggleManifestSection(sectionKey) {
+            if (sectionKey === 'authors') sectionAuthors.classList.toggle('hidden', !toggleAuthors.checked);
+            if (sectionKey === 'desc') sectionDesc.classList.toggle('hidden', !toggleDesc.checked);
+            if (sectionKey === 'license') sectionLicense.classList.toggle('hidden', !toggleLicense.checked);
+            if (sectionKey === 'link') sectionLink.classList.toggle('hidden', !toggleLink.checked);
+            onManifestFormChange();
+        }
+
+        function onManifestFormChange() {
+            if (isPopulating) return;
+
+            const pack = packsData[currentTab];
+            if (!pack) return;
+
+            const manifest = pack.manifest;
+            if (!manifest.header) manifest.header = {};
+            if (!manifest.metadata) manifest.metadata = {};
+
+            manifest.header.name = mInputName.value.trim();
+            manifest.header.uuid = mInputUuid.value.trim();
+
+            if (toggleDesc.checked && mInputDesc.value.trim()) {
+                manifest.header.description = mInputDesc.value.trim();
+            } else {
+                delete manifest.header.description;
+            }
+
+            const parseVer = (str) => {
+                const arr = str.split('.').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+                return arr.length >= 3 ? arr.slice(0, 3) : [1, 0, 0];
+            };
+
+            manifest.header.version = parseVer(mInputVersion.value);
+            manifest.header.min_engine_version = parseVer(mInputMinEngine.value);
+
+            if (!Array.isArray(manifest.dependencies)) {
+                manifest.dependencies = [];
+            }
+
+            if (currentTab === 'bp') {
+                if (!Array.isArray(manifest.modules)) manifest.modules = [];
+                
+                manifest.modules = manifest.modules.filter(m => m.type !== 'script');
+
+                const entryInputs = document.querySelectorAll('.script-entry-val');
+                const validNames = [];
+
+                entryInputs.forEach(ipt => {
+                    const name = ipt.value.trim();
+                    if (name) {
+                        validNames.push(name);
+                        manifest.modules.push({
+                            type: "script",
+                            language: "javascript",
+                            uuid: generateUuid(),
+                            entry: `scripts/${name}.js`,
+                            version: [1, 0, 0]
+                        });
+                    }
+                });
+
+                manifest.dependencies = manifest.dependencies.filter(d => !d.module_name);
+
+                Object.keys(SCRIPT_MODULES_DATA).forEach((mName, idx) => {
+                    const safeId = 'mod_' + idx;
+                    const chk = document.getElementById(safeId);
+                    if (chk && chk.checked) {
+                        const verVal = document.getElementById(safeId + '_ver').value;
+                        manifest.dependencies.push({
+                            module_name: mName,
+                            version: verVal
+                        });
+                    }
+                });
+
+                if (packsData.rp && packsData.rp.manifest.header) {
+                    const rpUuid = packsData.rp.manifest.header.uuid;
+                    const rpVer = packsData.rp.manifest.header.version || [1, 0, 0];
+
+                    manifest.dependencies = manifest.dependencies.filter(d => d.uuid !== rpUuid);
+
+                    if (toggleRpDep.checked) {
+                        manifest.dependencies.push({
+                            uuid: rpUuid,
+                            version: rpVer
+                        });
+                    }
+                }
+
+                syncScriptFiles(pack, validNames);
+            }
+
+            if (toggleAuthors.checked && mInputAuthors.value.trim()) {
+                manifest.metadata.authors = mInputAuthors.value.split(',').map(s => s.trim()).filter(Boolean);
+            } else {
+                delete manifest.metadata.authors;
+            }
+
+            if (toggleLicense.checked && mInputLicense.value.trim()) {
+                manifest.metadata.license = mInputLicense.value.trim();
+            } else {
+                delete manifest.metadata.license;
+            }
+
+            if (toggleLink.checked && mInputLink.value.trim()) {
+                manifest.metadata.url = mInputLink.value.trim();
+            } else {
+                delete manifest.metadata.url;
+            }
+
+            const manifestFile = pack.files.find(f => f.path.toLowerCase() === 'manifest.json');
+            if (manifestFile) {
+                manifestFile.modifiedContent = JSON.stringify(manifest, null, 2);
+            }
+
+            renderCurrentPackTree();
+            validateAllPacks();
+        }
+
+        function syncScriptFiles(pack, validNames) {
+            const expectedPaths = validNames.map(n => `scripts/${n}.js`);
+
+            pack.files = pack.files.filter(f => {
+                if (f.path.startsWith('scripts/')) {
+                    if (f.path === 'scripts/' && validNames.length === 0) return true;
+                    return expectedPaths.includes(f.path);
+                }
+                return true;
+            });
+
+            expectedPaths.forEach(path => {
+                const exists = pack.files.some(f => f.path === path);
+                if (!exists) {
+                    pack.files.push({
+                        path: path,
+                        fullZipPath: (pack.rootPrefix === '/' ? '' : pack.rootPrefix) + path,
+                        zipObj: null,
+                        modifiedContent: `// Minecraft Script API: ${path.split('/').pop()}\n`
+                    });
+                }
+            });
+        }
+
+        function validateAllPacks() {
+            let isValid = true;
+            let errorMsg = "";
+
+            ['bp', 'rp'].forEach(type => {
+                const pack = packsData[type];
+                if (pack) {
+                    const header = pack.manifest.header || {};
+                    if (!header.name || header.name.trim() === '') {
+                        isValid = false;
+                        errorMsg = `${type.toUpperCase()} の「パック名」が空欄です。`;
+                    }
+                    if (!header.uuid || header.uuid.trim() === '') {
+                        isValid = false;
+                        errorMsg = `${type.toUpperCase()} の「UUID」が空欄です。`;
+                    }
+                }
+            });
+
+            if (!packsData.bp && !packsData.rp) {
+                isValid = false;
+                errorMsg = "パックが読み込まれていません。";
+            }
+
+            exportBtn.disabled = !isValid;
+            if (!isValid) {
+                validationAlert.classList.remove('hidden');
+                document.getElementById('validationAlertText').textContent = errorMsg;
+            } else {
+                validationAlert.classList.add('hidden');
             }
         }
 
-        function generateMcAddonFile() {
-            const data = generateAddonJSON();
-            const id = itemIdInput.value || 'addon';
+        function renderCurrentPackTree() {
+            const pack = packsData[currentTab];
+            treeContainer.innerHTML = '';
 
-            const zip = new JSZip();
+            if (!pack) {
+                treePackTitleText.textContent = `${currentTab.toUpperCase()} 未検出`;
+                treePackDescText.textContent = "パックが含まれていません";
+                treePackIconBox.innerHTML = `<i data-lucide="package" class="w-5 h-5 text-slate-500"></i>`;
+                treeFileCount.textContent = "0 ファイル";
+                treeContainer.innerHTML = `<div class="text-slate-500 p-6 text-center text-xs">パックデータが存在しません</div>`;
+                lucide.createIcons();
+                return;
+            }
 
-            // Behavior Pack Folder Structure
-            const bp = zip.folder("AddonForge_BP");
-            bp.file("manifest.json", JSON.stringify({
-                "format_version": 2,
-                "header": {
-                    "name": "AddonForge Behavior Pack",
-                    "description": "Created with Minecraft AddonForge",
-                    "uuid": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
-                    "version": [1, 0, 0],
-                    "min_engine_version": [1, 20, 50]
-                },
-                "modules": [
-                    {
-                        "type": "data",
-                        "uuid": "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e",
-                        "version": [1, 0, 0]
+            const header = pack.manifest.header || {};
+            treePackTitleText.textContent = header.name || currentTab.toUpperCase();
+            treePackDescText.textContent = header.description || "説明なし";
+
+            const fileList = pack.files.filter(f => !f.isDir);
+            treeFileCount.textContent = `${fileList.length} ファイル`;
+
+            if (pack.iconUrl) {
+                treePackIconBox.innerHTML = `<img src="${pack.iconUrl}" class="w-full h-full object-cover image-render-pixelated">`;
+            } else {
+                treePackIconBox.innerHTML = `<i data-lucide="${currentTab === 'bp' ? 'cpu' : 'palette'}" class="w-5 h-5 ${currentTab === 'bp' ? 'text-mc-bp' : 'text-mc-rp'}"></i>`;
+            }
+
+            const treeRoot = buildFolderTree(pack.files);
+            treeContainer.appendChild(renderDirectoryNode(treeRoot));
+            lucide.createIcons();
+        }
+
+        function buildFolderTree(files) {
+            const root = { name: 'root', type: 'folder', children: {} };
+            files.forEach(file => {
+                const parts = file.path.split('/').filter(Boolean);
+                let current = root;
+                parts.forEach((part, idx) => {
+                    const isLast = (idx === parts.length - 1);
+                    if (isLast && !file.isDir) {
+                        current.children[part] = { name: part, type: 'file', fileRef: file };
+                    } else {
+                        if (!current.children[part]) {
+                            current.children[part] = { name: part, type: 'folder', children: {} };
+                        }
+                        current = current.children[part];
                     }
-                ]
-            }, null, 2));
+                });
+            });
+            return root;
+        }
 
-            bp.folder(`${currentType}s`).file(`${id}.json`, JSON.stringify(data.behaviorJSON, null, 2));
+        function renderDirectoryNode(node) {
+            const frag = document.createDocumentFragment();
 
-            // Resource Pack Folder Structure
-            const rp = zip.folder("AddonForge_RP");
-            rp.file("manifest.json", JSON.stringify({
-                "format_version": 2,
-                "header": {
-                    "name": "AddonForge Resource Pack",
-                    "description": "Created with Minecraft AddonForge",
-                    "uuid": "c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f",
-                    "version": [1, 0, 0],
-                    "min_engine_version": [1, 20, 50]
-                },
-                "modules": [
-                    {
-                        "type": "resources",
-                        "uuid": "d4e5f6a7-b89c-0d1e-2f3a-4b5c6d7e8f9a",
-                        "version": [1, 0, 0]
+            Object.keys(node.children).sort((a, b) => {
+                const itemA = node.children[a];
+                const itemB = node.children[b];
+                if (itemA.type !== itemB.type) return itemA.type === 'folder' ? -1 : 1;
+                return a.localeCompare(b);
+            }).forEach(key => {
+                const item = node.children[key];
+                const nodeDiv = document.createElement('div');
+
+                if (item.type === 'folder') {
+                    nodeDiv.className = 'select-none';
+                    nodeDiv.innerHTML = `
+                        <div class="tree-item flex items-center gap-2 py-1 px-2 rounded-lg cursor-pointer text-slate-300 font-medium hover:bg-mc-border/50">
+                            <i data-lucide="folder" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+                            <span class="truncate">${escapeHtml(item.name)}</span>
+                        </div>
+                        <div class="pl-3.5 border-l border-mc-border/40 ml-2.5 hidden"></div>
+                    `;
+                    const head = nodeDiv.firstElementChild;
+                    const childrenDiv = nodeDiv.lastElementChild;
+                    childrenDiv.appendChild(renderDirectoryNode(item));
+
+                    head.addEventListener('click', () => {
+                        const isHidden = childrenDiv.classList.toggle('hidden');
+                        const icon = head.querySelector('[data-lucide]');
+                        if (icon) icon.setAttribute('data-lucide', isHidden ? 'folder' : 'folder-open');
+                        lucide.createIcons();
+                    });
+                } else {
+                    const ext = item.name.split('.').pop().toLowerCase();
+                    let iconName = 'file';
+                    let iconColor = 'text-slate-400';
+
+                    if (['json', 'geometry', 'geo'].includes(ext) || item.name.endsWith('.geo.json')) {
+                        iconName = 'file-json';
+                        iconColor = 'text-emerald-400';
+                    } else if (['js', 'ts'].includes(ext)) {
+                        iconName = 'file-code-2';
+                        iconColor = 'text-amber-400';
+                    } else if (AUDIO_EXTENSIONS.includes(ext)) {
+                        iconName = 'music';
+                        iconColor = 'text-indigo-400';
+                    } else if (IMAGE_EXTENSIONS.includes(ext)) {
+                        iconName = 'image';
+                        iconColor = 'text-pink-400';
+                    } else if (['lang', 'txt', 'properties'].includes(ext)) {
+                        iconName = 'file-text';
+                        iconColor = 'text-blue-400';
+                    } else if (ext === 'mcfunction') {
+                        iconName = 'terminal';
+                        iconColor = 'text-purple-400';
+                    } else if (ext === 'mcstructure') {
+                        iconName = 'box';
+                        iconColor = 'text-amber-500';
                     }
-                ]
-            }, null, 2));
 
-            rp.folder(`${currentType}s`).file(`${id}.json`, JSON.stringify(data.resourceJSON, null, 2));
+                    const isModified = item.fileRef.modifiedContent !== null;
 
-            // Export as .mcaddon file
-            zip.generateAsync({ type: "blob" }).then(content => {
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(content);
-                a.download = `${id}_addon.mcaddon`;
+                    nodeDiv.className = 'tree-item flex items-center justify-between py-1 px-2 rounded-lg cursor-pointer text-slate-300 hover:text-white hover:bg-mc-border/50 transition-colors';
+                    nodeDiv.innerHTML = `
+                        <div class="flex items-center gap-2 min-w-0">
+                            <i data-lucide="${iconName}" class="w-3.5 h-3.5 ${iconColor} shrink-0"></i>
+                            <span class="truncate ${isModified ? 'text-amber-300 font-bold' : ''}">${escapeHtml(item.name)}</span>
+                        </div>
+                        ${isModified ? `<span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>` : ''}
+                    `;
+
+                    nodeDiv.addEventListener('click', () => openFileInEditor(item.fileRef));
+                }
+                frag.appendChild(nodeDiv);
+            });
+
+            return frag;
+        }
+
+        async function openFileInEditor(fileObj) {
+            activeFile = fileObj;
+            const ext = fileObj.path.split('.').pop().toLowerCase();
+
+            editorFilePath.textContent = fileObj.path;
+            unsavedBadge.classList.toggle('hidden', activeFile.modifiedContent === null);
+
+            // すべてのエディタ/プレビューエリアを一度隠す
+            editorPlaceholder.classList.add('hidden');
+            codeEditorArea.classList.add('hidden');
+            imageViewerArea.classList.add('hidden');
+            audioViewerArea.classList.add('hidden');
+            binaryViewerArea.classList.add('hidden');
+            editorControls.classList.add('hidden');
+
+            const formatBtn = document.getElementById('formatBtn');
+
+            // 1. テキスト / コードファイル
+            if (TEXT_EXTENSIONS.includes(ext) || fileObj.path.endsWith('.geo.json')) {
+                let content = activeFile.modifiedContent;
+                if (content === null) {
+                    content = fileObj.zipObj ? await fileObj.zipObj.async("string") : "";
+                    if ((ext === 'json' || fileObj.path.endsWith('.json')) && content) {
+                        try {
+                            content = JSON.stringify(JSON.parse(content), null, 2);
+                        } catch (e) {}
+                    }
+                }
+
+                codeTextarea.value = content || "";
+                codeEditorArea.classList.remove('hidden');
+                editorControls.classList.remove('hidden');
+
+                if (['json', 'js', 'ts'].includes(ext) || fileObj.path.endsWith('.json')) {
+                    formatBtn.classList.remove('hidden');
+                } else {
+                    formatBtn.classList.add('hidden');
+                }
+
+                updateLineNumbers();
+                setEditorIcon(ext);
+
+            // 2. 音声ファイル (.ogg, .wav, .mp3)
+            } else if (AUDIO_EXTENSIONS.includes(ext)) {
+                let blob;
+                if (fileObj.modifiedContent) {
+                    blob = new Blob([fileObj.modifiedContent]);
+                } else if (fileObj.zipObj) {
+                    blob = await fileObj.zipObj.async("blob");
+                }
+
+                if (blob) {
+                    const audioUrl = URL.createObjectURL(blob);
+                    audioPreview.src = audioUrl;
+                    audioFileName.textContent = fileObj.path.split('/').pop();
+                    audioViewerArea.classList.remove('hidden');
+                    editorFileIcon.setAttribute('data-lucide', 'music');
+                }
+
+            // 3. 画像ファイル (.png, .jpg, .tga 等)
+            } else if (IMAGE_EXTENSIONS.includes(ext)) {
+                let blob;
+                if (fileObj.modifiedContent) {
+                    blob = new Blob([fileObj.modifiedContent], { type: 'image/png' });
+                } else if (fileObj.zipObj) {
+                    blob = await fileObj.zipObj.async("blob");
+                }
+                if (blob) {
+                    document.getElementById('imagePreview').src = URL.createObjectURL(blob);
+                    imageViewerArea.classList.remove('hidden');
+                    editorFileIcon.setAttribute('data-lucide', 'image');
+                }
+
+            // 4. その他のバイナリファイル (.mcstructure 等)
+            } else {
+                binaryViewerArea.classList.remove('hidden');
+                editorFileIcon.setAttribute('data-lucide', 'file-binary');
+            }
+
+            lucide.createIcons();
+        }
+
+        function setEditorIcon(ext) {
+            let icon = 'file-code';
+            if (['json', 'geometry', 'geo'].includes(ext)) icon = 'file-json';
+            else if (['js', 'ts'].includes(ext)) icon = 'file-code-2';
+            else if (['lang', 'txt'].includes(ext)) icon = 'file-text';
+            else if (ext === 'mcfunction') icon = 'terminal';
+            editorFileIcon.setAttribute('data-lucide', icon);
+        }
+
+        function setupCodeEditorEvents() {
+            codeTextarea.addEventListener('input', () => {
+                updateLineNumbers();
+                if (activeFile) {
+                    activeFile.modifiedContent = codeTextarea.value;
+                    unsavedBadge.classList.remove('hidden');
+
+                    if (activeFile.path.toLowerCase() === 'manifest.json') {
+                        try {
+                            packsData[currentTab].manifest = JSON.parse(codeTextarea.value);
+                            populateManifestForm();
+                        } catch (e) {}
+                    }
+                }
+            });
+
+            codeTextarea.addEventListener('scroll', () => {
+                lineNumbers.scrollTop = codeTextarea.scrollTop;
+            });
+        }
+
+        function updateLineNumbers() {
+            const lines = codeTextarea.value.split('\n').length;
+            let numbersHtml = '';
+            for (let i = 1; i <= lines; i++) {
+                numbersHtml += `${i}<br>`;
+            }
+            lineNumbers.innerHTML = numbersHtml;
+        }
+
+        function formatCode() {
+            if (!activeFile) return;
+            const ext = activeFile.path.split('.').pop().toLowerCase();
+
+            if (ext === 'json' || activeFile.path.endsWith('.json')) {
+                try {
+                    const parsed = JSON.parse(codeTextarea.value);
+                    const formatted = JSON.stringify(parsed, null, 2);
+                    codeTextarea.value = formatted;
+                    activeFile.modifiedContent = formatted;
+                    updateLineNumbers();
+                } catch (err) {
+                    alert("JSONの構文エラーがあります: " + err.message);
+                }
+            } else if (['js', 'ts'].includes(ext)) {
+                let code = codeTextarea.value;
+                let lines = code.split('\n');
+                let indent = 0;
+                let formattedLines = lines.map(line => {
+                    let trimmed = line.trim();
+                    if (!trimmed) return '';
+                    if (trimmed.startsWith('}') || trimmed.startsWith(']') || trimmed.startsWith(')')) {
+                        indent = Math.max(0, indent - 1);
+                    }
+                    let indented = '  '.repeat(indent) + trimmed;
+                    if ((trimmed.endsWith('{') || trimmed.endsWith('[') || trimmed.endsWith('(')) && !trimmed.startsWith('//')) {
+                        indent++;
+                    }
+                    return indented;
+                });
+                const formatted = formattedLines.join('\n');
+                codeTextarea.value = formatted;
+                activeFile.modifiedContent = formatted;
+                updateLineNumbers();
+            }
+        }
+
+        function saveCurrentFile() {
+            if (!activeFile) return;
+            activeFile.modifiedContent = codeTextarea.value;
+            unsavedBadge.classList.add('hidden');
+            renderCurrentPackTree();
+        }
+
+        function openExportModal() {
+            if (exportBtn.disabled) return;
+            const mcpackHelp = document.getElementById('mcpackHelpText');
+            mcpackHelp.textContent = `選択中のパック (${currentTab.toUpperCase()}) を単体で出力`;
+            document.getElementById('exportModal').classList.remove('hidden');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.add('hidden');
+        }
+
+        async function executeExport() {
+            const selectedRadio = document.querySelector('input[name="exportFormat"]:checked');
+            if (!selectedRadio) return;
+
+            const format = selectedRadio.value;
+            closeExportModal();
+
+            exportBtn.disabled = true;
+            exportBtn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> <span>処理中...</span>`;
+            lucide.createIcons();
+
+            try {
+                let packName = "AddonForge_Pack";
+                if (packsData.bp && packsData.bp.manifest.header && packsData.bp.manifest.header.name) {
+                    packName = packsData.bp.manifest.header.name.replace(/[^a-zA-Z0-9_-]/g, "_");
+                } else if (packsData.rp && packsData.rp.manifest.header && packsData.rp.manifest.header.name) {
+                    packName = packsData.rp.manifest.header.name.replace(/[^a-zA-Z0-9_-]/g, "_");
+                }
+
+                let finalBlob = null;
+
+                if (format === 'mcaddon' || format === 'zip') {
+                    const outZip = new JSZip();
+
+                    if (packsData.bp) {
+                        const bpZip = new JSZip();
+                        await buildZipFromPack(bpZip, packsData.bp);
+                        const bpBlob = await bpZip.generateAsync({ type: "uint8array" });
+                        outZip.file("behavior_pack.mcpack", bpBlob);
+                    }
+
+                    if (packsData.rp) {
+                        const rpZip = new JSZip();
+                        await buildZipFromPack(rpZip, packsData.rp);
+                        const rpBlob = await rpZip.generateAsync({ type: "uint8array" });
+                        outZip.file("resource_pack.mcpack", rpBlob);
+                    }
+
+                    finalBlob = await outZip.generateAsync({ type: "blob" });
+
+                } else if (format === 'mcpack') {
+                    const packToExport = packsData[currentTab] || packsData.bp || packsData.rp;
+                    const packZip = new JSZip();
+                    await buildZipFromPack(packZip, packToExport);
+                    finalBlob = await packZip.generateAsync({ type: "blob" });
+                }
+
+                const downloadUrl = URL.createObjectURL(finalBlob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `${packName}.${format}`;
+                document.body.appendChild(a);
                 a.click();
-                showToast(`${id}_addon.mcaddon を出力しました！`);
-            });
+                document.body.removeChild(a);
+                URL.revokeObjectURL(downloadUrl);
+
+            } catch (err) {
+                alert("エクスポート中にエラーが発生しました: " + err.message);
+                console.error(err);
+            } finally {
+                validateAllPacks();
+                exportBtn.innerHTML = `<i data-lucide="download" class="w-4 h-4"></i> <span>出力</span>`;
+                lucide.createIcons();
+            }
         }
 
-        // Notification Helper
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            toastMsg.textContent = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+        async function buildZipFromPack(zipInstance, packData) {
+            for (const file of packData.files) {
+                if (file.isDir) continue;
+                let content;
+                if (file.modifiedContent !== null) {
+                    content = file.modifiedContent;
+                } else if (file.zipObj) {
+                    content = await file.zipObj.async("uint8array");
+                }
+                if (content !== undefined) {
+                    zipInstance.file(file.path, content);
+                }
+            }
+        }
+
+        function showLoading(show, titleText = "読み込み中...", subText = "処理を実行しています") {
+            if (show) {
+                document.getElementById('loadingTitle').textContent = titleText;
+                document.getElementById('loadingSub').textContent = subText;
+                loadingOverlay.classList.remove('hidden');
+                loadingOverlay.classList.add('flex');
+            } else {
+                loadingOverlay.classList.add('hidden');
+                loadingOverlay.classList.remove('flex');
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
     </script>
 </body>

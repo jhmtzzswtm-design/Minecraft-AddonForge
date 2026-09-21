@@ -26,8 +26,6 @@
 			tailwind.config = {
 			    darkMode: 'class',
 			    future: {
-			        // モバイルの「1回目のタップでホバー状態になり、2回目でようやく反応する」問題を防ぐ。
-			        // hover: スタイルを、実際にホバー可能なデバイスだけに適用する。
 			        hoverOnlyWhenSupported: true
 			    },
 			    theme: {
@@ -661,7 +659,9 @@
 						onclick="event.stopPropagation()"
 					>
 						<div
-							class="p-3 border-b border-mc-border bg-mc-sidebar flex items-center gap-3"
+							onclick="deselectTreeSelection(event)"
+							class="p-3 border-b border-mc-border bg-mc-sidebar flex items-center gap-3 cursor-pointer"
+							title="ここをタップすると選択を解除します"
 						>
 							<div
 								id="treePackIconBox"
@@ -903,6 +903,104 @@
 				<p id="loadingSub" class="text-xs text-slate-400 mt-1">
 					アドオンパック構造を解析しています
 				</p>
+			</div>
+		</div>
+
+		<!-- Import Scope Modal (both BP & RP detected) -->
+		<div
+			id="importScopeModal"
+			class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+			onclick="event.stopPropagation()"
+		>
+			<div
+				class="bg-mc-card border border-mc-border rounded-2xl w-full max-w-md p-6 flex flex-col gap-5 shadow-2xl relative animate-in fade-in zoom-in duration-150"
+			>
+				<div class="flex items-center gap-2 border-b border-mc-border pb-3">
+					<div
+						class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30"
+					>
+						<i data-lucide="package-open" class="w-4 h-4"></i>
+					</div>
+					<h3 class="font-bold text-white text-base">
+						読み込むパックを選択
+					</h3>
+				</div>
+
+				<p class="text-xs text-slate-300 leading-relaxed">
+					このファイルには
+					<span class="text-mc-bp font-bold">ビヘイビアパック(BP)</span>
+					と
+					<span class="text-mc-rp font-bold">リソースパック(RP)</span>
+					の両方が含まれています。どちらを読み込むか選択してください。
+				</p>
+
+				<div class="grid grid-cols-1 gap-2.5">
+					<label
+						class="flex items-center gap-3 p-3 rounded-xl bg-mc-dark border border-mc-border hover:border-emerald-500/50 cursor-pointer transition-all"
+					>
+						<input
+							type="radio"
+							name="importScope"
+							value="both"
+							checked
+							class="accent-emerald-500 w-4 h-4"
+						/>
+						<div>
+							<p class="font-bold text-white text-xs">
+								両方 (BP + RP)
+							</p>
+							<p class="text-[11px] text-slate-400">
+								両方のパックをそのまま読み込みます
+							</p>
+						</div>
+					</label>
+					<label
+						class="flex items-center gap-3 p-3 rounded-xl bg-mc-dark border border-mc-border hover:border-emerald-500/50 cursor-pointer transition-all"
+					>
+						<input
+							type="radio"
+							name="importScope"
+							value="bp"
+							class="accent-emerald-500 w-4 h-4"
+						/>
+						<div>
+							<p class="font-bold text-white text-xs">
+								ビヘイビアパックのみ
+							</p>
+							<p class="text-[11px] text-slate-400">
+								RPは新規作成時の状態になります
+							</p>
+						</div>
+					</label>
+					<label
+						class="flex items-center gap-3 p-3 rounded-xl bg-mc-dark border border-mc-border hover:border-emerald-500/50 cursor-pointer transition-all"
+					>
+						<input
+							type="radio"
+							name="importScope"
+							value="rp"
+							class="accent-emerald-500 w-4 h-4"
+						/>
+						<div>
+							<p class="font-bold text-white text-xs">
+								リソースパックのみ
+							</p>
+							<p class="text-[11px] text-slate-400">
+								BPは新規作成時の状態になります
+							</p>
+						</div>
+					</label>
+				</div>
+
+				<div class="flex justify-end gap-2 pt-2 border-t border-mc-border">
+					<button
+						onclick="confirmImportScope()"
+						class="px-5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-1.5"
+					>
+						<i data-lucide="check" class="w-4 h-4"></i>
+						<span>読み込む</span>
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -1245,8 +1343,6 @@
 			let packsData = { bp: null, rp: null };
 			let activeFile = null;
 
-			// インポートした zip / mcaddon / mcpack のファイル名（拡張子なし）。
-			// エクスポート時のファイル名復元と、追加先パス表示に使う。
 			let importedArchiveName = null;
 
 			let selectedFolderPath = "";
@@ -1254,9 +1350,6 @@
 			let openFoldersSet = new Set();
 			let currentModalMode = "";
 			let pendingImportFiles = null;
-			// モーダルを開いた瞬間に確定させる追加先ディレクトリ。
-			// body への click 伝播で選択が解除されても、この値を使うことで
-			// 「フォルダ選択中はそのフォルダ内に追加」を保証する。
 			let modalTargetDir = "";
 
 			let renameTarget = null;
@@ -1380,18 +1473,12 @@
 
 			function deselectTreeSelection(event) {
 			    if (event) event.stopPropagation();
-			    // 何もない場所をタップしたら、選択中のフォルダ・ファイルを両方解除する。
-			    // 選択が無いときは再描画しない（無駄なレンダリング防止）。
 			    if (!selectedFolderPath && !selectedFilePath) return;
 			    selectedFolderPath = "";
 			    selectedFilePath = "";
 			    renderCurrentPackTree();
 			}
 
-			// 選択状態から「追加先ディレクトリ（パック内相対パス）」を決める。
-			// フォルダ選択中 → そのフォルダの中
-			// ファイル選択中 → そのファイルが入っているフォルダの中
-			// 何も選択なし → パック直下（ルート）
 			function getTargetDirectory() {
 			    if (selectedFolderPath) return selectedFolderPath;
 			    if (selectedFilePath) {
@@ -1401,9 +1488,6 @@
 			    return "";
 			}
 
-			// 追加先パスの表示用文字列。
-			// 「zipファイル名/パックフォルダ名/（選択中のディレクトリ）」の形で表示する。
-			// モーダルを開いた瞬間に確定した modalTargetDir を使う。
 			function getTargetPathDisplay() {
 			    const pack = packsData[currentTab];
 			    const archiveName = importedArchiveName
@@ -1415,90 +1499,82 @@
 			    return dir ? `${base}/${dir}` : base;
 			}
 
+			// --- デフォルトパック生成（新規作成・片方インポート時に共通利用） ---
+			function buildDefaultRpPack() {
+			    const rpUuid = generateUuid();
+			    const rpManifest = {
+			        format_version: 2,
+			        header: {
+			            name: "Pack Name",
+			            description: "",
+			            uuid: rpUuid,
+			            version: [1, 0, 0],
+			            min_engine_version: [1, 20, 0]
+			        },
+			        modules: [
+			            { type: "resources", uuid: generateUuid(), version: [1, 0, 0] }
+			        ]
+			    };
+			    return {
+			        rootPrefix: "",
+			        folderName: "RP",
+			        manifest: rpManifest,
+			        files: [
+			            {
+			                path: "manifest.json",
+			                fullZipPath: "manifest.json",
+			                zipObj: null,
+			                modifiedContent: JSON.stringify(rpManifest, null, 2)
+			            }
+			        ],
+			        emptyFolders: new Set(),
+			        iconBlob: null,
+			        iconUrl: null
+			    };
+			}
+
+			function buildDefaultBpPack(rpUuidForDep) {
+			    const bpUuid = generateUuid();
+			    const bpManifest = {
+			        format_version: 2,
+			        header: {
+			            name: "Pack Name",
+			            description: "",
+			            uuid: bpUuid,
+			            version: [1, 0, 0],
+			            min_engine_version: [1, 20, 0]
+			        },
+			        modules: [
+			            { type: "data", uuid: generateUuid(), version: [1, 0, 0] }
+			        ],
+			        dependencies: rpUuidForDep ? [{ uuid: rpUuidForDep, version: [1, 0, 0] }] : []
+			    };
+			    return {
+			        rootPrefix: "",
+			        folderName: "BP",
+			        manifest: bpManifest,
+			        files: [
+			            {
+			                path: "manifest.json",
+			                fullZipPath: "manifest.json",
+			                zipObj: null,
+			                modifiedContent: JSON.stringify(bpManifest, null, 2)
+			            }
+			        ],
+			        emptyFolders: new Set(),
+			        iconBlob: null,
+			        iconUrl: null
+			    };
+			}
+
 			function createNewAddon() {
 			    showLoading(true, "新規パック作成中...");
 			    setTimeout(() => {
-			        const bpUuid = generateUuid();
-			        const rpUuid = generateUuid();
-
-			        const bpManifest = {
-			            format_version: 2,
-			            header: {
-			                name: "Pack Name",
-			                description: "",
-			                uuid: bpUuid,
-			                version: [1, 0, 0],
-			                min_engine_version: [1, 20, 0]
-			            },
-			            modules: [
-			                {
-			                    type: "data",
-			                    uuid: generateUuid(),
-			                    version: [1, 0, 0]
-			                }
-			            ],
-			            dependencies: [
-			                {
-			                    uuid: rpUuid,
-			                    version: [1, 0, 0]
-			                }
-			            ]
-			        };
-
-			        const rpManifest = {
-			            format_version: 2,
-			            header: {
-			                name: "Pack Name",
-			                description: "",
-			                uuid: rpUuid,
-			                version: [1, 0, 0],
-			                min_engine_version: [1, 20, 0]
-			            },
-			            modules: [
-			                {
-			                    type: "resources",
-			                    uuid: generateUuid(),
-			                    version: [1, 0, 0]
-			                }
-			            ]
-			        };
+			        const rp = buildDefaultRpPack();
+			        const bp = buildDefaultBpPack(rp.manifest.header.uuid);
 
 			        importedArchiveName = null;
-
-			        packsData = {
-			            bp: {
-			                rootPrefix: "",
-			                folderName: "BP",
-			                manifest: bpManifest,
-			                files: [
-			                    {
-			                        path: "manifest.json",
-			                        fullZipPath: "manifest.json",
-			                        zipObj: null,
-			                        modifiedContent: JSON.stringify(bpManifest, null, 2)
-			                    }
-			                ],
-			                emptyFolders: new Set(),
-			                iconBlob: null,
-			                iconUrl: null
-			            },
-			            rp: {
-			                rootPrefix: "",
-			                folderName: "RP",
-			                manifest: rpManifest,
-			                files: [
-			                    {
-			                        path: "manifest.json",
-			                        fullZipPath: "manifest.json",
-			                        zipObj: null,
-			                        modifiedContent: JSON.stringify(rpManifest, null, 2)
-			                    }
-			                ],
-			                emptyFolders: new Set(),
-			                iconBlob: null,
-			                iconUrl: null
-			            }
-			        };
+			        packsData = { bp, rp };
 
 			        currentTab = 'bp';
 			        selectedFolderPath = "";
@@ -1580,16 +1656,16 @@
 			            await parseAddonArchive(files[i]);
 			        }
 
-			        if (packsData.bp) currentTab = 'bp';
-			        else if (packsData.rp) currentTab = 'rp';
-
-			        updatePackIconsAndHeader();
-			        switchPackTab(currentTab);
-
 			        showLoading(false);
-			        homeView.classList.add('hidden');
-			        editorView.classList.remove('hidden');
-			        exportBtn.classList.remove('hidden');
+			        fileInput.value = '';
+
+			        // BPとRPの両方が見つかった場合のみ選択モーダルを表示。
+			        // 片方だけならそのまま開く。
+			        if (packsData.bp && packsData.rp) {
+			            openImportScopeModal();
+			        } else {
+			            finalizeImportAndOpen();
+			        }
 
 			    } catch (err) {
 			        alert("ファイルの解析に失敗しました: " + err.message);
@@ -1598,9 +1674,51 @@
 			    }
 			}
 
+			function openImportScopeModal() {
+			    // 既定は「両方」。ラジオを初期化する。
+			    const bothRadio = document.querySelector('input[name="importScope"][value="both"]');
+			    if (bothRadio) bothRadio.checked = true;
+			    document.getElementById('importScopeModal').classList.remove('hidden');
+			}
+
+			function closeImportScopeModal() {
+			    document.getElementById('importScopeModal').classList.add('hidden');
+			}
+
+			function confirmImportScope() {
+			    const el = document.querySelector('input[name="importScope"]:checked');
+			    const scope = el ? el.value : 'both';
+			    applyImportScope(scope);
+			}
+
+			function applyImportScope(scope) {
+			    // 選ばれなかった側は新規作成時と同じデフォルト状態にする。
+			    if (scope === 'bp') {
+			        packsData.rp = buildDefaultRpPack();
+			    } else if (scope === 'rp') {
+			        const rpUuid = (packsData.rp && packsData.rp.manifest && packsData.rp.manifest.header)
+			            ? packsData.rp.manifest.header.uuid
+			            : null;
+			        packsData.bp = buildDefaultBpPack(rpUuid);
+			    }
+			    // 'both' の場合は両方そのまま。
+			    closeImportScopeModal();
+			    finalizeImportAndOpen();
+			}
+
+			function finalizeImportAndOpen() {
+			    if (packsData.bp) currentTab = 'bp';
+			    else if (packsData.rp) currentTab = 'rp';
+
+			    updatePackIconsAndHeader();
+			    switchPackTab(currentTab);
+
+			    homeView.classList.add('hidden');
+			    editorView.classList.remove('hidden');
+			    exportBtn.classList.remove('hidden');
+			}
+
 			async function parseAddonArchive(file) {
-			    // インポートしたアーカイブのファイル名（拡張子なし）を保存する。
-			    // エクスポート時のファイル名復元・追加先パス表示に使用。
 			    const baseName = file.name.replace(/\.(mcaddon|mcpack|zip)$/i, '');
 			    importedArchiveName = baseName;
 
@@ -1614,7 +1732,6 @@
 			            const subBlob = await archive.files[subPath].async("blob");
 			            const subZip = new JSZip();
 			            const subArchive = await subZip.loadAsync(subBlob);
-			            // 中の .mcpack のファイル名をフォルダ名のフォールバックとして渡す
 			            const subName = subPath.split('/').pop().replace(/\.mcpack$/i, '');
 			            await scanAndExtractPacks(subArchive, subName);
 			        }
@@ -1644,9 +1761,6 @@
 			        const isRP = checkIsResourcePack(manifest, zipArchive, rootPrefix);
 			        const packType = isRP ? 'rp' : 'bp';
 
-			        // 元のフォルダ名を保持する。
-			        // zip 内にフォルダがある場合はそのフォルダ名（ネスト含む）、
-			        // manifest がルート直下（mcpack 等）の場合はアーカイブ名をフォールバックに使う。
 			        const folderName = rootPrefix
 			            ? rootPrefix.replace(/\/+$/, '')
 			            : (fallbackFolderName || (isRP ? 'RP' : 'BP'));
@@ -2108,9 +2222,6 @@
 			        });
 			    }
 
-			    // manifest.json をコードエディタで開いたままフォームを編集した場合、
-			    // エディタ側が古い内容のままだと「適用」でフォームの入力を上書きしてしまう。
-			    // フォームの内容をエディタにも即時反映して、マニフェスト情報が確実に紐づくようにする。
 			    if (activeFile && activeFile === manifestFile && !codeEditorArea.classList.contains('hidden')) {
 			        codeTextarea.value = newManifestStr;
 			        updateLineNumbers();
@@ -2185,7 +2296,6 @@
 			function buildTreeStructure(pack) {
 			    const root = { name: "", type: "folder", children: {}, files: [] };
 
-			    // 指定パスのフォルダノードを（無ければ作成して）取得する
 			    const ensureFolder = (folderPath) => {
 			        const parts = folderPath.split('/');
 			        let curr = root;
@@ -2199,7 +2309,6 @@
 			        return curr;
 			    };
 
-			    // .keep ファイルを使わず、空フォルダは emptyFolders セットからツリーに反映する
 			    if (pack.emptyFolders) {
 			        pack.emptyFolders.forEach(fp => ensureFolder(fp));
 			    }
@@ -2255,7 +2364,6 @@
 			        `;
 
 			        const actionDiv = document.createElement('div');
-			        // 名前変更・削除ボタンは常に表示する（ホバー時のみ表示だとタッチ端末で使えないため）。
 			        actionDiv.className = "flex items-center gap-1 shrink-0";
 			        actionDiv.innerHTML = `
 			            <button onclick="event.stopPropagation(); promptRenameFolder('${folderPath}')" title="名前変更" class="p-1 rounded hover:bg-mc-border text-slate-400 hover:text-white">
@@ -2282,8 +2390,6 @@
 
 			    const sortedFiles = [...node.files].sort((a, b) => a.path.localeCompare(b.path));
 			    sortedFiles.forEach(file => {
-			        // ハイライトは「最後にタップしたもの」だけに付ける。
-			        // （開いているファイル activeFile は判定に含めない。フォルダ選択時や選択解除時に光が残らないようにするため）
 			        const isSelected = (selectedFilePath === file.path);
 			        const fileRow = document.createElement('div');
 			        fileRow.className = `flex items-center justify-between py-1 px-2 my-0.5 rounded-lg cursor-pointer transition-colors group select-none ${isSelected ? 'bg-mc-border text-white font-bold' : 'hover:bg-mc-border/60 text-slate-300'}`;
@@ -2313,7 +2419,6 @@
 			        `;
 
 			        const actionDiv = document.createElement('div');
-			        // 名前変更・削除ボタンは常に表示する（ホバー時のみ表示だとタッチ端末で使えないため）。
 			        actionDiv.className = "flex items-center gap-1 shrink-0";
 			        actionDiv.innerHTML = `
 			            <button onclick="event.stopPropagation(); promptRenameFile('${file.path}')" title="名前変更" class="p-1 rounded hover:bg-mc-border text-slate-400 hover:text-white">
@@ -2485,7 +2590,6 @@
 			    const pack = packsData[currentTab];
 			    if (!pack) { alert("パックが読み込まれていません。"); return; }
 			    currentModalMode = "file";
-			    // モーダルを開く瞬間に追加先を確定保存する（バグ1対策）
 			    modalTargetDir = getTargetDirectory();
 			    document.getElementById('modalTypeIcon').innerHTML = `<i data-lucide="file-plus" class="w-4 h-4"></i>`;
 			    document.getElementById('modalTypeTitle').textContent = "新規ファイル作成";
@@ -2502,7 +2606,6 @@
 			    const pack = packsData[currentTab];
 			    if (!pack) { alert("パックが読み込まれていません。"); return; }
 			    currentModalMode = "folder";
-			    // モーダルを開く瞬間に追加先を確定保存する（バグ1対策）
 			    modalTargetDir = getTargetDirectory();
 			    document.getElementById('modalTypeIcon').innerHTML = `<i data-lucide="folder-plus" class="w-4 h-4"></i>`;
 			    document.getElementById('modalTypeTitle').textContent = "新規フォルダ作成";
@@ -2536,7 +2639,6 @@
 
 			    pendingImportFiles = files;
 			    currentModalMode = "import";
-			    // モーダルを開く瞬間に追加先を確定保存する（バグ1対策）
 			    modalTargetDir = getTargetDirectory();
 			    document.getElementById('modalTypeIcon').innerHTML = `<i data-lucide="upload" class="w-4 h-4"></i>`;
 			    document.getElementById('modalTypeTitle').textContent = "外部ファイル取り込み";
@@ -2563,7 +2665,6 @@
 			    if (!pack) return;
 			    if (!pack.emptyFolders) pack.emptyFolders = new Set();
 
-			    // モーダルを開いた瞬間に確定した追加先を使う（バグ1対策）
 			    const targetDir = modalTargetDir;
 
 			    if (currentModalMode === "file") {
@@ -2573,17 +2674,14 @@
 			            return;
 			        }
 			        const dotIdx = name.lastIndexOf('.');
-			        // 拡張子が全く無い（例: "item"）
 			        if (dotIdx === -1) {
 			            showModalError("拡張子を含めたファイル名を入力してください。（例: item.json）");
 			            return;
 			        }
-			        // 拡張子だけの名前（例: ".json"）はエラーにする。
 			        if (dotIdx === 0) {
 			            showModalError("拡張子のみのファイル名は使用できません。ファイル名を入力してください。（例: item.json）");
 			            return;
 			        }
-			        // 末尾がドットで終わる（例: "item."）
 			        if (dotIdx === name.length - 1) {
 			            showModalError("拡張子を入力してください。（例: item.json）");
 			            return;
@@ -2593,7 +2691,6 @@
 			            showModalError("同名のファイルが既に存在します。");
 			            return;
 			        }
-			        // 同名のフォルダ（ファイル入り・空フォルダの両方）が存在する場合もブロックする。
 			        if (pack.files.some(f => f.path.startsWith(newPath + '/')) || pack.emptyFolders.has(newPath)) {
 			            showModalError("同名のフォルダが既に存在するため、このファイル名は使用できません。");
 			            return;
@@ -2607,7 +2704,6 @@
 			        };
 			        pack.files.push(newFileObj);
 
-			        // 空フォルダの中にファイルが作られたら、そのフォルダは空フォルダ管理から外す
 			        if (targetDir) pack.emptyFolders.delete(targetDir);
 
 			        closeCreateItemModal();
@@ -2624,18 +2720,15 @@
 			        }
 			        const newFolderPath = targetDir ? `${targetDir}/${name}` : name;
 
-			        // 同名のフォルダが既に存在する場合はエラーを出してブロックする。
 			        if (pack.files.some(f => f.path.startsWith(newFolderPath + '/')) || pack.emptyFolders.has(newFolderPath)) {
 			            showModalError("同名のフォルダが既に存在します。");
 			            return;
 			        }
-			        // 同名のファイルが存在する場合もブロックする。
 			        if (pack.files.some(f => f.path === newFolderPath)) {
 			            showModalError("同名のファイルが既に存在するため、このフォルダ名は使用できません。");
 			            return;
 			        }
 
-			        // .keep のようなダミーファイルは作らず、空フォルダとしてセットで管理する
 			        pack.emptyFolders.add(newFolderPath);
 			        openFoldersSet.add(newFolderPath);
 
@@ -2666,7 +2759,6 @@
 			            }
 			        }
 
-			        // 空フォルダにインポートした場合は空フォルダ管理から外す
 			        if (targetDir) pack.emptyFolders.delete(targetDir);
 
 			        closeCreateItemModal();
@@ -2743,7 +2835,6 @@
 			            }
 			        });
 
-			        // 空フォルダの管理セットもリネームに追従させる
 			        if (pack.emptyFolders) {
 			            const updated = new Set();
 			            pack.emptyFolders.forEach(fp => {
@@ -2811,7 +2902,6 @@
 			    } else if (deleteTarget.type === 'folder') {
 			        const targetFolder = deleteTarget.path;
 			        pack.files = pack.files.filter(f => !f.path.startsWith(targetFolder + '/'));
-			        // 空フォルダの管理セットからも該当フォルダ（配下含む）を削除する
 			        if (pack.emptyFolders) {
 			            const updated = new Set();
 			            pack.emptyFolders.forEach(fp => {
@@ -2845,7 +2935,6 @@
 			    const scopeRadios = document.getElementById('exportScopeRadios');
 			    scopeRadios.innerHTML = '';
 
-			    // 出力対象（両方 / RPのみ / BPのみ）の選択肢を組み立てる
 			    const scopeOptions = [];
 			    if (hasBP && hasRP) {
 			        scopeOptions.push({ v: 'both', t: '両方 (BP + RP)', d: 'ビヘイビアパックとリソースパックの両方を出力します' });
@@ -2869,7 +2958,6 @@
 			        `;
 			    });
 
-			    // パックが1種類しかない場合は範囲選択を省略する
 			    scopeContainer.classList.toggle('hidden', scopeOptions.length <= 1);
 
 			    renderExportFormatOptions();
@@ -2887,7 +2975,6 @@
 			    const formatRadios = document.getElementById('exportFormatRadios');
 			    formatRadios.innerHTML = '';
 
-			    // 両方なら .mcaddon / .zip、単体なら .mcpack / .zip を出す
 			    let opts;
 			    if (scope === 'both') {
 			        opts = [
@@ -2932,7 +3019,6 @@
 			        let ext = "zip";
 
 			        if (scope === 'both') {
-			            // インポート時に保存した元のフォルダ名を復元して出力する
 			            const bpFolderName = packsData.bp.folderName || "BP";
 			            const rpFolderName = packsData.rp.folderName || "RP";
 
@@ -2967,7 +3053,6 @@
 			}
 
 			async function packFilesToZip(pack, zipFolder) {
-			    // 空フォルダも zip のフォルダエントリとして出力して構造を維持する
 			    if (pack.emptyFolders) {
 			        for (const folderPath of pack.emptyFolders) {
 			            zipFolder.folder(folderPath);
@@ -2975,7 +3060,6 @@
 			    }
 
 			    for (const fileItem of pack.files) {
-			        // 旧バージョンで作成された .keep ダミーファイルは出力しない（後方互換）
 			        if (fileItem.path.endsWith('/.keep')) continue;
 
 			        if (fileItem.modifiedContent !== null && fileItem.modifiedContent !== undefined) {

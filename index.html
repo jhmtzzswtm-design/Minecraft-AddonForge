@@ -1,20 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja" class="dark">
 	<head>
-		
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
-<link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="manifest" href="site.webmanifest">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Minecraft AddonForge">
-<meta name="theme-color" content="#121316">
 		<meta charset="UTF-8" />
 		<meta
 			name="viewport"
@@ -79,12 +65,24 @@
 			    background: rgba(22, 24, 29, 0.85);
 			    backdrop-filter: blur(12px);
 			}
+
+			/* 行番号とコードエディタの行を完全一致させるための共通指標。
+			   フォントサイズ・行高・上下パディングを両者で揃えることでズレを無くす。 */
+			.editor-metrics {
+			    font-family: 'JetBrains Mono', monospace;
+			    font-size: 12px;
+			    line-height: 20px; /* 1行 = 20px 固定 */
+			}
 			.code-textarea {
 			    tab-size: 2;
 			    resize: none;
 			    outline: none;
 			    white-space: pre;
 			    overflow-x: auto;
+			    overflow-y: hidden; /* 縦スクロールは無効化し、内容に合わせて高さを自動調整する */
+			}
+			.line-numbers-box > div {
+			    height: 20px; /* editor-metrics の line-height と一致 */
 			}
 			.image-render-pixelated {
 			    image-rendering: pixelated;
@@ -95,6 +93,37 @@
 			    margin-left: 11px;
 			    padding-left: 6px;
 			}
+
+			/* ===== 画像エディタ (PNG / JPG / JPEG / TGA) ===== */
+			.imged-btn {
+			    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+			    min-width: 32px; height: 32px; padding: 0 8px;
+			    border-radius: 8px; border: 1px solid #262933;
+			    background: #0d0e11; color: #cbd5e1;
+			    font-size: 11px; font-weight: 600; line-height: 1;
+			    cursor: pointer; transition: all .12s; white-space: nowrap;
+			    user-select: none; -webkit-user-select: none;
+			}
+			.imged-btn:hover { background: #262933; color: #fff; }
+			.imged-btn.active { background: rgba(16,185,129,.2); border-color: rgba(16,185,129,.45); color: #34d399; }
+			.imged-btn:disabled { opacity: .35; cursor: not-allowed; }
+			.imged-btn:disabled:hover { background: #0d0e11; color: #cbd5e1; }
+			.imged-sep { width: 1px; height: 20px; background: #262933; margin: 0 2px; flex-shrink: 0; }
+			.imged-lbl { font-size: 10px; color: #94a3b8; font-weight: 600; white-space: nowrap; }
+			.imged-checker { background: repeating-conic-gradient(#3a3d48 0% 25%, #2a2d37 0% 50%) 50% / 16px 16px; }
+			.imged-range { accent-color: #10b981; }
+			.imged-swatch {
+			    width: 20px; height: 20px; border-radius: 5px; padding: 0; cursor: pointer;
+			    border: 1px solid rgba(255,255,255,.25); flex-shrink: 0;
+			}
+			.imged-swatch:hover { transform: scale(1.15); }
+			.imged-cursor { outline: 1px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.7); }
+			.imged-anchor {
+			    width: 36px; height: 36px; border-radius: 8px; border: 1px solid #262933;
+			    background: #0d0e11; color: #64748b; cursor: pointer; font-size: 14px;
+			}
+			.imged-anchor.active { background: rgba(16,185,129,.25); border-color: rgba(16,185,129,.6); color: #34d399; }
+			#imgEdCanvas { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: none; }
 		</style>
 	</head>
 	<body
@@ -828,21 +857,25 @@
 								</p>
 							</div>
 
+							<!-- コードエディタ本体。行番号とテキストを同じ寸法(editor-metrics)で揃え、
+							     縦スクロールはこのコンテナ側で行う(テキストエリアは自動高さ)。 -->
 							<div
 								id="codeEditorArea"
-								class="hidden flex-1 flex relative overflow-hidden font-mono text-xs leading-relaxed"
+								class="hidden flex-1 overflow-auto relative"
 							>
-								<div
-									id="lineNumbers"
-									class="line-numbers w-10 py-3 pr-2 bg-mc-dark/80 border-r border-mc-border shrink-0 select-none text-[11px] font-mono leading-relaxed text-right text-slate-500"
-								>
-									1
+								<div class="flex min-h-full">
+									<div
+										id="lineNumbers"
+										class="line-numbers-box editor-metrics w-10 py-3 pr-2 bg-mc-dark/80 border-r border-mc-border shrink-0 select-none text-right text-slate-500"
+									>
+										<div>1</div>
+									</div>
+									<textarea
+										id="codeTextarea"
+										spellcheck="false"
+										class="code-textarea editor-metrics flex-1 p-3 bg-transparent text-slate-100 focus:outline-none"
+									></textarea>
 								</div>
-								<textarea
-									id="codeTextarea"
-									spellcheck="false"
-									class="code-textarea flex-1 p-3 bg-transparent text-slate-100 font-mono text-xs leading-relaxed focus:outline-none"
-								></textarea>
 							</div>
 
 							<div
@@ -854,6 +887,123 @@
 									src=""
 									class="max-h-[350px] object-contain image-render-pixelated rounded-xl shadow-2xl border border-mc-border"
 								/>
+							</div>
+
+							<!-- ===== 画像エディタ (PNG / JPG / JPEG / TGA) ===== -->
+							<div
+								id="imageEditorArea"
+								class="hidden flex-1 flex flex-col min-h-0 bg-mc-editor"
+							>
+								<div
+									class="p-2 border-b border-mc-border bg-mc-sidebar/60 flex flex-col gap-2"
+								>
+									<!-- ツール -->
+									<div class="flex flex-wrap items-center gap-1.5">
+										<button data-tool="hand" onclick="imgEdSetTool('hand')" title="手のひら (H) 表示位置を移動" class="imged-btn"><i data-lucide="hand" class="w-4 h-4"></i></button>
+										<button data-tool="pen" onclick="imgEdSetTool('pen')" title="ペン (B)" class="imged-btn"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+										<button data-tool="eraser" onclick="imgEdSetTool('eraser')" title="消しゴム (E)" class="imged-btn"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+										<button data-tool="fill" onclick="imgEdSetTool('fill')" title="塗りつぶし (G)" class="imged-btn"><i data-lucide="paint-bucket" class="w-4 h-4"></i></button>
+										<button data-tool="picker" onclick="imgEdSetTool('picker')" title="スポイト (I)" class="imged-btn"><i data-lucide="pipette" class="w-4 h-4"></i></button>
+										<button data-tool="line" onclick="imgEdSetTool('line')" title="直線 (L) Shiftで角度固定" class="imged-btn"><i data-lucide="slash" class="w-4 h-4"></i></button>
+										<button data-tool="rect" onclick="imgEdSetTool('rect')" title="四角形 (R) Shiftで正方形" class="imged-btn"><i data-lucide="square" class="w-4 h-4"></i></button>
+										<button data-tool="ellipse" onclick="imgEdSetTool('ellipse')" title="楕円 (O) Shiftで正円" class="imged-btn"><i data-lucide="circle" class="w-4 h-4"></i></button>
+										<span class="imged-sep"></span>
+										<button id="imgEdUndoBtn" onclick="imgEdUndo()" title="元に戻す (Ctrl+Z)" class="imged-btn"><i data-lucide="undo-2" class="w-4 h-4"></i></button>
+										<button id="imgEdRedoBtn" onclick="imgEdRedo()" title="やり直し (Ctrl+Y)" class="imged-btn"><i data-lucide="redo-2" class="w-4 h-4"></i></button>
+									</div>
+
+									<!-- 画像の変形 -->
+									<div class="flex flex-wrap items-center gap-1.5">
+										<button onclick="imgEdOpenResize()" title="縦横サイズの変更" class="imged-btn"><i data-lucide="crop" class="w-4 h-4 text-emerald-400"></i><span>サイズ変更</span></button>
+										<button onclick="imgEdFlip('h')" title="左右反転" class="imged-btn"><i data-lucide="flip-horizontal" class="w-4 h-4"></i><span class="hidden sm:inline">左右反転</span></button>
+										<button onclick="imgEdFlip('v')" title="上下反転" class="imged-btn"><i data-lucide="flip-vertical" class="w-4 h-4"></i><span class="hidden sm:inline">上下反転</span></button>
+										<button onclick="imgEdRotate(-1)" title="左に90°回転" class="imged-btn"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span class="hidden sm:inline">左回転</span></button>
+										<button onclick="imgEdRotate(1)" title="右に90°回転" class="imged-btn"><i data-lucide="rotate-cw" class="w-4 h-4"></i><span class="hidden sm:inline">右回転</span></button>
+										<button onclick="imgEdClearAll()" title="全体を透明にする" class="imged-btn"><i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i><span class="hidden sm:inline">全消去</span></button>
+									</div>
+
+									<!-- ツールオプション -->
+									<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+										<div data-opt="color" class="flex items-center gap-1.5">
+											<span class="imged-lbl">色</span>
+											<input type="color" id="imgEdColor" value="#10b981" class="w-8 h-8 rounded-lg border border-mc-border bg-mc-dark cursor-pointer p-0.5" />
+										</div>
+										<div data-opt="opacity" class="flex items-center gap-1.5">
+											<span class="imged-lbl">不透明度</span>
+											<input type="range" id="imgEdOpacity" min="1" max="100" value="100" class="imged-range w-24" />
+											<span id="imgEdOpacityVal" class="font-mono text-[11px] text-slate-300 w-9 text-right">100%</span>
+										</div>
+										<div data-opt="size" class="flex items-center gap-1.5">
+											<span class="imged-lbl">サイズ</span>
+											<input type="range" id="imgEdSize" min="1" max="64" value="1" class="imged-range w-24" />
+											<span id="imgEdSizeVal" class="font-mono text-[11px] text-slate-300 w-9 text-right">1px</span>
+										</div>
+										<div data-opt="shape" class="flex items-center gap-1">
+											<span class="imged-lbl mr-0.5">形</span>
+											<button data-shape="square" onclick="imgEdSetShape('square')" class="imged-btn">四角</button>
+											<button data-shape="round" onclick="imgEdSetShape('round')" class="imged-btn">丸</button>
+										</div>
+										<div data-opt="fillmode" class="flex items-center gap-1">
+											<span class="imged-lbl mr-0.5">図形</span>
+											<button data-fillmode="0" onclick="imgEdSetFillMode(false)" class="imged-btn">枠線</button>
+											<button data-fillmode="1" onclick="imgEdSetFillMode(true)" class="imged-btn">塗りつぶし</button>
+										</div>
+										<div data-opt="tolerance" class="flex items-center gap-1.5">
+											<span class="imged-lbl">許容差</span>
+											<input type="range" id="imgEdTolerance" min="0" max="128" value="0" class="imged-range w-24" />
+											<span id="imgEdToleranceVal" class="font-mono text-[11px] text-slate-300 w-7 text-right">0</span>
+										</div>
+										<div data-jpeg class="hidden flex items-center gap-1.5">
+											<span class="imged-lbl">JPEG画質</span>
+											<input type="range" id="imgEdJpegQuality" min="10" max="100" value="92" class="imged-range w-24" />
+											<span id="imgEdJpegQualityVal" class="font-mono text-[11px] text-slate-300 w-9 text-right">92%</span>
+										</div>
+									</div>
+
+									<!-- パレット -->
+									<div id="imgEdPalette" class="flex flex-wrap items-center gap-1"></div>
+								</div>
+
+								<!-- キャンバス表示領域 -->
+								<div
+									id="imgEdViewport"
+									class="overflow-auto bg-black/40 flex"
+									style="height: min(60vh, 640px); min-height: 280px"
+								>
+									<div
+										id="imgEdStage"
+										class="imged-checker relative shrink-0 m-auto shadow-2xl ring-1 ring-white/15"
+									>
+										<canvas
+											id="imgEdCanvas"
+											class="block image-render-pixelated"
+										></canvas>
+										<div id="imgEdGrid" class="absolute inset-0 pointer-events-none" style="display: none"></div>
+										<div id="imgEdCursor" class="imged-cursor absolute pointer-events-none" style="display: none"></div>
+									</div>
+								</div>
+
+								<!-- ステータス / ズーム -->
+								<div
+									class="p-2 border-t border-mc-border bg-mc-sidebar/60 flex flex-col gap-1.5"
+								>
+									<div class="flex flex-wrap items-center justify-between gap-2">
+										<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono text-slate-400">
+											<span id="imgEdPosText">X - Y -</span>
+											<span id="imgEdSizeText" class="text-slate-300"></span>
+										</div>
+										<div class="flex items-center gap-1.5">
+											<button id="imgEdGridBtn" onclick="imgEdToggleGrid()" title="ピクセルグリッド (拡大時に表示)" class="imged-btn"><i data-lucide="grid-3x3" class="w-4 h-4"></i></button>
+											<button onclick="imgEdZoomStep(-1)" title="縮小 (-)" class="imged-btn"><i data-lucide="zoom-out" class="w-4 h-4"></i></button>
+											<span id="imgEdZoomText" class="font-mono text-[11px] text-slate-300 w-12 text-center">100%</span>
+											<button onclick="imgEdZoomStep(1)" title="拡大 (+)" class="imged-btn"><i data-lucide="zoom-in" class="w-4 h-4"></i></button>
+											<button onclick="imgEdFitZoom()" title="画面に合わせる" class="imged-btn"><i data-lucide="maximize" class="w-4 h-4"></i></button>
+										</div>
+									</div>
+									<p id="imgEdHint" class="text-[11px] text-slate-500"></p>
+									<p id="imgEdJpegNote" class="hidden text-[11px] text-amber-400">JPEGは透明に対応していません。透明部分は白で保存されます。</p>
+									<p class="text-[11px] text-slate-500">編集内容は右上の「適用」で反映されます(ファイル切替・出力時は自動で適用)。</p>
+								</div>
 							</div>
 
 							<div
@@ -898,6 +1048,103 @@
 				</div>
 			</div>
 		</main>
+
+		<!-- 画像サイズ変更モーダル -->
+		<div
+			id="imgEdResizeModal"
+			class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+			onclick="event.stopPropagation()"
+		>
+			<div
+				class="bg-mc-card border border-mc-border rounded-2xl w-full max-w-md p-5 flex flex-col gap-4 shadow-2xl max-h-[92vh] overflow-y-auto"
+			>
+				<div class="flex items-center justify-between border-b border-mc-border pb-3">
+					<div class="flex items-center gap-2">
+						<div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+							<i data-lucide="crop" class="w-4 h-4"></i>
+						</div>
+						<div>
+							<h3 class="font-bold text-white text-base leading-tight">画像サイズの変更</h3>
+							<p class="text-[11px] text-slate-400 font-mono">現在: <span id="imgEdResizeCur"></span></p>
+						</div>
+					</div>
+					<button onclick="imgEdCloseResize()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-mc-border transition-colors">
+						<i data-lucide="x" class="w-5 h-5"></i>
+					</button>
+				</div>
+
+				<div class="grid grid-cols-2 gap-2">
+					<button data-rmode="scale" onclick="imgEdResizeMode('scale')" class="imged-btn !h-auto !py-2 flex-col !gap-0.5">
+						<span class="text-xs">拡大・縮小</span>
+						<span class="text-[10px] font-normal opacity-70">画像ごと伸縮する</span>
+					</button>
+					<button data-rmode="canvas" onclick="imgEdResizeMode('canvas')" class="imged-btn !h-auto !py-2 flex-col !gap-0.5">
+						<span class="text-xs">キャンバス変更</span>
+						<span class="text-[10px] font-normal opacity-70">絵は等倍のまま拡張/切り抜き</span>
+					</button>
+				</div>
+
+				<div
+					id="imgEdResizeErr"
+					class="hidden bg-red-500/10 border border-red-500/30 rounded-xl p-2.5 text-red-400 text-xs font-semibold"
+				></div>
+
+				<div class="flex items-end gap-2 text-xs">
+					<label class="flex-1 flex flex-col gap-1">
+						<span class="imged-lbl">幅 (px)</span>
+						<input id="imgEdResizeW" type="number" min="1" max="4096" oninput="imgEdResizeInput('w')" class="bg-mc-dark border border-mc-border rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500" />
+					</label>
+					<button id="imgEdLockBtn" onclick="imgEdToggleLock()" title="縦横比を固定" class="imged-btn active !h-[38px]"><i data-lucide="link" class="w-4 h-4"></i></button>
+					<label class="flex-1 flex flex-col gap-1">
+						<span class="imged-lbl">高さ (px)</span>
+						<input id="imgEdResizeH" type="number" min="1" max="4096" oninput="imgEdResizeInput('h')" class="bg-mc-dark border border-mc-border rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500" />
+					</label>
+				</div>
+
+				<div class="flex flex-wrap items-center gap-1.5">
+					<button onclick="imgEdResizeFactor(0.5)" class="imged-btn">÷2</button>
+					<button onclick="imgEdResizeFactor(2)" class="imged-btn">×2</button>
+					<span class="imged-sep"></span>
+					<button onclick="imgEdResizePreset(16)" class="imged-btn">16</button>
+					<button onclick="imgEdResizePreset(32)" class="imged-btn">32</button>
+					<button onclick="imgEdResizePreset(64)" class="imged-btn">64</button>
+					<button onclick="imgEdResizePreset(128)" class="imged-btn">128</button>
+					<button onclick="imgEdResizePreset(256)" class="imged-btn">256</button>
+					<button onclick="imgEdResizePreset(512)" class="imged-btn">512</button>
+				</div>
+
+				<div data-rpanel="scale" class="flex flex-col gap-1">
+					<span class="imged-lbl">補間方法</span>
+					<select id="imgEdResizeSmooth" class="bg-mc-dark border border-mc-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+						<option value="nearest">ニアレストネイバー(ドット絵向け・くっきり)</option>
+						<option value="smooth">スムーズ(なめらか)</option>
+					</select>
+				</div>
+
+				<div data-rpanel="canvas" class="hidden flex flex-col gap-2">
+					<span class="imged-lbl">元画像の配置位置</span>
+					<div class="grid grid-cols-3 gap-1.5 w-fit">
+						<button data-anchor="0,0" onclick="imgEdSetAnchor(0,0)" class="imged-anchor">↖</button>
+						<button data-anchor="1,0" onclick="imgEdSetAnchor(1,0)" class="imged-anchor">↑</button>
+						<button data-anchor="2,0" onclick="imgEdSetAnchor(2,0)" class="imged-anchor">↗</button>
+						<button data-anchor="0,1" onclick="imgEdSetAnchor(0,1)" class="imged-anchor">←</button>
+						<button data-anchor="1,1" onclick="imgEdSetAnchor(1,1)" class="imged-anchor">●</button>
+						<button data-anchor="2,1" onclick="imgEdSetAnchor(2,1)" class="imged-anchor">→</button>
+						<button data-anchor="0,2" onclick="imgEdSetAnchor(0,2)" class="imged-anchor">↙</button>
+						<button data-anchor="1,2" onclick="imgEdSetAnchor(1,2)" class="imged-anchor">↓</button>
+						<button data-anchor="2,2" onclick="imgEdSetAnchor(2,2)" class="imged-anchor">↘</button>
+					</div>
+					<p class="text-[11px] text-slate-500">拡張した部分は透明になります(JPEGは白)。小さくすると、はみ出た部分は切り取られます。</p>
+				</div>
+
+				<p id="imgEdResizeWarn" class="hidden text-[11px] text-amber-400"></p>
+
+				<div class="flex items-center gap-2 pt-1">
+					<button onclick="imgEdCloseResize()" class="flex-1 py-2.5 rounded-xl border border-mc-border bg-mc-dark hover:bg-mc-border text-slate-200 text-xs font-bold transition-all">キャンセル</button>
+					<button onclick="imgEdApplyResize()" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition-all active:scale-95">サイズを変更</button>
+				</div>
+			</div>
+		</div>
 
 		<!-- Loading Overlay -->
 		<div
@@ -1589,6 +1836,7 @@
 
 			        importedArchiveName = null;
 			        packsData = { bp, rp };
+			        resetImageEditorState();
 
 			        currentTab = 'bp';
 			        selectedFolderPath = "";
@@ -1620,6 +1868,7 @@
 			    stopAudioPlayback();
 			    packsData = { bp: null, rp: null };
 			    activeFile = null;
+			    resetImageEditorState();
 			    importedArchiveName = null;
 			    selectedFolderPath = "";
 			    selectedFilePath = "";
@@ -1660,6 +1909,7 @@
 			    stopAudioPlayback();
 			    packsData = { bp: null, rp: null };
 			    activeFile = null;
+			    resetImageEditorState();
 			    importedArchiveName = null;
 			    selectedFolderPath = "";
 			    selectedFilePath = "";
@@ -1673,8 +1923,6 @@
 			        showLoading(false);
 			        fileInput.value = '';
 
-			        // BPとRPの両方が見つかった場合のみ選択モーダルを表示。
-			        // 片方だけならそのまま開く。
 			        if (packsData.bp && packsData.rp) {
 			            openImportScopeModal();
 			        } else {
@@ -1689,7 +1937,6 @@
 			}
 
 			function openImportScopeModal() {
-			    // 既定は「両方」。ラジオを初期化する。
 			    const bothRadio = document.querySelector('input[name="importScope"][value="both"]');
 			    if (bothRadio) bothRadio.checked = true;
 			    document.getElementById('importScopeModal').classList.remove('hidden');
@@ -1706,7 +1953,6 @@
 			}
 
 			function applyImportScope(scope) {
-			    // 選ばれなかった側は新規作成時と同じデフォルト状態にする。
 			    if (scope === 'bp') {
 			        packsData.rp = buildDefaultRpPack();
 			    } else if (scope === 'rp') {
@@ -1715,7 +1961,6 @@
 			            : null;
 			        packsData.bp = buildDefaultBpPack(rpUuid);
 			    }
-			    // 'both' の場合は両方そのまま。
 			    closeImportScopeModal();
 			    finalizeImportAndOpen();
 			}
@@ -1733,8 +1978,12 @@
 			}
 
 			async function parseAddonArchive(file) {
+			    // インポートしたアーカイブ名(拡張子なし)を保持。
+			    // 複数ファイルを読み込む場合でも、最初に確定した名前を優先して失わないようにする。
 			    const baseName = file.name.replace(/\.(mcaddon|mcpack|zip)$/i, '');
-			    importedArchiveName = baseName;
+			    if (!importedArchiveName) {
+			        importedArchiveName = baseName;
+			    }
 
 			    const zip = new JSZip();
 			    const archive = await zip.loadAsync(file);
@@ -1775,6 +2024,8 @@
 			        const isRP = checkIsResourcePack(manifest, zipArchive, rootPrefix);
 			        const packType = isRP ? 'rp' : 'bp';
 
+			        // 元のフォルダ名を保持する。サブフォルダがあればそのフォルダ名、
+			        // manifestがルート直下ならアーカイブ名(またはmcpack名)をフォールバックに使う。
 			        const folderName = rootPrefix
 			            ? rootPrefix.replace(/\/+$/, '')
 			            : (fallbackFolderName || (isRP ? 'RP' : 'BP'));
@@ -1917,6 +2168,11 @@
 
 			        modeBtnFiles.className = "px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5";
 			        modeBtnManifest.className = "px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5";
+
+			        // ファイル編集ビュー表示時、開いているテキストがあれば高さを再計算する
+			        if (activeFile && !codeEditorArea.classList.contains('hidden')) {
+			            requestAnimationFrame(autoResizeTextarea);
+			        }
 			    }
 			}
 
@@ -2456,9 +2712,6 @@
 			            unsavedBadge.classList.remove('hidden');
 			        }
 			    });
-			    codeTextarea.addEventListener('scroll', () => {
-			        lineNumbers.scrollTop = codeTextarea.scrollTop;
-			    });
 			    codeTextarea.addEventListener('keydown', (e) => {
 			        if (e.key === 'Tab') {
 			            e.preventDefault();
@@ -2471,16 +2724,25 @@
 			    });
 			}
 
+			// テキストエリアを内容に合わせて自動リサイズ（縦スクロールを出さない）
+			function autoResizeTextarea() {
+			    codeTextarea.style.height = 'auto';
+			    codeTextarea.style.height = codeTextarea.scrollHeight + 'px';
+			}
+
 			function updateLineNumbers() {
 			    const lines = codeTextarea.value.split('\n').length;
-			    let lineNumsHtml = '';
+			    let html = '';
 			    for (let i = 1; i <= lines; i++) {
-			        lineNumsHtml += i + '<br>';
+			        html += `<div>${i}</div>`;
 			    }
-			    lineNumbers.innerHTML = lineNumsHtml;
+			    lineNumbers.innerHTML = html;
+			    // 行番号を更新するたびにテキストエリアの高さも合わせる
+			    autoResizeTextarea();
 			}
 
 			async function openFileInEditor(file) {
+			    await commitImageEditorIfDirty(); // 画像エディタの未適用変更を先に反映
 			    stopAudioPlayback();
 			    activeFile = file;
 			    unsavedBadge.classList.add('hidden');
@@ -2490,6 +2752,7 @@
 			    editorPlaceholder.classList.add('hidden');
 			    codeEditorArea.classList.add('hidden');
 			    imageViewerArea.classList.add('hidden');
+			    imageEditorArea.classList.add('hidden');
 			    audioViewerArea.classList.add('hidden');
 			    binaryViewerArea.classList.add('hidden');
 
@@ -2505,12 +2768,22 @@
 			        }
 			        codeTextarea.value = content;
 			        updateLineNumbers();
+			        // レイアウト確定後に再度高さを合わせる
+			        requestAnimationFrame(autoResizeTextarea);
 
 			        document.getElementById('formatBtn').classList.toggle('hidden', ext !== 'json');
 
 			    } else if (IMAGE_EXTENSIONS.includes(ext)) {
-			        imageViewerArea.classList.remove('hidden');
 			        document.getElementById('formatBtn').classList.add('hidden');
+			        // 画像エディタで開く(読み込めない場合は従来のプレビュー表示へフォールバック)
+			        try {
+			            if (await openImageEditor(file, ext)) return;
+			        } catch (err) {
+			            console.error(err);
+			            if (activeFile === file) alert('この画像はエディタで開けませんでした(' + err.message + ')。プレビュー表示に切り替えます。');
+			        }
+			        if (activeFile !== file) return;
+			        imageViewerArea.classList.remove('hidden');
 			        let src = "";
 			        if (file.modifiedContent) {
 			            const blob = new Blob([file.modifiedContent]);
@@ -2544,6 +2817,10 @@
 			function saveCurrentFile() {
 			    if (!activeFile) return;
 			    const ext = activeFile.path.split('.').pop().toLowerCase();
+			    if (IMAGE_EXTENSIONS.includes(ext) && imgEd.img && imgEd.file === activeFile) {
+			        applyImageEditorChanges(); // 画像は非同期でエンコードして反映
+			        return;
+			    }
 			    if (TEXT_EXTENSIONS.includes(ext)) {
 			        activeFile.modifiedContent = codeTextarea.value;
 			    }
@@ -2562,8 +2839,24 @@
 			    if (!activeFile) return;
 			    try {
 			        const parsed = JSON.parse(codeTextarea.value);
-			        codeTextarea.value = JSON.stringify(parsed, null, 2);
+			        const formatted = JSON.stringify(parsed, null, 2);
+			        codeTextarea.value = formatted;
 			        updateLineNumbers();
+
+			        // 整形結果を即座に保存する（バグ①対策）
+			        const ext = activeFile.path.split('.').pop().toLowerCase();
+			        if (TEXT_EXTENSIONS.includes(ext)) {
+			            activeFile.modifiedContent = formatted;
+			        }
+			        unsavedBadge.classList.add('hidden');
+
+			        // manifest.json ならフォーム側にも反映
+			        if (activeFile.path === 'manifest.json') {
+			            try {
+			                packsData[currentTab].manifest = JSON.parse(formatted);
+			                populateManifestForm();
+			            } catch (e) {}
+			        }
 			    } catch (e) {
 			        alert("JSONの構文にエラーがあるため整形できませんでした。");
 			    }
@@ -2908,6 +3201,7 @@
 			            editorPlaceholder.classList.remove('hidden');
 			            codeEditorArea.classList.add('hidden');
 			            imageViewerArea.classList.add('hidden');
+			            imageEditorArea.classList.add('hidden');
 			            audioViewerArea.classList.add('hidden');
 			            binaryViewerArea.classList.add('hidden');
 			            editorControls.classList.add('hidden');
@@ -3028,17 +3322,20 @@
 			    showLoading(true, "パックを圧縮・生成中...", "ファイルをパッケージングしています");
 
 			    try {
+			        await commitImageEditorIfDirty(); // 画像エディタの未適用変更を反映
 			        const zip = new JSZip();
 			        let outName = "Addon";
 			        let ext = "zip";
 
 			        if (scope === 'both') {
+			            // インポート時に保持した元フォルダ名を復元して出力（バグ②対策）
 			            const bpFolderName = packsData.bp.folderName || "BP";
 			            const rpFolderName = packsData.rp.folderName || "RP";
 
 			            await packFilesToZip(packsData.bp, zip.folder(bpFolderName));
 			            await packFilesToZip(packsData.rp, zip.folder(rpFolderName));
 
+			            // 出力ファイル名はインポート時のアーカイブ名を優先して復元
 			            outName = importedArchiveName
 			                || (packsData.bp.manifest.header && packsData.bp.manifest.header.name)
 			                || "Addon";
@@ -3048,8 +3345,10 @@
 			            const pack = (scope === 'bp') ? packsData.bp : packsData.rp;
 			            await packFilesToZip(pack, zip);
 
+			            // 単体出力は元フォルダ名 → アーカイブ名 → manifest名 の順で復元
 			            const folderBase = (pack.folderName || '').split('/').pop();
 			            outName = folderBase
+			                || importedArchiveName
 			                || (pack.manifest.header && pack.manifest.header.name)
 			                || (scope === 'bp' ? 'BehaviorPack' : 'ResourcePack');
 			            ext = (format === 'mcpack') ? 'mcpack' : 'zip';
@@ -3094,6 +3393,1033 @@
 			    a.click();
 			    document.body.removeChild(a);
 			    URL.revokeObjectURL(url);
+			}
+
+			/* =====================================================================
+			   画像エディタ (PNG / JPG / JPEG / TGA)
+			   - 作業データは ImageData(非プリマルチプライ RGBA)で保持
+			   - 「適用」またはファイル切替・出力時に元の形式へエンコードして
+			     file.modifiedContent(Uint8Array)へ書き戻す
+			   ===================================================================== */
+			const IMG_ED_ZOOMS = [0.125, 0.25, 0.5, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64];
+			const IMG_ED_MAX_SIZE = 4096;
+			const IMG_ED_BASE_COLORS = [
+			    '#000000', '#ffffff', '#7f7f7f', '#c3c3c3', '#880015', '#ed1c24', '#ff7f27', '#fff200',
+			    '#22b14c', '#b5e61d', '#00a2e8', '#3f48cc', '#a349a4', '#ffaec9', '#b97a57', '#c8bfe7'
+			];
+			const IMG_ED_TOOLS = {
+			    hand:    { label: '手のひら',   hint: 'ドラッグで表示位置を動かします。',                 opts: [] },
+			    pen:     { label: 'ペン',       hint: 'タップ/ドラッグで描画します。',                     opts: ['color', 'opacity', 'size', 'shape'] },
+			    eraser:  { label: '消しゴム',   hint: 'タップ/ドラッグで透明にします。',                   opts: ['opacity', 'size', 'shape'] },
+			    fill:    { label: '塗りつぶし', hint: '同じ色でつながった範囲を塗りつぶします。',         opts: ['color', 'opacity', 'tolerance'] },
+			    picker:  { label: 'スポイト',   hint: 'タップした位置の色を取得します。',                 opts: ['color'] },
+			    line:    { label: '直線',       hint: 'ドラッグで直線を引きます(Shiftで角度を固定)。',   opts: ['color', 'opacity', 'size', 'shape'] },
+			    rect:    { label: '四角形',     hint: 'ドラッグで四角形を描きます(Shiftで正方形)。',     opts: ['color', 'opacity', 'size', 'fillmode'] },
+			    ellipse: { label: '楕円',       hint: 'ドラッグで楕円を描きます(Shiftで正円)。',         opts: ['color', 'opacity', 'size', 'fillmode'] }
+			};
+
+			const imageEditorArea = document.getElementById('imageEditorArea');
+			const imgEdViewport = document.getElementById('imgEdViewport');
+			const imgEdStage = document.getElementById('imgEdStage');
+			const imgEdCanvas = document.getElementById('imgEdCanvas');
+			const imgEdGrid = document.getElementById('imgEdGrid');
+			const imgEdCursor = document.getElementById('imgEdCursor');
+			const imgEdCtx = imgEdCanvas.getContext('2d', { willReadFrequently: true });
+
+			const imgEd = {
+			    file: null, ext: '', img: null,
+			    history: [], future: [], dirty: false, editGen: 0,
+			    tool: 'pen', prevTool: 'pen',
+			    color: '#10b981', opacity: 100, size: 1, shape: 'square', fillShape: false, tolerance: 0,
+			    jpegQuality: 92, zoom: 8, showGrid: true, recent: [],
+			    stroke: null, pan: null,
+			    resizeMode: 'scale', anchor: [1, 1], lockAspect: true
+			};
+
+			/* ---------- TGA デコード / エンコード ---------- */
+			function decodeTGA(bytes) {
+			    if (bytes.length < 18) throw new Error('TGAヘッダーが短すぎます');
+			    const idLen = bytes[0], cmType = bytes[1], imgType = bytes[2];
+			    const cmStart = bytes[3] | (bytes[4] << 8);
+			    const cmLen = bytes[5] | (bytes[6] << 8);
+			    const cmDepth = bytes[7];
+			    const width = bytes[12] | (bytes[13] << 8);
+			    const height = bytes[14] | (bytes[15] << 8);
+			    const bpp = bytes[16];
+			    const desc = bytes[17];
+			    const rle = imgType >= 9;
+			    const baseType = rle ? imgType - 8 : imgType;
+
+			    if (baseType !== 1 && baseType !== 2 && baseType !== 3) throw new Error(`未対応のTGA形式です (type ${imgType})`);
+			    if (!width || !height) throw new Error('TGAのサイズが不正です');
+			    if (baseType === 1 && (cmType !== 1 || (bpp !== 8 && bpp !== 16))) throw new Error('未対応のカラーマップ形式です');
+			    if (baseType === 2 && ![15, 16, 24, 32].includes(bpp)) throw new Error(`未対応のビット深度です (${bpp}bit)`);
+			    if (baseType === 3 && bpp !== 8 && bpp !== 16) throw new Error(`未対応のビット深度です (${bpp}bit)`);
+
+			    const bytesPP = (bpp + 7) >> 3;
+			    const alphaBits = desc & 0x0f;
+			    const flipY = !(desc & 0x20);
+			    const flipX = !!(desc & 0x10);
+			    let pos = 18 + idLen;
+
+			    let palette = null;
+			    if (cmType === 1) {
+			        const eb = (cmDepth + 7) >> 3;
+			        palette = new Uint8Array(cmLen * 4);
+			        for (let i = 0; i < cmLen; i++) {
+			            const p = pos + i * eb;
+			            let r, g, b, a = 255;
+			            if (cmDepth === 24 || cmDepth === 32) {
+			                b = bytes[p]; g = bytes[p + 1]; r = bytes[p + 2];
+			                if (cmDepth === 32) a = bytes[p + 3];
+			            } else {
+			                const v = bytes[p] | (bytes[p + 1] << 8);
+			                r = Math.round(((v >> 10) & 31) * 255 / 31);
+			                g = Math.round(((v >> 5) & 31) * 255 / 31);
+			                b = Math.round((v & 31) * 255 / 31);
+			            }
+			            palette[i * 4] = r; palette[i * 4 + 1] = g; palette[i * 4 + 2] = b; palette[i * 4 + 3] = a;
+			        }
+			        pos += cmLen * eb;
+			    }
+
+			    const total = width * height;
+			    const out = new Uint8ClampedArray(total * 4);
+			    let pr = 0, pg = 0, pb = 0, pa = 255;
+
+			    const decodePx = (p) => {
+			        if (baseType === 3) {
+			            pr = pg = pb = bytes[p];
+			            pa = bpp === 16 ? bytes[p + 1] : 255;
+			        } else if (baseType === 1) {
+			            const v = bytesPP === 1 ? bytes[p] : (bytes[p] | (bytes[p + 1] << 8));
+			            const pi = (v - cmStart) * 4;
+			            if (palette && pi >= 0 && pi < palette.length) {
+			                pr = palette[pi]; pg = palette[pi + 1]; pb = palette[pi + 2]; pa = palette[pi + 3];
+			            } else { pr = pg = pb = 0; pa = 0; }
+			        } else if (bpp === 32) {
+			            pb = bytes[p]; pg = bytes[p + 1]; pr = bytes[p + 2]; pa = bytes[p + 3];
+			        } else if (bpp === 24) {
+			            pb = bytes[p]; pg = bytes[p + 1]; pr = bytes[p + 2]; pa = 255;
+			        } else {
+			            const v = bytes[p] | (bytes[p + 1] << 8);
+			            pr = Math.round(((v >> 10) & 31) * 255 / 31);
+			            pg = Math.round(((v >> 5) & 31) * 255 / 31);
+			            pb = Math.round((v & 31) * 255 / 31);
+			            pa = (bpp === 16 && alphaBits > 0) ? ((v & 0x8000) ? 255 : 0) : 255;
+			        }
+			    };
+			    const writePx = (idx) => {
+			        let row = (idx / width) | 0;
+			        let col = idx - row * width;
+			        if (flipY) row = height - 1 - row;
+			        if (flipX) col = width - 1 - col;
+			        const o = (row * width + col) * 4;
+			        out[o] = pr; out[o + 1] = pg; out[o + 2] = pb; out[o + 3] = pa;
+			    };
+			    const shortErr = () => new Error('TGAのデータが不足しています');
+
+			    let idx = 0;
+			    if (!rle) {
+			        if (pos + total * bytesPP > bytes.length) throw shortErr();
+			        while (idx < total) { decodePx(pos); pos += bytesPP; writePx(idx++); }
+			    } else {
+			        while (idx < total) {
+			            if (pos >= bytes.length) throw shortErr();
+			            const hdr = bytes[pos++];
+			            const cnt = (hdr & 0x7f) + 1;
+			            if (hdr & 0x80) {
+			                if (pos + bytesPP > bytes.length) throw shortErr();
+			                decodePx(pos); pos += bytesPP;
+			                for (let k = 0; k < cnt && idx < total; k++) writePx(idx++);
+			            } else {
+			                for (let k = 0; k < cnt && idx < total; k++) {
+			                    if (pos + bytesPP > bytes.length) throw shortErr();
+			                    decodePx(pos); pos += bytesPP;
+			                    writePx(idx++);
+			                }
+			            }
+			        }
+			    }
+
+			    // 32bitでアルファ情報なし(descのalphaビット=0)かつ全て透明なら、不透明として扱う
+			    if (bpp === 32 && alphaBits === 0) {
+			        let allZero = true;
+			        for (let i = 3; i < out.length; i += 4) { if (out[i] !== 0) { allZero = false; break; } }
+			        if (allZero) for (let i = 3; i < out.length; i += 4) out[i] = 255;
+			    }
+			    return new ImageData(out, width, height);
+			}
+
+			// 非圧縮 32bit BGRA / 左下原点 で出力(最も互換性が高い形式)
+			function encodeTGA(img) {
+			    const w = img.width, h = img.height;
+			    if (w > 65535 || h > 65535) throw new Error('TGAの最大サイズ(65535px)を超えています');
+			    const out = new Uint8Array(18 + w * h * 4);
+			    out[2] = 2;
+			    out[12] = w & 255; out[13] = (w >> 8) & 255;
+			    out[14] = h & 255; out[15] = (h >> 8) & 255;
+			    out[16] = 32;
+			    out[17] = 0x08;
+			    const s = img.data;
+			    let o = 18;
+			    for (let y = h - 1; y >= 0; y--) {
+			        for (let x = 0; x < w; x++) {
+			            const i = (y * w + x) * 4;
+			            out[o++] = s[i + 2]; out[o++] = s[i + 1]; out[o++] = s[i]; out[o++] = s[i + 3];
+			        }
+			    }
+			    return out;
+			}
+
+			/* ---------- 読み込み / 書き出し ---------- */
+			async function imgEdGetBytes(file) {
+			    const mc = file.modifiedContent;
+			    if (mc !== null && mc !== undefined) {
+			        if (mc instanceof Uint8Array) return mc;
+			        if (typeof mc === 'string') return new TextEncoder().encode(mc);
+			        return new Uint8Array(mc);
+			    }
+			    if (file.zipObj) return await file.zipObj.async('uint8array');
+			    throw new Error('ファイルデータが見つかりません');
+			}
+
+			async function imgEdDecodeFile(file, ext) {
+			    const bytes = await imgEdGetBytes(file);
+			    if (ext === 'tga') return decodeTGA(bytes);
+
+			    const blob = new Blob([bytes], { type: ext === 'png' ? 'image/png' : 'image/jpeg' });
+			    let bmp = null;
+			    try {
+			        bmp = await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
+			    } catch (e) {
+			        const url = URL.createObjectURL(blob);
+			        try {
+			            const im = new Image();
+			            im.src = url;
+			            await im.decode();
+			            bmp = im;
+			        } finally { URL.revokeObjectURL(url); }
+			    }
+			    const w = bmp.width || bmp.naturalWidth, h = bmp.height || bmp.naturalHeight;
+			    if (!w || !h) throw new Error('画像を読み込めませんでした');
+			    const c = document.createElement('canvas');
+			    c.width = w; c.height = h;
+			    const cx = c.getContext('2d', { willReadFrequently: true });
+			    cx.drawImage(bmp, 0, 0);
+			    if (bmp.close) bmp.close();
+			    return cx.getImageData(0, 0, w, h);
+			}
+
+			async function imgEdEncode(img, ext) {
+			    if (ext === 'tga') return encodeTGA(img);
+			    const w = img.width, h = img.height;
+			    const c = document.createElement('canvas');
+			    c.width = w; c.height = h;
+			    const cx = c.getContext('2d');
+			    const isJpeg = (ext === 'jpg' || ext === 'jpeg');
+			    if (isJpeg) {
+			        const t = document.createElement('canvas');
+			        t.width = w; t.height = h;
+			        t.getContext('2d').putImageData(img, 0, 0);
+			        cx.fillStyle = '#ffffff';
+			        cx.fillRect(0, 0, w, h);
+			        cx.drawImage(t, 0, 0);
+			    } else {
+			        cx.putImageData(img, 0, 0);
+			    }
+			    const blob = await new Promise((resolve, reject) => {
+			        c.toBlob(
+			            (b) => b ? resolve(b) : reject(new Error('画像のエンコードに失敗しました')),
+			            isJpeg ? 'image/jpeg' : 'image/png',
+			            isJpeg ? imgEd.jpegQuality / 100 : undefined
+			        );
+			    });
+			    return new Uint8Array(await blob.arrayBuffer());
+			}
+
+			async function openImageEditor(file, ext) {
+			    const decoded = await imgEdDecodeFile(file, ext);
+			    if (activeFile !== file) return true; // 読み込み中に別ファイルへ切り替わった
+			    imgEd.file = file;
+			    imgEd.ext = ext;
+			    imgEd.img = decoded;
+			    imgEd.history = [];
+			    imgEd.future = [];
+			    imgEd.dirty = false;
+			    imgEd.stroke = null;
+			    imgEd.pan = null;
+			    imageEditorArea.classList.remove('hidden');
+			    imgEdSyncCanvasSize();
+			    imgEdRender();
+			    imgEdFitZoom();
+			    imgEdSyncUi();
+			    return true;
+			}
+
+			async function applyImageEditorChanges() {
+			    const file = imgEd.file;
+			    if (!file || !imgEd.img) return;
+			    const ext = file.path.split('.').pop().toLowerCase();
+			    if (!IMAGE_EXTENSIONS.includes(ext)) { imgEd.dirty = false; return; }
+			    const gen = imgEd.editGen;
+			    try {
+			        const bytes = await imgEdEncode(imgEd.img, ext);
+			        file.modifiedContent = bytes;
+			        if (imgEd.editGen === gen) {
+			            imgEd.dirty = false;
+			            if (activeFile === file) unsavedBadge.classList.add('hidden');
+			        }
+
+			        // pack_icon.png を編集した場合はパックアイコン表示にも反映
+			        const pack = [packsData.bp, packsData.rp].find(p => p && p.files.includes(file));
+			        if (pack && file.path.toLowerCase() === 'pack_icon.png') {
+			            pack.iconBlob = new Blob([bytes], { type: 'image/png' });
+			            pack.iconUrl = URL.createObjectURL(pack.iconBlob);
+			            updatePackIconsAndHeader();
+			            populateManifestForm();
+			            renderCurrentPackTree();
+			        }
+			    } catch (err) {
+			        console.error(err);
+			        alert('画像の保存に失敗しました: ' + err.message);
+			    }
+			}
+
+			async function commitImageEditorIfDirty() {
+			    if (!imgEd.dirty || !imgEd.file || !imgEd.img) return;
+			    const exists = [packsData.bp, packsData.rp].some(p => p && p.files.includes(imgEd.file));
+			    if (!exists) { imgEd.dirty = false; return; }
+			    await applyImageEditorChanges();
+			}
+
+			/* ---------- 描画・表示 ---------- */
+			function imgEdSyncCanvasSize() {
+			    const { width, height } = imgEd.img;
+			    if (imgEdCanvas.width !== width) imgEdCanvas.width = width;
+			    if (imgEdCanvas.height !== height) imgEdCanvas.height = height;
+			    imgEdApplyZoomStyle();
+			}
+
+			function imgEdRender() {
+			    imgEdCtx.putImageData(imgEd.img, 0, 0);
+			}
+
+			function imgEdApplyZoomStyle() {
+			    if (!imgEd.img) return;
+			    const z = imgEd.zoom, w = imgEd.img.width * z, h = imgEd.img.height * z;
+			    imgEdStage.style.width = w + 'px';
+			    imgEdStage.style.height = h + 'px';
+			    imgEdCanvas.style.width = w + 'px';
+			    imgEdCanvas.style.height = h + 'px';
+			    const showGrid = imgEd.showGrid && z >= 6;
+			    imgEdGrid.style.display = showGrid ? 'block' : 'none';
+			    if (showGrid) {
+			        imgEdGrid.style.backgroundImage =
+			            'linear-gradient(to right, rgba(255,255,255,.22) 1px, transparent 1px),' +
+			            'linear-gradient(to bottom, rgba(255,255,255,.22) 1px, transparent 1px)';
+			        imgEdGrid.style.backgroundSize = z + 'px ' + z + 'px';
+			    }
+			    document.getElementById('imgEdZoomText').textContent = Math.round(z * 100) + '%';
+			    document.getElementById('imgEdGridBtn').classList.toggle('active', imgEd.showGrid);
+			}
+
+			function imgEdFitZoom() {
+			    if (!imgEd.img) return;
+			    const vw = imgEdViewport.clientWidth - 24, vh = imgEdViewport.clientHeight - 24;
+			    let z = 8;
+			    if (vw > 0 && vh > 0) {
+			        const fit = Math.min(vw / imgEd.img.width, vh / imgEd.img.height);
+			        z = IMG_ED_ZOOMS[0];
+			        for (const c of IMG_ED_ZOOMS) if (c <= fit) z = c;
+			    }
+			    imgEd.zoom = z;
+			    imgEdApplyZoomStyle();
+			}
+
+			function imgEdSetZoom(z, clientX, clientY) {
+			    if (!imgEd.img) return;
+			    const vr = imgEdViewport.getBoundingClientRect();
+			    if (clientX === undefined) { clientX = vr.left + vr.width / 2; clientY = vr.top + vr.height / 2; }
+			    const r1 = imgEdCanvas.getBoundingClientRect();
+			    const ix = (clientX - r1.left) / imgEd.zoom, iy = (clientY - r1.top) / imgEd.zoom;
+			    imgEd.zoom = z;
+			    imgEdApplyZoomStyle();
+			    const r2 = imgEdCanvas.getBoundingClientRect();
+			    imgEdViewport.scrollLeft += r2.left + ix * z - clientX;
+			    imgEdViewport.scrollTop += r2.top + iy * z - clientY;
+			}
+
+			function imgEdZoomStep(dir, clientX, clientY) {
+			    let i = IMG_ED_ZOOMS.indexOf(imgEd.zoom);
+			    if (i < 0) {
+			        i = 0;
+			        for (let k = 0; k < IMG_ED_ZOOMS.length; k++) if (IMG_ED_ZOOMS[k] <= imgEd.zoom) i = k;
+			    }
+			    const ni = Math.max(0, Math.min(IMG_ED_ZOOMS.length - 1, i + dir));
+			    imgEdSetZoom(IMG_ED_ZOOMS[ni], clientX, clientY);
+			}
+
+			function imgEdToggleGrid() {
+			    imgEd.showGrid = !imgEd.showGrid;
+			    imgEdApplyZoomStyle();
+			}
+
+			/* ---------- UI 同期 ---------- */
+			function imgEdSyncUi() {
+			    const def = IMG_ED_TOOLS[imgEd.tool];
+			    imageEditorArea.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('active', b.dataset.tool === imgEd.tool));
+			    imageEditorArea.querySelectorAll('[data-opt]').forEach(el => el.classList.toggle('hidden', !def.opts.includes(el.dataset.opt)));
+			    imageEditorArea.querySelectorAll('[data-shape]').forEach(b => b.classList.toggle('active', b.dataset.shape === imgEd.shape));
+			    imageEditorArea.querySelectorAll('[data-fillmode]').forEach(b => b.classList.toggle('active', (b.dataset.fillmode === '1') === imgEd.fillShape));
+			    document.getElementById('imgEdHint').textContent = `${def.label}: ${def.hint}`;
+
+			    const isJpeg = (imgEd.ext === 'jpg' || imgEd.ext === 'jpeg');
+			    imageEditorArea.querySelector('[data-jpeg]').classList.toggle('hidden', !isJpeg);
+			    document.getElementById('imgEdJpegNote').classList.toggle('hidden', !isJpeg);
+
+			    document.getElementById('imgEdColor').value = imgEd.color;
+			    document.getElementById('imgEdOpacity').value = imgEd.opacity;
+			    document.getElementById('imgEdOpacityVal').textContent = imgEd.opacity + '%';
+			    document.getElementById('imgEdSize').value = imgEd.size;
+			    document.getElementById('imgEdSizeVal').textContent = imgEd.size + 'px';
+			    document.getElementById('imgEdTolerance').value = imgEd.tolerance;
+			    document.getElementById('imgEdToleranceVal').textContent = imgEd.tolerance;
+			    document.getElementById('imgEdJpegQuality').value = imgEd.jpegQuality;
+			    document.getElementById('imgEdJpegQualityVal').textContent = imgEd.jpegQuality + '%';
+
+			    imgEdCanvas.style.cursor = imgEd.tool === 'hand' ? 'grab' : 'crosshair';
+			    imgEdRenderPalette();
+			    imgEdUpdateUndoButtons();
+			    imgEdUpdateSizeText();
+			}
+
+			function imgEdUpdateSizeText() {
+			    if (!imgEd.img) return;
+			    document.getElementById('imgEdSizeText').textContent = `${imgEd.img.width} × ${imgEd.img.height} px / ${imgEd.ext.toUpperCase()}`;
+			}
+
+			function imgEdUpdateUndoButtons() {
+			    document.getElementById('imgEdUndoBtn').disabled = imgEd.history.length === 0;
+			    document.getElementById('imgEdRedoBtn').disabled = imgEd.future.length === 0;
+			}
+
+			function imgEdRenderPalette() {
+			    const box = document.getElementById('imgEdPalette');
+			    let html = '';
+			    IMG_ED_BASE_COLORS.forEach(c => {
+			        html += `<button class="imged-swatch" style="background:${c}" title="${c}" onclick="imgEdSetColor('${c}')"></button>`;
+			    });
+			    if (imgEd.recent.length) {
+			        html += '<span class="imged-sep"></span><span class="imged-lbl">最近</span>';
+			        imgEd.recent.forEach(c => {
+			            html += `<button class="imged-swatch" style="background:${c}" title="${c}" onclick="imgEdSetColor('${c}')"></button>`;
+			        });
+			    }
+			    box.innerHTML = html;
+			}
+
+			function imgEdSetTool(t) {
+			    if (!IMG_ED_TOOLS[t] || imgEd.stroke) return;
+			    if (t !== 'picker' && t !== 'hand') imgEd.prevTool = t;
+			    imgEd.tool = t;
+			    imgEdCursor.style.display = 'none';
+			    imgEdSyncUi();
+			}
+			function imgEdSetShape(s) { imgEd.shape = s; imgEdSyncUi(); }
+			function imgEdSetFillMode(f) { imgEd.fillShape = !!f; imgEdSyncUi(); }
+			function imgEdSetColor(hex) {
+			    imgEd.color = hex;
+			    document.getElementById('imgEdColor').value = hex;
+			}
+			function imgEdRememberColor() {
+			    const c = imgEd.color.toLowerCase();
+			    if (imgEd.recent[0] === c) return;
+			    imgEd.recent = [c, ...imgEd.recent.filter(x => x !== c)].slice(0, 10);
+			    imgEdRenderPalette();
+			}
+
+			/* ---------- 履歴 ---------- */
+			function imgEdClone(img) {
+			    return new ImageData(new Uint8ClampedArray(img.data), img.width, img.height);
+			}
+			function imgEdTrimHistory() {
+			    const bytes = Math.max(1, imgEd.img.width * imgEd.img.height * 4);
+			    const max = Math.max(5, Math.min(60, Math.floor(160 * 1024 * 1024 / bytes)));
+			    while (imgEd.history.length > max) imgEd.history.shift();
+			    while (imgEd.future.length > max) imgEd.future.shift();
+			}
+			function imgEdMarkDirty() {
+			    imgEd.dirty = true;
+			    imgEd.editGen++;
+			    if (activeFile === imgEd.file) unsavedBadge.classList.remove('hidden');
+			}
+			// 変更前の状態を保存(スナップショットを返す)
+			function imgEdPushHistory() {
+			    const snap = imgEdClone(imgEd.img);
+			    imgEd.history.push(snap);
+			    imgEd.future = [];
+			    imgEdTrimHistory();
+			    imgEdMarkDirty();
+			    imgEdUpdateUndoButtons();
+			    return snap;
+			}
+			// 画像そのものを差し替える操作(リサイズ・回転など)
+			function imgEdReplaceImage(newImg) {
+			    imgEd.history.push(imgEd.img);
+			    imgEd.future = [];
+			    imgEd.img = newImg;
+			    imgEdTrimHistory();
+			    imgEdAfterReplace();
+			}
+			function imgEdAfterReplace() {
+			    imgEdSyncCanvasSize();
+			    imgEdRender();
+			    imgEdMarkDirty();
+			    imgEdUpdateUndoButtons();
+			    imgEdUpdateSizeText();
+			}
+			function imgEdUndo() {
+			    if (imgEd.stroke || !imgEd.img || !imgEd.history.length) return;
+			    imgEd.future.push(imgEd.img);
+			    imgEd.img = imgEd.history.pop();
+			    imgEdAfterReplace();
+			}
+			function imgEdRedo() {
+			    if (imgEd.stroke || !imgEd.img || !imgEd.future.length) return;
+			    imgEd.history.push(imgEd.img);
+			    imgEd.img = imgEd.future.pop();
+			    imgEdAfterReplace();
+			}
+
+			/* ---------- ピクセル操作 ---------- */
+			function imgEdRgb() {
+			    const n = parseInt(imgEd.color.replace('#', ''), 16) || 0;
+			    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+			}
+
+			// 非プリマルチプライ RGBA への source-over 合成
+			function imgEdBlendPixel(d, i, r, g, b, a) {
+			    const da = d[i + 3] / 255;
+			    const oa = a + da * (1 - a);
+			    if (oa <= 0) return;
+			    d[i]     = Math.round((r * a + d[i]     * da * (1 - a)) / oa);
+			    d[i + 1] = Math.round((g * a + d[i + 1] * da * (1 - a)) / oa);
+			    d[i + 2] = Math.round((b * a + d[i + 2] * da * (1 - a)) / oa);
+			    d[i + 3] = Math.round(oa * 255);
+			}
+
+			function imgEdLinePoints(x0, y0, x1, y1, cb) {
+			    const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
+			    const sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+			    let err = dx + dy;
+			    for (;;) {
+			        cb(x0, y0);
+			        if (x0 === x1 && y0 === y1) break;
+			        const e2 = 2 * err;
+			        if (e2 >= dy) { err += dy; x0 += sx; }
+			        if (e2 <= dx) { err += dx; y0 += sy; }
+			    }
+			}
+
+			// ブラシを1回分スタンプ(1ストローク内では同じピクセルに二重適用しない)
+			function imgEdStamp(cx, cy) {
+			    const st = imgEd.stroke;
+			    const img = imgEd.img, W = img.width, H = img.height, d = img.data;
+			    const s = imgEd.size, x0 = cx - Math.floor(s / 2), y0 = cy - Math.floor(s / 2);
+			    const round = imgEd.shape === 'round';
+			    const rad = s / 2;
+			    const a = imgEd.opacity / 100;
+			    const [cr, cg, cb] = imgEdRgb();
+			    const erase = st.tool === 'eraser';
+			    let minX = W, minY = H, maxX = -1, maxY = -1;
+			    for (let y = 0; y < s; y++) {
+			        const py = y0 + y;
+			        if (py < 0 || py >= H) continue;
+			        for (let x = 0; x < s; x++) {
+			            const px = x0 + x;
+			            if (px < 0 || px >= W) continue;
+			            if (round) {
+			                const ddx = x + 0.5 - rad, ddy = y + 0.5 - rad;
+			                if (ddx * ddx + ddy * ddy > rad * rad) continue;
+			            }
+			            const pi = py * W + px;
+			            if (st.mask[pi]) continue;
+			            st.mask[pi] = 1;
+			            const i = pi * 4;
+			            if (erase) d[i + 3] = Math.round(d[i + 3] * (1 - a));
+			            else imgEdBlendPixel(d, i, cr, cg, cb, a);
+			            if (px < minX) minX = px; if (px > maxX) maxX = px;
+			            if (py < minY) minY = py; if (py > maxY) maxY = py;
+			        }
+			    }
+			    if (maxX >= 0) {
+			        const dr = st.dirty;
+			        if (!dr) st.dirty = { x0: minX, y0: minY, x1: maxX, y1: maxY };
+			        else {
+			            dr.x0 = Math.min(dr.x0, minX); dr.y0 = Math.min(dr.y0, minY);
+			            dr.x1 = Math.max(dr.x1, maxX); dr.y1 = Math.max(dr.y1, maxY);
+			        }
+			    }
+			}
+
+			function imgEdFlush() {
+			    const st = imgEd.stroke;
+			    if (!st || !st.dirty) return;
+			    const r = st.dirty;
+			    imgEdCtx.putImageData(imgEd.img, 0, 0, r.x0, r.y0, r.x1 - r.x0 + 1, r.y1 - r.y0 + 1);
+			    st.dirty = null;
+			}
+
+			function imgEdConstrain(tool, a, b) {
+			    let dx = b.x - a.x, dy = b.y - a.y;
+			    const ax = Math.abs(dx), ay = Math.abs(dy);
+			    if (tool === 'line') {
+			        if (ax > ay * 2) dy = 0;
+			        else if (ay > ax * 2) dx = 0;
+			        else { const m = Math.max(ax, ay); dx = (dx < 0 ? -1 : 1) * m; dy = (dy < 0 ? -1 : 1) * m; }
+			    } else {
+			        const m = Math.max(ax, ay);
+			        dx = (dx < 0 ? -1 : 1) * m; dy = (dy < 0 ? -1 : 1) * m;
+			    }
+			    return { x: a.x + dx, y: a.y + dy };
+			}
+
+			// 直線・四角形・楕円: 開始時のスナップショットへ戻してから描き直す
+			function imgEdDrawShape(shift) {
+			    const st = imgEd.stroke;
+			    const img = imgEd.img, W = img.width, H = img.height, d = img.data;
+			    d.set(st.base.data);
+			    const a = st.start;
+			    const b = shift ? imgEdConstrain(st.tool, st.start, st.last) : st.last;
+
+			    if (st.tool === 'line') {
+			        st.mask.fill(0);
+			        imgEdLinePoints(a.x, a.y, b.x, b.y, (x, y) => imgEdStamp(x, y));
+			        st.dirty = null;
+			    } else {
+			        const [cr, cg, cb] = imgEdRgb();
+			        const alpha = imgEd.opacity / 100, s = imgEd.size, fill = imgEd.fillShape;
+			        const x0 = Math.min(a.x, b.x), x1 = Math.max(a.x, b.x);
+			        const y0 = Math.min(a.y, b.y), y1 = Math.max(a.y, b.y);
+			        const sy = Math.max(0, y0), ey = Math.min(H - 1, y1);
+			        const sx = Math.max(0, x0), ex = Math.min(W - 1, x1);
+			        if (st.tool === 'rect') {
+			            for (let y = sy; y <= ey; y++) {
+			                for (let x = sx; x <= ex; x++) {
+			                    if (fill || x < x0 + s || x > x1 - s || y < y0 + s || y > y1 - s) {
+			                        imgEdBlendPixel(d, (y * W + x) * 4, cr, cg, cb, alpha);
+			                    }
+			                }
+			            }
+			        } else {
+			            const cx = (x0 + x1 + 1) / 2, cy = (y0 + y1 + 1) / 2;
+			            const rx = (x1 - x0 + 1) / 2, ry = (y1 - y0 + 1) / 2;
+			            const irx = rx - s, iry = ry - s;
+			            for (let y = sy; y <= ey; y++) {
+			                for (let x = sx; x <= ex; x++) {
+			                    const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
+			                    if (dx * dx + dy * dy > 1) continue;
+			                    if (!fill && irx > 0 && iry > 0) {
+			                        const ux = (x + 0.5 - cx) / irx, uy = (y + 0.5 - cy) / iry;
+			                        if (ux * ux + uy * uy < 1) continue;
+			                    }
+			                    imgEdBlendPixel(d, (y * W + x) * 4, cr, cg, cb, alpha);
+			                }
+			            }
+			        }
+			    }
+			    imgEdCtx.putImageData(img, 0, 0);
+			}
+
+			function imgEdFlood(sx, sy) {
+			    const img = imgEd.img, W = img.width, H = img.height, d = img.data;
+			    const t0 = (sy * W + sx) * 4;
+			    const tr = d[t0], tg = d[t0 + 1], tb = d[t0 + 2], ta = d[t0 + 3];
+			    const [fr, fg, fb] = imgEdRgb();
+			    const fa = Math.round(imgEd.opacity / 100 * 255);
+			    const tol = imgEd.tolerance;
+			    if (tol === 0 && tr === fr && tg === fg && tb === fb && ta === fa) return;
+
+			    const match = (i) => {
+			        const a = d[i + 3];
+			        if (ta === 0 && a === 0) return true;
+			        return Math.abs(d[i] - tr) <= tol && Math.abs(d[i + 1] - tg) <= tol &&
+			               Math.abs(d[i + 2] - tb) <= tol && Math.abs(a - ta) <= tol;
+			    };
+			    const visited = new Uint8Array(W * H);
+			    const stack = [sx, sy];
+			    while (stack.length) {
+			        const cy = stack.pop(), cx = stack.pop();
+			        let lx = cx;
+			        while (lx >= 0 && !visited[cy * W + lx] && match((cy * W + lx) * 4)) lx--;
+			        lx++;
+			        let up = false, down = false;
+			        for (let x = lx; x < W; x++) {
+			            const pi = cy * W + x;
+			            if (visited[pi] || !match(pi * 4)) break;
+			            visited[pi] = 1;
+			            const i = pi * 4;
+			            d[i] = fr; d[i + 1] = fg; d[i + 2] = fb; d[i + 3] = fa;
+			            if (cy > 0) {
+			                const j = (cy - 1) * W + x;
+			                const m = !visited[j] && match(j * 4);
+			                if (m && !up) { stack.push(x, cy - 1); up = true; } else if (!m) up = false;
+			            }
+			            if (cy < H - 1) {
+			                const j = (cy + 1) * W + x;
+			                const m = !visited[j] && match(j * 4);
+			                if (m && !down) { stack.push(x, cy + 1); down = true; } else if (!m) down = false;
+			            }
+			        }
+			    }
+			}
+
+			function imgEdPickColor(x, y) {
+			    const d = imgEd.img.data, i = (y * imgEd.img.width + x) * 4;
+			    if (d[i + 3] === 0) return; // 透明ピクセルは取得しない
+			    const hex = '#' + [d[i], d[i + 1], d[i + 2]].map(v => v.toString(16).padStart(2, '0')).join('');
+			    imgEdSetColor(hex);
+			    imgEd.opacity = Math.max(1, Math.round(d[i + 3] / 255 * 100));
+			    if (imgEd.prevTool && imgEd.prevTool !== 'eraser') imgEd.tool = imgEd.prevTool;
+			    imgEdSyncUi();
+			}
+
+			/* ---------- ポインター操作 ---------- */
+			function imgEdPos(e) {
+			    const r = imgEdCanvas.getBoundingClientRect();
+			    return {
+			        x: Math.floor((e.clientX - r.left) / r.width * imgEd.img.width),
+			        y: Math.floor((e.clientY - r.top) / r.height * imgEd.img.height)
+			    };
+			}
+
+			function imgEdUpdateHover(e) {
+			    const p = imgEdPos(e), W = imgEd.img.width, H = imgEd.img.height;
+			    const inside = p.x >= 0 && p.y >= 0 && p.x < W && p.y < H;
+			    document.getElementById('imgEdPosText').textContent = inside ? `X ${p.x}  Y ${p.y}` : 'X -  Y -';
+			    if (e.pointerType === 'touch' || !inside || imgEd.tool === 'hand') { imgEdCursor.style.display = 'none'; return; }
+			    const brushTool = ['pen', 'eraser', 'line'].includes(imgEd.tool);
+			    const b = brushTool ? imgEd.size : 1;
+			    const z = imgEd.zoom, half = Math.floor(b / 2);
+			    imgEdCursor.style.display = 'block';
+			    imgEdCursor.style.left = ((p.x - half) * z) + 'px';
+			    imgEdCursor.style.top = ((p.y - half) * z) + 'px';
+			    imgEdCursor.style.width = (b * z) + 'px';
+			    imgEdCursor.style.height = (b * z) + 'px';
+			    imgEdCursor.style.borderRadius = (brushTool && imgEd.shape === 'round' && b >= 4) ? '50%' : '0';
+			}
+
+			function imgEdPointerDown(e) {
+			    if (!imgEd.img || !e.isPrimary || imgEd.stroke || imgEd.pan) return;
+			    if (e.pointerType === 'mouse' && e.button !== 0 && e.button !== 1) return;
+			    e.preventDefault();
+			    const tool = (e.pointerType === 'mouse' && e.button === 1) ? 'hand' : imgEd.tool;
+
+			    if (tool === 'hand') {
+			        imgEd.pan = { id: e.pointerId, x: e.clientX, y: e.clientY, sl: imgEdViewport.scrollLeft, st: imgEdViewport.scrollTop };
+			        imgEdCanvas.setPointerCapture(e.pointerId);
+			        imgEdCanvas.style.cursor = 'grabbing';
+			        return;
+			    }
+
+			    const p = imgEdPos(e), W = imgEd.img.width, H = imgEd.img.height;
+			    if (p.x < 0 || p.y < 0 || p.x >= W || p.y >= H) return;
+
+			    if (tool === 'picker') { imgEdPickColor(p.x, p.y); return; }
+
+			    if (tool === 'fill') {
+			        imgEdRememberColor();
+			        imgEdPushHistory();
+			        imgEdFlood(p.x, p.y);
+			        imgEdRender();
+			        return;
+			    }
+
+			    if (tool !== 'eraser') imgEdRememberColor();
+			    const base = imgEdPushHistory();
+			    imgEd.stroke = { id: e.pointerId, tool, start: p, last: p, base, mask: new Uint8Array(W * H), dirty: null };
+			    imgEdCanvas.setPointerCapture(e.pointerId);
+
+			    if (tool === 'pen' || tool === 'eraser') {
+			        imgEdStamp(p.x, p.y);
+			        imgEdFlush();
+			    } else {
+			        imgEdDrawShape(e.shiftKey);
+			    }
+			}
+
+			function imgEdPointerMove(e) {
+			    if (!imgEd.img) return;
+			    imgEdUpdateHover(e);
+
+			    const pan = imgEd.pan;
+			    if (pan && e.pointerId === pan.id) {
+			        imgEdViewport.scrollLeft = pan.sl - (e.clientX - pan.x);
+			        imgEdViewport.scrollTop = pan.st - (e.clientY - pan.y);
+			        return;
+			    }
+
+			    const st = imgEd.stroke;
+			    if (!st || e.pointerId !== st.id) return;
+			    const p = imgEdPos(e);
+			    if (st.tool === 'pen' || st.tool === 'eraser') {
+			        if (p.x === st.last.x && p.y === st.last.y) return;
+			        imgEdLinePoints(st.last.x, st.last.y, p.x, p.y, (x, y) => imgEdStamp(x, y));
+			        st.last = p;
+			        imgEdFlush();
+			    } else {
+			        st.last = p;
+			        imgEdDrawShape(e.shiftKey);
+			    }
+			}
+
+			function imgEdPointerUp(e) {
+			    if (imgEd.pan && e.pointerId === imgEd.pan.id) {
+			        imgEd.pan = null;
+			        imgEdCanvas.style.cursor = imgEd.tool === 'hand' ? 'grab' : 'crosshair';
+			        return;
+			    }
+			    const st = imgEd.stroke;
+			    if (!st || e.pointerId !== st.id) return;
+			    imgEdFlush();
+			    imgEd.stroke = null;
+			}
+
+			imgEdCanvas.addEventListener('pointerdown', imgEdPointerDown);
+			imgEdCanvas.addEventListener('pointermove', imgEdPointerMove);
+			imgEdCanvas.addEventListener('pointerup', imgEdPointerUp);
+			imgEdCanvas.addEventListener('pointercancel', imgEdPointerUp);
+			imgEdCanvas.addEventListener('lostpointercapture', imgEdPointerUp);
+			imgEdCanvas.addEventListener('pointerleave', () => { if (!imgEd.stroke) imgEdCursor.style.display = 'none'; });
+			imgEdCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
+			imgEdViewport.addEventListener('wheel', (e) => {
+			    if (!imgEd.img || !(e.ctrlKey || e.metaKey)) return;
+			    e.preventDefault();
+			    imgEdZoomStep(e.deltaY < 0 ? 1 : -1, e.clientX, e.clientY);
+			}, { passive: false });
+
+			/* ---------- オプション入力 ---------- */
+			document.getElementById('imgEdColor').addEventListener('input', (e) => { imgEd.color = e.target.value; });
+			document.getElementById('imgEdOpacity').addEventListener('input', (e) => {
+			    imgEd.opacity = parseInt(e.target.value, 10);
+			    document.getElementById('imgEdOpacityVal').textContent = imgEd.opacity + '%';
+			});
+			document.getElementById('imgEdSize').addEventListener('input', (e) => {
+			    imgEd.size = parseInt(e.target.value, 10);
+			    document.getElementById('imgEdSizeVal').textContent = imgEd.size + 'px';
+			});
+			document.getElementById('imgEdTolerance').addEventListener('input', (e) => {
+			    imgEd.tolerance = parseInt(e.target.value, 10);
+			    document.getElementById('imgEdToleranceVal').textContent = imgEd.tolerance;
+			});
+			document.getElementById('imgEdJpegQuality').addEventListener('input', (e) => {
+			    imgEd.jpegQuality = parseInt(e.target.value, 10);
+			    document.getElementById('imgEdJpegQualityVal').textContent = imgEd.jpegQuality + '%';
+			    if (imgEd.img) imgEdMarkDirty(); // 画質変更も適用対象にする
+			});
+
+			/* ---------- 変形操作 ---------- */
+			function imgEdFlip(dir) {
+			    if (!imgEd.img || imgEd.stroke) return;
+			    const { width: W, height: H } = imgEd.img;
+			    const out = new ImageData(W, H);
+			    const src = new Uint32Array(imgEd.img.data.buffer), dst = new Uint32Array(out.data.buffer);
+			    for (let y = 0; y < H; y++) {
+			        for (let x = 0; x < W; x++) {
+			            const sx = dir === 'h' ? W - 1 - x : x;
+			            const sy = dir === 'v' ? H - 1 - y : y;
+			            dst[y * W + x] = src[sy * W + sx];
+			        }
+			    }
+			    imgEdReplaceImage(out);
+			}
+
+			function imgEdRotate(dir) { // 1: 右(時計回り) / -1: 左
+			    if (!imgEd.img || imgEd.stroke) return;
+			    const { width: W, height: H } = imgEd.img;
+			    const out = new ImageData(H, W);
+			    const src = new Uint32Array(imgEd.img.data.buffer), dst = new Uint32Array(out.data.buffer);
+			    for (let y = 0; y < H; y++) {
+			        for (let x = 0; x < W; x++) {
+			            const nx = dir === 1 ? H - 1 - y : y;
+			            const ny = dir === 1 ? x : W - 1 - x;
+			            dst[ny * H + nx] = src[y * W + x];
+			        }
+			    }
+			    imgEdReplaceImage(out);
+			    imgEdFitZoom();
+			}
+
+			function imgEdClearAll() {
+			    if (!imgEd.img || imgEd.stroke) return;
+			    imgEdPushHistory();
+			    imgEd.img.data.fill(0);
+			    imgEdRender();
+			}
+
+			/* ---------- サイズ変更 ---------- */
+			function imgEdOpenResize() {
+			    if (!imgEd.img || imgEd.stroke) return;
+			    imgEd.resizeMode = 'scale';
+			    imgEd.anchor = [1, 1];
+			    imgEd.lockAspect = true;
+			    document.getElementById('imgEdResizeW').value = imgEd.img.width;
+			    document.getElementById('imgEdResizeH').value = imgEd.img.height;
+			    document.getElementById('imgEdResizeCur').textContent = `${imgEd.img.width} × ${imgEd.img.height} px`;
+			    document.getElementById('imgEdResizeErr').classList.add('hidden');
+			    imgEdResizeUi();
+			    document.getElementById('imgEdResizeModal').classList.remove('hidden');
+			}
+			function imgEdCloseResize() {
+			    document.getElementById('imgEdResizeModal').classList.add('hidden');
+			}
+			function imgEdResizeUi() {
+			    const modal = document.getElementById('imgEdResizeModal');
+			    modal.querySelectorAll('[data-rmode]').forEach(b => b.classList.toggle('active', b.dataset.rmode === imgEd.resizeMode));
+			    modal.querySelectorAll('[data-rpanel]').forEach(p => p.classList.toggle('hidden', p.dataset.rpanel !== imgEd.resizeMode));
+			    modal.querySelectorAll('[data-anchor]').forEach(b => b.classList.toggle('active', b.dataset.anchor === imgEd.anchor.join(',')));
+			    document.getElementById('imgEdLockBtn').classList.toggle('active', imgEd.lockAspect);
+			    imgEdResizeCheck();
+			}
+			function imgEdResizeMode(m) {
+			    imgEd.resizeMode = m;
+			    imgEd.lockAspect = (m === 'scale');
+			    imgEdResizeUi();
+			}
+			function imgEdToggleLock() {
+			    imgEd.lockAspect = !imgEd.lockAspect;
+			    imgEdResizeUi();
+			}
+			function imgEdSetAnchor(ax, ay) {
+			    imgEd.anchor = [ax, ay];
+			    imgEdResizeUi();
+			}
+			function imgEdResizeInput(which) {
+			    if (imgEd.lockAspect && imgEd.img) {
+			        const wEl = document.getElementById('imgEdResizeW'), hEl = document.getElementById('imgEdResizeH');
+			        const ratio = imgEd.img.height / imgEd.img.width;
+			        if (which === 'w') {
+			            const w = parseInt(wEl.value, 10);
+			            if (w > 0) hEl.value = Math.max(1, Math.round(w * ratio));
+			        } else {
+			            const h = parseInt(hEl.value, 10);
+			            if (h > 0) wEl.value = Math.max(1, Math.round(h / ratio));
+			        }
+			    }
+			    imgEdResizeCheck();
+			}
+			function imgEdResizePreset(n) {
+			    document.getElementById('imgEdResizeW').value = n;
+			    if (imgEd.lockAspect) imgEdResizeInput('w');
+			    else document.getElementById('imgEdResizeH').value = n;
+			    imgEdResizeCheck();
+			}
+			function imgEdResizeFactor(f) {
+			    document.getElementById('imgEdResizeW').value = Math.max(1, Math.round(imgEd.img.width * f));
+			    document.getElementById('imgEdResizeH').value = Math.max(1, Math.round(imgEd.img.height * f));
+			    imgEdResizeCheck();
+			}
+			function imgEdResizeCheck() {
+			    const w = parseInt(document.getElementById('imgEdResizeW').value, 10);
+			    const h = parseInt(document.getElementById('imgEdResizeH').value, 10);
+			    const warn = document.getElementById('imgEdResizeWarn');
+			    const isPow2 = (n) => n > 0 && (n & (n - 1)) === 0;
+			    if (w > 0 && h > 0 && (!isPow2(w) || !isPow2(h))) {
+			        warn.textContent = '幅・高さが2の累乗(16, 32, 64, 128…)ではありません。テクスチャによっては表示が乱れる場合があります。';
+			        warn.classList.remove('hidden');
+			    } else {
+			        warn.classList.add('hidden');
+			    }
+			}
+
+			function imgEdScaleImage(img, nw, nh, smooth) {
+			    const src = document.createElement('canvas');
+			    src.width = img.width; src.height = img.height;
+			    src.getContext('2d').putImageData(img, 0, 0);
+			    const dst = document.createElement('canvas');
+			    dst.width = nw; dst.height = nh;
+			    const cx = dst.getContext('2d', { willReadFrequently: true });
+			    cx.imageSmoothingEnabled = smooth;
+			    if (smooth) cx.imageSmoothingQuality = 'high';
+			    cx.drawImage(src, 0, 0, nw, nh);
+			    return cx.getImageData(0, 0, nw, nh);
+			}
+
+			function imgEdResizeCanvasImage(img, nw, nh, anchor) {
+			    const ow = img.width, oh = img.height;
+			    const ox = anchor[0] === 0 ? 0 : (anchor[0] === 1 ? Math.floor((nw - ow) / 2) : nw - ow);
+			    const oy = anchor[1] === 0 ? 0 : (anchor[1] === 1 ? Math.floor((nh - oh) / 2) : nh - oh);
+			    const out = new ImageData(nw, nh);
+			    const sx0 = Math.max(0, -ox), sx1 = Math.min(ow, nw - ox);
+			    if (sx1 > sx0) {
+			        for (let y = 0; y < nh; y++) {
+			            const sy = y - oy;
+			            if (sy < 0 || sy >= oh) continue;
+			            out.data.set(img.data.subarray((sy * ow + sx0) * 4, (sy * ow + sx1) * 4), (y * nw + sx0 + ox) * 4);
+			        }
+			    }
+			    return out;
+			}
+
+			function imgEdApplyResize() {
+			    const err = document.getElementById('imgEdResizeErr');
+			    const nw = parseInt(document.getElementById('imgEdResizeW').value, 10);
+			    const nh = parseInt(document.getElementById('imgEdResizeH').value, 10);
+			    if (!(nw >= 1 && nh >= 1) || nw > IMG_ED_MAX_SIZE || nh > IMG_ED_MAX_SIZE) {
+			        err.textContent = `幅と高さは 1〜${IMG_ED_MAX_SIZE} の整数で入力してください。`;
+			        err.classList.remove('hidden');
+			        return;
+			    }
+			    if (nw === imgEd.img.width && nh === imgEd.img.height) { imgEdCloseResize(); return; }
+			    let out;
+			    if (imgEd.resizeMode === 'scale') {
+			        const smooth = document.getElementById('imgEdResizeSmooth').value === 'smooth';
+			        out = imgEdScaleImage(imgEd.img, nw, nh, smooth);
+			    } else {
+			        out = imgEdResizeCanvasImage(imgEd.img, nw, nh, imgEd.anchor);
+			    }
+			    imgEdReplaceImage(out);
+			    imgEdCloseResize();
+			    imgEdFitZoom();
+			}
+
+			/* ---------- キーボードショートカット ---------- */
+			document.addEventListener('keydown', (e) => {
+			    if (!imgEd.img || imageEditorArea.classList.contains('hidden') || imageEditorArea.offsetParent === null) return;
+			    if (document.querySelector('[id$="Modal"]:not(.hidden)')) return;
+			    const t = e.target, tag = t && t.tagName;
+			    if (tag === 'TEXTAREA' || tag === 'SELECT' || (tag === 'INPUT' && t.type !== 'range' && t.type !== 'color')) return;
+
+			    const mod = e.ctrlKey || e.metaKey;
+			    const k = e.key.toLowerCase();
+			    if (mod && k === 'z') { e.preventDefault(); if (e.shiftKey) imgEdRedo(); else imgEdUndo(); return; }
+			    if (mod && k === 'y') { e.preventDefault(); imgEdRedo(); return; }
+			    if (mod && k === 's') { e.preventDefault(); applyImageEditorChanges(); return; }
+			    if (mod || e.altKey) return;
+
+			    const map = { h: 'hand', b: 'pen', e: 'eraser', g: 'fill', i: 'picker', l: 'line', r: 'rect', o: 'ellipse' };
+			    if (map[k]) { imgEdSetTool(map[k]); return; }
+			    if (k === '+' || k === '=') imgEdZoomStep(1);
+			    else if (k === '-') imgEdZoomStep(-1);
+			});
+
+			// パック読み込み・新規作成・ホームへ戻る際に画像エディタの状態を破棄する
+			function resetImageEditorState() {
+			    imgEd.file = null;
+			    imgEd.img = null;
+			    imgEd.history = [];
+			    imgEd.future = [];
+			    imgEd.dirty = false;
+			    imgEd.stroke = null;
+			    imgEd.pan = null;
+			    if (!imageEditorArea.classList.contains('hidden')) {
+			        imageEditorArea.classList.add('hidden');
+			        editorPlaceholder.classList.remove('hidden');
+			        editorControls.classList.add('hidden');
+			        editorFilePath.textContent = "ファイルを選択してください";
+			        unsavedBadge.classList.add('hidden');
+			    }
 			}
 		</script>
 	</body>

@@ -1,0 +1,71 @@
+::-webkit-scrollbar { width: 6px; height: 6px; }
+			::-webkit-scrollbar-track { background: #0d0e11; }
+			::-webkit-scrollbar-thumb { background: #262933; border-radius: 3px; }
+			::-webkit-scrollbar-thumb:hover { background: #3b3f4f; }
+			.mc-bg-grid {
+			    background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
+			    background-size: 20px 20px;
+			}
+			.glass-panel {
+			    background: rgba(22, 24, 29, 0.85);
+			    backdrop-filter: blur(12px);
+			}
+
+			/* 行番号とコードエディタの行を完全一致させるための共通指標。
+			   フォントサイズ・行高・上下パディングを両者で揃えることでズレを無くす。 */
+			.editor-metrics {
+			    font-family: 'JetBrains Mono', monospace;
+			    font-size: 12px;
+			    line-height: 20px; /* 1行 = 20px 固定 */
+			}
+			.code-textarea {
+			    tab-size: 2;
+			    resize: none;
+			    outline: none;
+			    white-space: pre;
+			    overflow-x: auto;
+			    overflow-y: hidden; /* 縦スクロールは無効化し、内容に合わせて高さを自動調整する */
+			}
+			.line-numbers-box > div {
+			    height: 20px; /* editor-metrics の line-height と一致 */
+			}
+			.image-render-pixelated {
+			    image-rendering: pixelated;
+			    image-rendering: crisp-edges;
+			}
+			.tree-branch {
+			    border-left: 1px dashed rgba(255, 255, 255, 0.15);
+			    margin-left: 11px;
+			    padding-left: 6px;
+			}
+
+			/* ===== 画像エディタ (PNG / JPG / JPEG / TGA) ===== */
+			.imged-btn {
+			    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+			    min-width: 32px; height: 32px; padding: 0 8px;
+			    border-radius: 8px; border: 1px solid #262933;
+			    background: #0d0e11; color: #cbd5e1;
+			    font-size: 11px; font-weight: 600; line-height: 1;
+			    cursor: pointer; transition: all .12s; white-space: nowrap;
+			    user-select: none; -webkit-user-select: none;
+			}
+			.imged-btn:hover { background: #262933; color: #fff; }
+			.imged-btn.active { background: rgba(16,185,129,.2); border-color: rgba(16,185,129,.45); color: #34d399; }
+			.imged-btn:disabled { opacity: .35; cursor: not-allowed; }
+			.imged-btn:disabled:hover { background: #0d0e11; color: #cbd5e1; }
+			.imged-sep { width: 1px; height: 20px; background: #262933; margin: 0 2px; flex-shrink: 0; }
+			.imged-lbl { font-size: 10px; color: #94a3b8; font-weight: 600; white-space: nowrap; }
+			.imged-checker { background: repeating-conic-gradient(#3a3d48 0% 25%, #2a2d37 0% 50%) 50% / 16px 16px; }
+			.imged-range { accent-color: #10b981; }
+			.imged-swatch {
+			    width: 20px; height: 20px; border-radius: 5px; padding: 0; cursor: pointer;
+			    border: 1px solid rgba(255,255,255,.25); flex-shrink: 0;
+			}
+			.imged-swatch:hover { transform: scale(1.15); }
+			.imged-cursor { outline: 1px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.7); }
+			.imged-anchor {
+			    width: 36px; height: 36px; border-radius: 8px; border: 1px solid #262933;
+			    background: #0d0e11; color: #64748b; cursor: pointer; font-size: 14px;
+			}
+			.imged-anchor.active { background: rgba(16,185,129,.25); border-color: rgba(16,185,129,.6); color: #34d399; }
+			#imgEdCanvas { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: none; }

@@ -15,6 +15,7 @@
       --active-color: #ffd600;
       --folder-color: #ffb300;
     }
+
     * { 
       box-sizing: border-box; 
       margin: 0; 
@@ -25,8 +26,10 @@
     }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow: hidden; height: 100vh; }
     #canvas-container { width: 100%; height: 100%; position: relative; background: radial-gradient(circle at center, #232b36 0%, #0c0f12 100%); }
+    
     .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
     .interactive { pointer-events: auto; }
+    
     header {
       background: var(--panel-bg);
       backdrop-filter: blur(8px);
@@ -40,6 +43,7 @@
     }
     h1 { font-size: 0.9rem; font-weight: 600; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; }
     .btn-group { display: flex; gap: 8px; align-items: center; }
+    
     .btn {
       background: #262626;
       color: #e0e0e0;
@@ -58,6 +62,7 @@
     .btn:disabled { opacity: 0.35; cursor: not-allowed; }
     .btn-primary { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
     .btn-primary:hover:not(:disabled) { background: #388e3c; }
+
     .dropdown { position: relative; display: inline-block; }
     .dropdown-content {
       display: none;
@@ -93,6 +98,7 @@
     /* 「⋮」メニュー内のアイコン(EDIT_SVG等)がデフォルトのfill(黒)のままだと
        暗い背景で見えなくなってしまうため、ボタンの文字色を継承させる */
     .dropdown-item svg { fill: currentColor; width: 16px; height: 16px; flex-shrink: 0; }
+
     .mode-selector-vertical {
       position: absolute;
       right: 16px;
@@ -114,6 +120,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
     .mode-btn.active { background: #333; color: var(--active-color); font-weight: bold; border-color: var(--active-color); }
+
     /* 左下ズームボタン */
     .zoom-btn-container {
       position: absolute;
@@ -137,7 +144,9 @@
     }
     .icon-only-btn:hover { background: #333; color: #fff; }
     .icon-only-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
     input[type="file"] { display: none; }
+
     #info-overlay, #paint-panel {
       position: absolute;
       top: 60px;
@@ -185,6 +194,7 @@
     #info-overlay input[type="number"], #paint-panel input[type="number"] {
       -moz-appearance: textfield;
     }
+
     /* ペイントモード専用UI */
     #paint-color-swatch {
       width: 26px;
@@ -210,6 +220,7 @@
     }
     .paint-tool-btn svg { width: 16px; height: 16px; fill: currentColor; pointer-events: none; }
     .paint-tool-btn.active { background: #333; color: var(--active-color); border-color: var(--active-color); }
+
     #error-msg {
       position: absolute;
       top: 60px;
@@ -223,6 +234,7 @@
       display: none;
       z-index: 20;
     }
+
     #bottom-panel {
       background: var(--panel-bg);
       backdrop-filter: blur(8px);
@@ -236,6 +248,7 @@
       max-height: 80vh;
       position: relative;
     }
+
     #resize-handle {
       width: 100%;
       height: 16px;
@@ -252,12 +265,14 @@
       background: #444;
       border-radius: 2px;
     }
+
     .panel-content {
       display: flex;
       gap: 12px;
       flex: 1;
       overflow: hidden;
     }
+
     #list-section {
       flex: 1;
       display: flex;
@@ -265,6 +280,7 @@
       gap: 6px;
       overflow: hidden;
     }
+
     .panel-header {
       display: flex;
       justify-content: space-between;
@@ -272,6 +288,7 @@
       gap: 8px;
     }
     .panel-title { font-size: 0.75rem; color: #aaa; font-weight: bold; letter-spacing: 0.05em; }
+
     #cube-list-container {
       flex: 1;
       overflow-y: auto;
@@ -281,6 +298,7 @@
       padding: 4px;
       -webkit-overflow-scrolling: touch;
     }
+
     /* ツリー構造スタイル */
     .tree-item {
       display: flex;
@@ -314,7 +332,9 @@
       color: #ccc;
       border-left: 2px solid rgba(255,255,255,0.08);
     }
+
     .tree-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; pointer-events: none; }
+    
     .toggle-icon {
       width: 18px;
       height: 18px;
@@ -329,6 +349,7 @@
     }
     .toggle-icon:hover { color: #fff; }
     .toggle-icon.collapsed { transform: rotate(-90deg); }
+
     .tree-actions {
       display: flex;
       align-items: center;
@@ -336,6 +357,7 @@
       margin-left: auto;
       flex-shrink: 0;
     }
+
     .icon-btn {
       background: none;
       border: none;
@@ -356,6 +378,7 @@
     .icon-btn.danger:hover { color: #ff5252; background: rgba(255,82,82,0.15); }
     .icon-btn.hidden { color: #444; }
     .icon-btn svg { width: 14px; height: 14px; fill: currentColor; pointer-events: none; }
+
     #drop-zone {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -367,6 +390,7 @@
       transition: opacity 0.2s; z-index: 100;
     }
     #drop-zone.active { opacity: 1; pointer-events: auto; }
+
     #modal-overlay, #texture-modal-overlay {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -402,13 +426,16 @@
     }
     #modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
   </style>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
 </head>
 <body>
+
   <div id="canvas-container">
     <div id="drop-zone">JSONモデル または PNGファイルをドロップ</div>
+
     <div id="modal-overlay" class="interactive">
       <div id="modal-box">
         <div id="modal-message"></div>
@@ -420,9 +447,12 @@
         </div>
       </div>
     </div>
+
+    <!-- テクスチャ新規作成専用モーダル -->
     <div id="texture-modal-overlay" class="interactive">
       <div id="modal-box" style="width: 320px;">
         <h3 style="font-size:0.9rem; color:var(--active-color); margin-bottom:14px; border-bottom:1px solid #333; padding-bottom:6px;">テクスチャ新規作成</h3>
+        
         <div style="display:flex; gap:10px; margin-bottom:14px;">
           <div style="flex:1;">
             <label style="font-size:0.75rem; color:#aaa;">横幅 (px)</label>
@@ -433,20 +463,24 @@
             <input id="tex-height" type="number" value="64" min="1" step="1" style="width:100%; padding:8px; margin-top:4px; background:#1a1a1a; border:1px solid var(--border-color); border-radius:4px; color:#fff; font-size:0.8rem; user-select:text;">
           </div>
         </div>
+
         <label style="margin-bottom:16px; display:flex; align-items:center; gap:8px; cursor:pointer;">
           <input type="checkbox" id="tex-auto-uv" checked style="width:16px; height:16px; accent-color:var(--accent-color);">
           <span style="font-size:0.78rem; color:#ccc;">UV自動配置 (全キューブキツキツ配置)</span>
         </label>
+
         <div style="margin-bottom:20px;">
           <label style="font-size:0.75rem; color:#aaa;">テクセル数値 (空欄で面積限界まで自動拡大)</label>
           <input id="tex-density" type="number" placeholder="自動" min="0.1" step="0.1" style="width:100%; padding:8px; margin-top:4px; background:#1a1a1a; border:1px solid var(--border-color); border-radius:4px; color:#fff; font-size:0.8rem; user-select:text;">
         </div>
+
         <div id="modal-actions">
           <button id="tex-modal-cancel" class="btn">キャンセル</button>
           <button id="tex-modal-ok" class="btn btn-primary">作成</button>
         </div>
       </div>
     </div>
+    
     <div class="mode-selector-vertical interactive">
       <button class="mode-btn active" id="mode-translate" title="移動 (Translate)">移動</button>
       <button class="mode-btn" id="mode-rotate" title="回転 (Rotate)">回転</button>
@@ -454,11 +488,14 @@
       <button class="mode-btn" id="mode-select" title="選択 (Select / UV設定用)">選択</button>
       <button class="mode-btn" id="mode-paint" title="ペイント (Paint)">ペイント</button>
     </div>
+
+    <!-- 左下ズームボタン（アイコン拡大・全画面化アイコンに変更） -->
     <div class="zoom-btn-container interactive">
       <button class="icon-only-btn" id="btn-focus" title="カメラリセット/フォーカス">
         <svg viewBox="0 0 24 24"><path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/></svg>
       </button>
     </div>
+
     <div class="ui-layer">
       <header class="interactive">
         <h1>
@@ -472,6 +509,7 @@
           <button class="btn" id="btn-redo" disabled title="やり直し">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.06-5.5 7.6-5.5 1.96 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
           </button>
+
           <div class="dropdown">
             <button class="btn" id="menu-btn" style="padding: 6px 10px; font-weight: bold;">&#8942;</button>
             <div class="dropdown-content" id="menu-dropdown">
@@ -487,6 +525,7 @@
           </div>
         </div>
       </header>
+
       <div id="info-overlay" class="interactive">
         <div class="title" id="info-name">cube</div>
         <div class="row">
@@ -514,6 +553,7 @@
           </div>
         </div>
       </div>
+
       <div id="paint-panel" class="interactive">
         <div class="title">ペイントツール</div>
         <div class="row">
@@ -544,15 +584,21 @@
           </button>
         </div>
       </div>
+
       <div id="error-msg"></div>
+
       <div id="bottom-panel" class="interactive">
         <div id="resize-handle"></div>
         <div class="panel-content" style="flex-direction: column;">
+          
+          <!-- 上部切り替えタブ（モデル構成 / テクスチャ画像表示 / UV設定） -->
           <div style="display: flex; gap: 6px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
             <button class="btn btn-primary" id="tab-outline" style="flex: 1; justify-content: center;">モデル構成</button>
             <button class="btn" id="tab-texture" style="flex: 1; justify-content: center; background: #262626;">テクスチャ画像表示</button>
             <button class="btn" id="tab-uv" style="flex: 1; justify-content: center; background: #262626;">UV設定</button>
           </div>
+
+          <!-- ビュー1: モデル構成 モード用のコンテンツ -->
           <div id="view-outline" style="display: flex; flex-direction: column; gap: 6px; flex: 1; overflow: hidden;">
             <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
               <button class="btn" id="btn-add-bone" style="padding: 4px 8px; font-size: 0.7rem; background:#333;">+ Bone追加</button>
@@ -565,6 +611,8 @@
             </div>
             <div id="cube-list-container" style="flex: 1; overflow-y: auto;"></div>
           </div>
+
+          <!-- ビュー2: テクスチャ画像表示 モード用のコンテンツ -->
           <div id="view-texture" style="display: none; flex-direction: column; gap: 8px; flex: 1; overflow: hidden;">
             <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
               <button class="btn btn-primary" id="btn-new-texture" style="padding: 4px 10px; font-size: 0.75rem;">+ テクスチャ新規作成</button>
@@ -574,22 +622,27 @@
                 <input type="file" id="texture-input" accept="image/png">
               </label>
             </div>
+            <!-- テクスチャ画像エリア -->
             <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; align-items: center; justify-content: center; overflow: auto;">
               <div id="texture-preview-container" style="max-width: 100%; max-height: 100%; display: flex; align-items: center; justify-content: center; background: #1a1a1a; border: 1px dashed #444; border-radius: 4px; padding: 4px; width: 100%; height: 100%;">
                 <span style="font-size: 0.75rem; color: #777;">テクスチャ未読み込み</span>
               </div>
             </div>
           </div>
+
+          <!-- ビュー3: UV設定 モード用のコンテンツ -->
           <div id="view-uv" style="display: none; flex-direction: column; gap: 6px; flex: 1; overflow: hidden;">
             <div id="uv-editor-hint" style="font-size: 0.72rem; color: #999;">Cubeを選択すると、その6面のUVを編集できます（ドラッグで移動、右下の四角で拡縮）。</div>
             <div id="uv-editor-container" style="flex: 1; position: relative; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; display:flex; align-items:center; justify-content:center;">
               <canvas id="uv-editor-canvas" style="max-width:100%; max-height:100%; touch-action:none; cursor:default;"></canvas>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
+
   <script>
     const EYE_OPEN_SVG = `<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`;
     const EYE_CLOSED_SVG = `<svg viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.17c0-1.66-1.34-3-3-3l-.17.02z"/></svg>`;
@@ -598,26 +651,34 @@
     const COPY_SVG = `<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
     const FOLDER_SVG = `<svg viewBox="0 0 24 24" fill="var(--folder-color)"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1 0 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
     const CUBE_SVG = `<svg viewBox="0 0 24 24" fill="#aaa"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>`;
+    
     const ARROW_UP_SVG = `<svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>`;
     const ARROW_DOWN_SVG = `<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>`;
     const MOVE_BONE_SVG = `<svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3v-3h2v3h3v2z"/></svg>`;
     const MORE_SVG = `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
+
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
+
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(24, 24, 32);
+
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     if (renderer.outputColorSpace !== undefined) renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
+
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = false;
+
     const worldDummyObject = new THREE.Object3D();
     scene.add(worldDummyObject);
+
     const transformControls = new THREE.TransformControls(camera, renderer.domElement);
     transformControls.setSize(0.75);
     scene.add(transformControls);
+
     // 回転モードの「E」(画面平面回転・黄色い円)のハンドルのみ削除し、
     // X/Y/Z軸の回転ハンドルと「XYZE」(自由回転・赤青緑に合わせた白い円)は残す。
     // 表示用・当たり判定用の両方から取り除く。
@@ -628,6 +689,7 @@
       });
       toRemove.forEach((obj) => { if (obj.parent) obj.parent.remove(obj); });
     })();
+
     // 白い円(XYZE)は当たり判定(picker)側だけを取り除き、見た目(gizmo)側は残すことで
     // 「表示はされるが操作はできない」見た目のみのガイドにする。
     // (実際の無効化はdragging-changed/changeイベント側の巻き戻し処理で保証しているため、
@@ -642,14 +704,17 @@
         toRemove.forEach((obj) => { if (obj.parent) obj.parent.remove(obj); });
       } catch (e) { /* 構造が異なる場合は何もしない(change側の巻き戻しでカバーされる) */ }
     })();
+
     let currentMode = 'translate';
     let initialWorldDummyPos = new THREE.Vector3();
     let initialTranslateCubeOrigin = [0, 0, 0];
     let initialTranslateCubePivot = null;
+
     const resizeGizmoGroup = new THREE.Group();
     resizeGizmoGroup.name = '__resize_gizmo__';
     scene.add(resizeGizmoGroup);
     resizeGizmoGroup.visible = false;
+
     // 変形(拡縮)モードのハンドルは固定のワールドサイズ(0.6ユニット)だったため、
     // カメラを引く(ズームアウトする)と画面上でどんどん小さくなり、ほぼ掴めなくなるバグがあった。
     // 逆に距離補正のスケール係数/上限を大きくしすぎたところ、今度は見た目が画面からはみ出すほど
@@ -657,6 +722,7 @@
     // 見た目は控えめな固定サイズのまま、タップ判定用だけ一回り大きい透明メッシュを別に用意して
     // raycastの対象をそちらにすることで、「見た目は画面に収まる」「判定だけ広い」を両立させた。
     const RESIZE_GIZMO_SCALE_FACTOR = 0.06;
+
     function updateResizeGizmoAutoScale() {
       if (!resizeGizmoGroup.visible) return;
       const dist = camera.position.distanceTo(resizeGizmoGroup.position);
@@ -664,6 +730,7 @@
       const s = dist * fovFactor * RESIZE_GIZMO_SCALE_FACTOR;
       resizeGizmoGroup.scale.setScalar(THREE.MathUtils.clamp(s, 0.35, 2.2));
     }
+
     const resizeHandleMeshes = [];
     const HANDLE_DEFINITIONS = [
       { name: '+X', localAxis: new THREE.Vector3(-1, 0, 0), color: 0xff3333 },
@@ -673,10 +740,12 @@
       { name: '+Z', localAxis: new THREE.Vector3(0, 0, 1), color: 0x3388ff },
       { name: '-Z', localAxis: new THREE.Vector3(0, 0, -1), color: 0x3388ff }
     ];
+
     HANDLE_DEFINITIONS.forEach(def => {
       const handleGroup = new THREE.Group();
       handleGroup.name = def.name;
       handleGroup.userData = { localAxis: def.localAxis, dirName: def.name };
+
       // 見た目は控えめなサイズに戻す(0.85→0.5)
       const geom = new THREE.BoxGeometry(0.5, 0.5, 0.5);
       const mat = new THREE.MeshBasicMaterial({ color: def.color, depthTest: false, transparent: true, opacity: 0.95 });
@@ -684,40 +753,50 @@
       mesh.renderOrder = 999;
       mesh.userData = handleGroup.userData;
       handleGroup.add(mesh);
+
       // タップ判定だけを大きく取るための、見えない当たり判定専用メッシュ(見た目のBoxの倍以上)
       const hitGeom = new THREE.BoxGeometry(1.2, 1.2, 1.2);
       const hitMesh = new THREE.Mesh(hitGeom, new THREE.MeshBasicMaterial({ visible: false }));
       hitMesh.userData = handleGroup.userData;
       handleGroup.add(hitMesh);
+
       const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0)]);
       const lineMat = new THREE.LineBasicMaterial({ color: def.color, depthTest: false, transparent: true, opacity: 0.8, linewidth: 2 });
       const line = new THREE.Line(lineGeo, lineMat);
       line.renderOrder = 998;
       handleGroup.add(line);
+
       handleGroup.userData.mesh = mesh;
       handleGroup.userData.hitMesh = hitMesh;
       handleGroup.userData.line = line;
+
       resizeGizmoGroup.add(handleGroup);
       // raycast(タップ判定)は大きい方のhitMeshを対象にする
       resizeHandleMeshes.push(hitMesh);
     });
+
     function updateResizeGizmo() {
       if (currentMode !== 'scale' || !selectedCubeData) {
         resizeGizmoGroup.visible = false;
         return;
       }
+
       const { mesh, cube } = selectedCubeData;
       resizeGizmoGroup.visible = true;
+
       const worldPos = new THREE.Vector3();
       const worldQuat = new THREE.Quaternion();
       mesh.getWorldPosition(worldPos);
       mesh.getWorldQuaternion(worldQuat);
+
       resizeGizmoGroup.position.copy(worldPos);
       resizeGizmoGroup.quaternion.copy(worldQuat);
+
       const size = cube.size || [1, 1, 1];
       const hx = size[0] / 2;
       const hy = size[1] / 2;
       const hz = size[2] / 2;
+
       const offset = 1.5;
       const positions = {
         '+X': new THREE.Vector3(-hx - offset, 0, 0),
@@ -727,26 +806,31 @@
         '+Z': new THREE.Vector3(0, 0, hz + offset),
         '-Z': new THREE.Vector3(0, 0, -hz - offset)
       };
+
       resizeGizmoGroup.children.forEach(handleGroup => {
         const targetPos = positions[handleGroup.name];
         if (targetPos) {
           const hMesh = handleGroup.userData.mesh;
           const hHitMesh = handleGroup.userData.hitMesh;
           const hLine = handleGroup.userData.line;
+
           hMesh.position.copy(targetPos);
           if (hHitMesh) hHitMesh.position.copy(targetPos);
+
           const linePositions = new Float32Array([0, 0, 0, targetPos.x, targetPos.y, targetPos.z]);
           hLine.geometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
           hLine.geometry.attributes.position.needsUpdate = true;
         }
       });
     }
+
     let activeResizeHandle = null;
     let dragPlane = new THREE.Plane();
     let dragStartWorldPos = new THREE.Vector3();
     let initialCubeOrigin = [0, 0, 0];
     let initialCubeSize = [1, 1, 1];
     let currentAppliedDelta = 0;
+
     let recentlyDragged = false;
     // 回転ギズモの外側にある白い円(XYZE/自由回転ハンドル)は、見た目のガイドとして残しつつ
     // ドラッグしても実際には回転させない(見た目のみ)ようにするため、ドラッグ開始時の
@@ -790,8 +874,10 @@
         }
       }
     });
+
     transformControls.addEventListener('change', () => {
       if (!transformControls.dragging) return;
+
       // 白い円(XYZE)での自由回転は見た目のみで、実際の回転には反映させない。
       // ドラッグ中に軸がXYZEの場合、毎フレーム開始時点の回転へ戻すことで無効化する。
       if (currentMode === 'rotate' && transformControls.axis === 'XYZE') {
@@ -800,16 +886,19 @@
         }
         return;
       }
+
       if (!selectedCubeData && selectedBone) {
         if (currentMode === 'translate' && boneTranslateInitial) {
           const dx = Math.round(transformControls.object.position.x - boneTranslateInitial.groupPos.x);
           const dy = Math.round(transformControls.object.position.y - boneTranslateInitial.groupPos.y);
           const dz = Math.round(transformControls.object.position.z - boneTranslateInitial.groupPos.z);
+
           selectedBone.pivot = [
             boneTranslateInitial.bonePivot[0] - dx,
             boneTranslateInitial.bonePivot[1] + dy,
             boneTranslateInitial.bonePivot[2] + dz
           ];
+
           boneTranslateInitial.cubes.forEach(snap => {
             snap.cube.origin = [snap.origin[0] - dx, snap.origin[1] + dy, snap.origin[2] + dz];
             if (snap.pivot) {
@@ -826,17 +915,21 @@
         }
         return;
       }
+
       if (!selectedCubeData || !transformControls.dragging) return;
+
       if (currentMode === 'translate') {
         const dx = Math.round(worldDummyObject.position.x - initialWorldDummyPos.x);
         const dy = Math.round(worldDummyObject.position.y - initialWorldDummyPos.y);
         const dz = Math.round(worldDummyObject.position.z - initialWorldDummyPos.z);
+
         const cube = selectedCubeData.cube;
         cube.origin = [
           initialTranslateCubeOrigin[0] - dx,
           initialTranslateCubeOrigin[1] + dy,
           initialTranslateCubeOrigin[2] + dz
         ];
+
         if (initialTranslateCubePivot) {
           cube.pivot = [
             initialTranslateCubePivot[0] - dx,
@@ -844,12 +937,14 @@
             initialTranslateCubePivot[2] + dz
           ];
         }
+
         if (selectedCubeData.mesh) {
           const bonePivot = selectedCubeData.bonePivot || [0, 0, 0];
           const size = cube.size || [1, 1, 1];
           const posX = -(cube.origin[0] + size[0] / 2) + bonePivot[0];
           const posY = (cube.origin[1] + size[1] / 2) - bonePivot[1];
           const posZ = (cube.origin[2] + size[2] / 2) - bonePivot[2];
+
           if (selectedCubeData.rotGroup) {
             const pivot = cube.pivot || [
               cube.origin[0] + size[0] / 2,
@@ -868,34 +963,42 @@
         updateOverlayInfo();
       }
     });
+
     scene.add(new THREE.AmbientLight(0xffffff, 0.65));
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
     dirLight.position.set(20, 40, 30);
     scene.add(dirLight);
     scene.add(new THREE.GridHelper(16, 16, 0x00ff88, 0x555555));
+
     let currentModelGroup = new THREE.Group();
     scene.add(currentModelGroup);
     let currentTexture = null;
     let rawModelJSON = null;
+
     /* ===== ペイント機能: キャンバスベースのテクスチャ管理 ===== */
     let paintTool = 'pen';       // 'pen' | 'eraser' | 'fill'
     let paintColor = '#ff0000';
     let brushSize = 1;
     let isPaintStroke = false;
     let textureLoaded = false;   // テクスチャ画像が読み込み/新規作成済みかどうか(未選択時のペイントを防ぐため)
+
     const paintCanvas = document.createElement('canvas');
     paintCanvas.width = 64; paintCanvas.height = 64;
     const paintCtx = paintCanvas.getContext('2d', { willReadFrequently: true });
+
     const displayCanvas = document.createElement('canvas');
     displayCanvas.width = 64; displayCanvas.height = 64;
     const displayCtx = displayCanvas.getContext('2d');
+
     let paintTexture = null;
+
     // テクスチャ解像度が低いほど拡大し、網目線がテクセルを塗り潰さず細い線として見えるようにする
     function getDisplayScale(tw, th) {
       const target = 1024;
       const s = Math.floor(target / Math.max(tw, th, 1));
       return Math.max(1, Math.min(16, s));
     }
+
     /* ===== ペイントモードの網目線(グリッド)オーバーレイ =====
        以前はグリッド線をキャンバスに焼き込んだテクスチャとして表示していたため、線の太さが
        テクスチャ(=モデル)の画面上の見かけの大きさに比例してしまい、カメラを近づけると太く、
@@ -948,16 +1051,19 @@
         }
       `
     });
+
     // テクスチャの解像度(texel数)が変わった時だけ、シェーダーのtexSize uniformを更新する
     function ensureGridTexture(tw, th) {
       if (gridTexSize.tw === tw && gridTexSize.th === th) return;
       gridTexSize = { tw, th };
       gridMaterial.uniforms.texSize.value.set(tw, th);
     }
+
     function setGridMeshesVisible(visible) {
       gridMeshList.forEach(gm => { gm.visible = visible; });
     }
     /* ===== 網目線オーバーレイここまで ===== */
+
     function getActiveGeometry() {
       if (!rawModelJSON) return null;
       if (rawModelJSON["minecraft:geometry"]) return rawModelJSON["minecraft:geometry"][0];
@@ -965,6 +1071,7 @@
       if (keys.length > 0) return rawModelJSON[keys[0]];
       return null;
     }
+
     function ensurePaintTexture() {
       if (!paintTexture) {
         paintTexture = new THREE.CanvasTexture(displayCanvas);
@@ -975,6 +1082,7 @@
       currentTexture = paintTexture;
       return paintTexture;
     }
+
     // 実データ(paintCanvas)を表示用キャンバスへ反映(網目線は別テクスチャのオーバーレイメッシュで描画するため、ここには含めない)
     function refreshDisplayCanvas() {
       if (!paintTexture) return;
@@ -989,26 +1097,35 @@
       displayCtx.drawImage(paintCanvas, 0, 0, tw, th, 0, 0, dw, dh);
       paintTexture.needsUpdate = true;
     }
+
     function updateTexturePreviewFromCanvas() {
       updateTexturePreview(paintCanvas.toDataURL('image/png'));
       redrawUVEditor();
     }
+
     function loadImageIntoPaintCanvas(dataUrl, width, height, callback) {
       const img = new Image();
       img.onload = () => {
-        paintCanvas.width = width;
-        paintCanvas.height = height;
-        paintCtx.clearRect(0, 0, width, height);
-        paintCtx.drawImage(img, 0, 0, width, height);
+        // 以前は呼び出し側が渡したwidth/height(多くはモデルJSONのtexture_width/height)に
+        // 強制的に合わせて描画(=引き伸ばし/圧縮)していたため、実際のPNGファイルの解像度が
+        // モデルの宣言サイズと違うと画像が歪んで「読み込むたびに画像が変わる」ように見える
+        // バグがあった。実際に読み込んだ画像の解像度をそのまま使い、引き伸ばさないようにする。
+        const actualW = img.naturalWidth || width;
+        const actualH = img.naturalHeight || height;
+        paintCanvas.width = actualW;
+        paintCanvas.height = actualH;
+        paintCtx.clearRect(0, 0, actualW, actualH);
+        paintCtx.drawImage(img, 0, 0);
         ensurePaintTexture();
         refreshDisplayCanvas();
         textureLoaded = true;
         // ペイントモード中にテクスチャを読み込み/新規作成した場合、網目オーバーレイを表示する
         if (currentMode === 'paint') setGridMeshesVisible(true);
-        if (callback) callback();
+        if (callback) callback(actualW, actualH);
       };
       img.src = dataUrl;
     }
+
     function initBlankPaintCanvas(width, height) {
       paintCanvas.width = width;
       paintCanvas.height = height;
@@ -1023,16 +1140,20 @@
       ensurePaintTexture();
       refreshDisplayCanvas();
     }
+
     function enterPaintMode() {
       document.getElementById('info-overlay').style.display = 'none';
       document.getElementById('paint-panel').style.display = 'block';
+
       const geometry = getActiveGeometry();
       let tw = 64, th = 64;
       if (geometry && geometry.description) {
         tw = geometry.description.texture_width || 64;
         th = geometry.description.texture_height || 64;
       }
+
       ensureGridTexture(tw, th);
+
       // テクスチャ画像が未選択の場合は自動でプレースホルダーを作らない(ペイント時にエラー表示するため)
       if (paintTexture) {
         refreshDisplayCanvas();
@@ -1041,12 +1162,14 @@
       // テクスチャが実際に読み込み/新規作成済みのときだけ網目を表示する
       setGridMeshesVisible(textureLoaded && !!paintTexture);
     }
+
     function exitPaintMode() {
       document.getElementById('paint-panel').style.display = 'none';
       refreshDisplayCanvas();
       setGridMeshesVisible(false);
       if (selectedCubeData) updateOverlayInfo();
     }
+
     // 交差した面(faceIndex)から、その面が使うテクスチャ上のピクセル矩形を取得
     function getFaceRectForIntersection(mesh, faceIndex) {
       const rects = mesh.geometry.userData.faceUVRects;
@@ -1054,16 +1177,20 @@
       const faceIdx = Math.floor(faceIndex / 2);
       return rects[faceIdx] || null;
     }
+
     function uvToPixel(uv, w, h) {
       return { x: uv.x * w, y: (1 - uv.y) * h };
     }
+
     function hexToRgb(hex) {
       const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
       return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [255, 0, 0];
     }
+
     function colorsEqual(a, b) {
       return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
     }
+
     // 指定した色(hex)をamount(0〜1)の割合だけ暗くしたrgb()文字列を返す
     function darkenColor(hex, amount) {
       const [r, g, b] = hexToRgb(hex);
@@ -1072,6 +1199,7 @@
       const nb = Math.round(b * (1 - amount));
       return `rgb(${nr},${ng},${nb})`;
     }
+
     // ブラシで塗る/消す。rect(現在の面のUV範囲)でクリップし、隣接面へのはみ出しを防止
     function paintBrushAt(px, py, rect, skipRefresh) {
       const w = paintCanvas.width, h = paintCanvas.height;
@@ -1079,13 +1207,16 @@
       const clipY0 = Math.max(0, rect ? Math.floor(rect.y0) : 0);
       const clipX1 = Math.min(w, rect ? Math.ceil(rect.x1) : w);
       const clipY1 = Math.min(h, rect ? Math.ceil(rect.y1) : h);
+
       const half = Math.floor(brushSize / 2);
       const bx0 = Math.floor(px) - half;
       const by0 = Math.floor(py) - half;
+
       const x0 = Math.max(clipX0, bx0);
       const y0 = Math.max(clipY0, by0);
       const x1 = Math.min(clipX1, bx0 + brushSize);
       const y1 = Math.min(clipY1, by0 + brushSize);
+
       if (x1 > x0 && y1 > y0) {
         if (paintTool === 'eraser') {
           paintCtx.clearRect(x0, y0, x1 - x0, y1 - y0);
@@ -1096,6 +1227,7 @@
       }
       if (!skipRefresh) refreshDisplayCanvas();
     }
+
     // 塗りつぶし(バケツ)。こちらも面のUV範囲内に限定して塗りつぶす
     function paintFillAt(px, py, rect) {
       const w = paintCanvas.width, h = paintCanvas.height;
@@ -1105,21 +1237,26 @@
       const clipY1 = Math.min(h, rect ? Math.ceil(rect.y1) : h);
       const rw = clipX1 - clipX0, rh = clipY1 - clipY0;
       if (rw <= 0 || rh <= 0) return;
+
       const startX = Math.min(Math.max(Math.floor(px), clipX0), clipX1 - 1) - clipX0;
       const startY = Math.min(Math.max(Math.floor(py), clipY0), clipY1 - 1) - clipY0;
+
       const imgData = paintCtx.getImageData(clipX0, clipY0, rw, rh);
       const data = imgData.data;
       const idx0 = (startY * rw + startX) * 4;
       const target = [data[idx0], data[idx0 + 1], data[idx0 + 2], data[idx0 + 3]];
       const fill = paintTool === 'eraser' ? [0, 0, 0, 0] : [...hexToRgb(paintColor), 255];
       if (colorsEqual(target, fill)) return;
+
       const visited = new Uint8Array(rw * rh);
       const stack = [[startX, startY]];
       visited[startY * rw + startX] = 1;
+
       while (stack.length) {
         const [x, y] = stack.pop();
         const i = (y * rw + x) * 4;
         data[i] = fill[0]; data[i + 1] = fill[1]; data[i + 2] = fill[2]; data[i + 3] = fill[3];
+
         const neighbors = [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]];
         for (const [nx, ny] of neighbors) {
           if (nx < 0 || ny < 0 || nx >= rw || ny >= rh) continue;
@@ -1135,19 +1272,23 @@
       paintCtx.putImageData(imgData, clipX0, clipY0);
       refreshDisplayCanvas();
     }
+
     // 直前に塗った位置(同じ面の範囲内でのみ有効)。高速にペンを動かした際の点線化を防ぐための補間に使用
     let lastPaintPixel = null;
+
     function applyPaintAtIntersection(intersection, isStrokeStart) {
       if (!intersection.uv || !paintTexture) return;
       const mesh = intersection.object;
       const rect = getFaceRectForIntersection(mesh, intersection.faceIndex);
       const pixel = uvToPixel(intersection.uv, paintCanvas.width, paintCanvas.height);
       const rectKey = rect ? `${rect.x0},${rect.y0},${rect.x1},${rect.y1}` : 'none';
+
       if (paintTool === 'fill') {
         paintFillAt(pixel.x, pixel.y, rect);
         lastPaintPixel = null;
         return;
       }
+
       // ポインタ移動が速いとサンプル間の距離が開き、点と点の間に隙間(点線)ができてしまう。
       // 直前の座標から現在座標までを細かく補間して連続的に塗ることで、滑らかな一本線にする。
       if (!isStrokeStart && lastPaintPixel && lastPaintPixel.rectKey === rectKey) {
@@ -1164,13 +1305,16 @@
       } else {
         paintBrushAt(pixel.x, pixel.y, rect);
       }
+
       lastPaintPixel = { x: pixel.x, y: pixel.y, rectKey };
     }
     /* ===== ペイント機能ここまで ===== */
+
     let selectedCubeData = null; 
     let selectedBone = null;     
     let cubeMeshList = [];
     let boneGroupList = []; // { bone, group } のリスト。Bone単位でのまとめて移動/回転/変形に使用
+
     // Bone(のグループ)をまとめて移動する際の、ドラッグ開始時点のスナップショット
     let boneTranslateInitial = null;
     // Bone(のグループ)をまとめて変形(リサイズ)する際の、ドラッグ開始時点のバウンディングボックス
@@ -1178,6 +1322,7 @@
     // リサイズギズモが今操作しているのが単体Cubeか、選択中のBone全体かを判別するための、回転(向き)取得元
     let activeResizeWorldObject = null;
     let activeResizeTargetIsBone = false;
+
     const menuBtn = document.getElementById('menu-btn');
     const menuDropdown = document.getElementById('menu-dropdown');
     menuBtn.addEventListener('click', (e) => {
@@ -1187,6 +1332,7 @@
     window.addEventListener('click', () => {
       menuDropdown.classList.remove('show');
     });
+
     // タブ切り替え処理（モデル構成 / テクスチャ画像表示 / UV設定）
     const tabOutline = document.getElementById('tab-outline');
     const tabTexture = document.getElementById('tab-texture');
@@ -1194,6 +1340,7 @@
     const viewOutline = document.getElementById('view-outline');
     const viewTexture = document.getElementById('view-texture');
     const viewUV = document.getElementById('view-uv');
+
     function switchBottomTab(target) {
       const tabs = { outline: [tabOutline, viewOutline], texture: [tabTexture, viewTexture], uv: [tabUV, viewUV] };
       Object.keys(tabs).forEach(key => {
@@ -1215,11 +1362,14 @@
         setUVHighlight(false);
       }
     }
+
     tabOutline.addEventListener('click', (e) => { e.stopPropagation(); switchBottomTab('outline'); });
     tabTexture.addEventListener('click', (e) => { e.stopPropagation(); switchBottomTab('texture'); });
     tabUV.addEventListener('click', (e) => { e.stopPropagation(); switchBottomTab('uv'); });
+
     const undoStack = [];
     const redoStack = [];
+
     // モデルのJSONに加え、ペイント中のテクスチャ(キャンバスの中身)とテクスチャ選択状態も
     // 一緒にスナップショットする。テクスチャ側だけを戻し忘れると、戻る操作の後に
     // モデルのUV/テクスチャサイズとキャンバスの実サイズが食い違い、表示が壊れるバグの原因になっていた。
@@ -1232,6 +1382,7 @@
         textureLoaded: textureLoaded
       };
     }
+
     function applySnapshot(snap) {
       rawModelJSON = JSON.parse(snap.json);
       textureLoaded = snap.textureLoaded;
@@ -1246,16 +1397,19 @@
         parseBedrockJSON(rawModelJSON, false);
       }
     }
+
     function saveState() {
       if (!rawModelJSON) return;
       undoStack.push(captureSnapshot());
       redoStack.length = 0;
       updateUndoRedoButtons();
     }
+
     function updateUndoRedoButtons() {
       document.getElementById('btn-undo').disabled = undoStack.length === 0;
       document.getElementById('btn-redo').disabled = redoStack.length === 0;
     }
+
     document.getElementById('btn-undo').addEventListener('click', (e) => {
       e.stopPropagation();
       if (undoStack.length === 0) return;
@@ -1263,6 +1417,7 @@
       applySnapshot(undoStack.pop());
       updateUndoRedoButtons();
     });
+
     document.getElementById('btn-redo').addEventListener('click', (e) => {
       e.stopPropagation();
       if (redoStack.length === 0) return;
@@ -1270,17 +1425,20 @@
       applySnapshot(redoStack.pop());
       updateUndoRedoButtons();
     });
+
     function showError(msg) {
       const errDiv = document.getElementById('error-msg');
       errDiv.innerText = msg;
       errDiv.style.display = 'block';
       setTimeout(() => clearError(), 5000);
     }
+
     function clearError() {
       const errDiv = document.getElementById('error-msg');
       errDiv.innerText = '';
       errDiv.style.display = 'none';
     }
+
     function getUniqueBoneName(baseName, geometry) {
       if (!geometry || !geometry.bones) return baseName;
       const existingNames = new Set(geometry.bones.map(b => b.name));
@@ -1291,6 +1449,7 @@
       }
       return `${baseName}_${counter}`;
     }
+
     function createEmptyModel() {
       return {
         "format_version": "1.12.0",
@@ -1309,6 +1468,7 @@
         ]
       };
     }
+
     function parseBedrockJSON(json, isNewFile = true) {
       clearError();
       rawModelJSON = json;
@@ -1317,6 +1477,7 @@
         redoStack.length = 0;
         updateUndoRedoButtons();
       }
+
       const activeCubeRef = selectedCubeData?.cube;
       deselectCube();
       scene.remove(currentModelGroup);
@@ -1324,16 +1485,19 @@
       cubeMeshList = [];
       gridMeshList = [];
       boneGroupList = [];
+
       let geometry = null;
       if (json["minecraft:geometry"]) geometry = json["minecraft:geometry"][0];
       else {
         const keys = Object.keys(json).filter(k => k.startsWith("geometry."));
         if (keys.length > 0) geometry = json[keys[0]];
       }
+
       if (!geometry) {
         showError("有効なBedrock Geometry JSONではありません。");
         return;
       }
+
       const boneNames = new Set();
       if (geometry.bones) {
         geometry.bones.forEach(b => {
@@ -1346,11 +1510,13 @@
           boneNames.add(b.name);
         });
       }
+
       const description = geometry.description || {};
       const tw = description.texture_width || 64;
       const th = description.texture_height || 64;
       ensureGridTexture(tw, th);
       const bonesMap = new Map();
+
       if (geometry.bones) {
         geometry.bones.forEach((bone) => {
           const boneGroup = new THREE.Group();
@@ -1358,21 +1524,27 @@
           boneGroup.visible = !bone._hidden;
           const pivot = bone.pivot ? [...bone.pivot] : [0, 0, 0];
           boneGroup.position.set(-pivot[0], pivot[1], pivot[2]);
+
           if (bone.rotation) {
             boneGroup.rotation.order = 'ZYX';
             boneGroup.rotation.x = THREE.MathUtils.degToRad(-bone.rotation[0]);
             boneGroup.rotation.y = THREE.MathUtils.degToRad(-bone.rotation[1]);
             boneGroup.rotation.z = THREE.MathUtils.degToRad(bone.rotation[2]);
           }
+
           if (bone.cubes) {
             bone.cubes.forEach((cube) => {
-              const res = createCubeMesh(cube, pivot, tw, th, !!bone.mirror);
+              // mirrorはBone単位でも設定でき、Cube側にmirrorがあればそちらが優先(公式仕様)。
+              // 以前はcube.mirrorしか見ておらず、Bone単位のmirror指定が無視されるバグがあった。
+              const mirror = (cube.mirror !== undefined) ? cube.mirror : !!bone.mirror;
+              const res = createCubeMesh(cube, pivot, tw, th, mirror);
               if (res) {
                 const mesh = res.mesh;
                 mesh.userData = { bone, cube, rotGroup: res.rotGroup, bonePivot: pivot, mesh };
                 if (cube._hidden) {
                   mesh.visible = false;
                 }
+
                 boneGroup.add(res.rootObj);
                 cubeMeshList.push(mesh);
                 if (res.gridMesh) gridMeshList.push(res.gridMesh);
@@ -1382,6 +1554,7 @@
           bonesMap.set(bone.name, { group: boneGroup, parent: bone.parent, pivot });
           boneGroupList.push({ bone, group: boneGroup });
         });
+
         bonesMap.forEach((boneObj) => {
           if (boneObj.parent && bonesMap.has(boneObj.parent)) {
             const parentObj = bonesMap.get(boneObj.parent);
@@ -1394,6 +1567,7 @@
           }
         });
       }
+
       scene.add(currentModelGroup);
       buildCubeListUI();
       if (isNewFile) {
@@ -1411,23 +1585,22 @@
         }
       }
     }
-    function createCubeMesh(cube, bonePivot, tw, th, boneMirror) {
+
+    function createCubeMesh(cube, bonePivot, tw, th, mirror) {
       const size = cube.size || [1, 1, 1];
       const origin = cube.origin || [0, 0, 0];
       const inflate = cube.inflate || 0;
+
       const geoSize = [
         Math.max(0.001, size[0] + inflate * 2),
         Math.max(0.001, size[1] + inflate * 2),
         Math.max(0.001, size[2] + inflate * 2)
       ];
+
       const geometry = new THREE.BoxGeometry(geoSize[0], geoSize[1], geoSize[2]);
-      // Bedrockの仕様上、mirrorはBone単位で指定でき、Cube側にmirrorがあれば
-      // それがBoneの設定を上書きする(Cube側未指定ならBoneの値を継承する)。
-      // 以前はcube.mirrorしか見ていなかったため、Bone単位でmirrorを指定している
-      // モデル(左右対称の腕/脚などでよくある指定方法)を読み込むと、東西(east/west)面の
-      // テクスチャが反転されずに読み込まれ、UVがズレて見える不具合があった。
-      const effectiveMirror = (cube.mirror !== undefined && cube.mirror !== null) ? cube.mirror : !!boneMirror;
-      if (cube.uv) applyBedrockUVs(geometry, cube.uv, size, tw, th, effectiveMirror);
+
+      if (cube.uv) applyBedrockUVs(geometry, cube.uv, size, tw, th, mirror);
+
       const material = new THREE.MeshStandardMaterial({
         transparent: true,
         alphaTest: 0.1,
@@ -1436,7 +1609,9 @@
         roughness: 0.8,
         metalness: 0.1
       });
+
       const mesh = new THREE.Mesh(geometry, material);
+
       // ペイントモード用の網目線オーバーレイ。ジオメトリ(UV含む)を共有しつつ、
       // 色テクスチャとは別のLinearFilterテクスチャを貼ることで、どの距離でも滑らかな線になる
       let gridMesh = null;
@@ -1452,12 +1627,16 @@
         gridMesh.raycast = () => {}; // ペイント判定に干渉させない(色メッシュ側だけを判定させる)
         mesh.add(gridMesh);
       }
+
       const posX = -(origin[0] + size[0] / 2) + bonePivot[0];
       const posY = (origin[1] + size[1] / 2) - bonePivot[1];
       const posZ = (origin[2] + size[2] / 2) - bonePivot[2];
+
       mesh.position.set(posX, posY, posZ);
+
       let rotGroup = null;
       let rootObj = mesh;
+
       if (cube.rotation) {
         const pivot = cube.pivot || [
           origin[0] + size[0] / 2,
@@ -1468,18 +1647,22 @@
         rotGroup.position.set(-pivot[0] + bonePivot[0], pivot[1] - bonePivot[1], pivot[2] - bonePivot[2]);
         mesh.position.sub(rotGroup.position);
         rotGroup.add(mesh);
+
         rotGroup.rotation.order = 'ZYX';
         rotGroup.rotation.x = THREE.MathUtils.degToRad(-cube.rotation[0]);
         rotGroup.rotation.y = THREE.MathUtils.degToRad(-cube.rotation[1]);
         rotGroup.rotation.z = THREE.MathUtils.degToRad(cube.rotation[2]);
         rootObj = rotGroup;
       }
+
       return { mesh, rootObj, rotGroup, gridMesh };
     }
+
     function applyBedrockUVs(geometry, uvData, size, tw, th, globalMirror) {
       const uvAttr = geometry.attributes.uv;
       const w = size[0], h = size[1], d = size[2];
       let faces = {};
+
       if (Array.isArray(uvData)) {
         const u = uvData[0], v = uvData[1];
         faces = {
@@ -1499,12 +1682,24 @@
           }
         });
       }
+
+      // 公式仕様: mirrorはUVをX軸方向に反転し、east/westの面も入れ替わる(Java版ModelPartと同じ挙動)。
+      // 以前はnorth/south/up/downだけを反転してeast/westを放置していたため、
+      // mirror指定のモデルでUVがずれて見えていた。box UV(配列形式)のときだけ適用する。
+      const mirrorBox = !!globalMirror && Array.isArray(uvData);
+      if (mirrorBox) {
+        const tmp = faces.east; faces.east = faces.west; faces.west = tmp;
+      }
+
       if (!geometry.userData.faceUVRects) geometry.userData.faceUVRects = [];
+
       ['east', 'west', 'up', 'down', 'south', 'north'].forEach((faceKey, faceIdx) => {
         const face = faces[faceKey];
         if (!face) return;
+
         let [x, y] = face.uv;
         let [sw, sh] = face.size;
+
         // ペイント時に隣接面へはみ出さないよう、この面が占めるテクセル範囲を記録
         geometry.userData.faceUVRects[faceIdx] = {
           x0: Math.max(0, Math.min(x, x + sw)),
@@ -1512,11 +1707,14 @@
           y0: Math.max(0, Math.min(y, y + sh)),
           y1: Math.min(th, Math.max(y, y + sh))
         };
-        if (globalMirror && ['north', 'south', 'up', 'down'].includes(faceKey)) {
+
+        if (mirrorBox) {
           x += sw; sw = -sw;
         }
+
         let u0 = x / tw, v0 = 1.0 - (y + sh) / th;
         let u1 = (x + sw) / tw, v1 = 1.0 - y / th;
+
         if (faceKey === 'up') {
           uvAttr.setXY(faceIdx * 4 + 0, u0, v0); uvAttr.setXY(faceIdx * 4 + 1, u1, v0);
           uvAttr.setXY(faceIdx * 4 + 2, u0, v1); uvAttr.setXY(faceIdx * 4 + 3, u1, v1);
@@ -1527,6 +1725,7 @@
       });
       uvAttr.needsUpdate = true;
     }
+
     /* ===== モデル構成ツリーの行メニュー(「⋮」) =====
        以前は各行に「上へ/下へ/他Boneへ移動/複製/削除」等のアイコンが横一列に並び、
        特にスマホ幅では窮屈で押し間違えやすかった。よく使う「表示/非表示」だけを
@@ -1549,6 +1748,7 @@
       }
     }, true);
     window.addEventListener('scroll', closeRowMenu, true);
+
     function openRowMenu(anchorBtn, items) {
       closeRowMenu();
       const menu = document.createElement('div');
@@ -1558,6 +1758,7 @@
       menu.style.marginTop = '0';
       menu.style.zIndex = '60';
       menu.style.minWidth = '170px';
+
       items.forEach(item => {
         const btn = document.createElement('button');
         btn.className = 'dropdown-item';
@@ -1575,6 +1776,7 @@
         });
         menu.appendChild(btn);
       });
+
       document.body.appendChild(menu);
       const rect = anchorBtn.getBoundingClientRect();
       const menuRect = menu.getBoundingClientRect();
@@ -1586,37 +1788,48 @@
       menu.style.top = `${Math.max(8, top)}px`;
       activeRowMenu = menu;
     }
+
     /* キューブリストUI描画 */
     function buildCubeListUI() {
       const container = document.getElementById('cube-list-container');
       container.innerHTML = '';
+
       if (!rawModelJSON) return;
+
       let geometry = rawModelJSON["minecraft:geometry"] ? rawModelJSON["minecraft:geometry"][0] : null;
       if (!geometry) {
         const keys = Object.keys(rawModelJSON).filter(k => k.startsWith("geometry."));
         if (keys.length > 0) geometry = rawModelJSON[keys[0]];
       }
+
       if (!geometry || (!geometry.bones || geometry.bones.length === 0)) {
         container.innerHTML = '<div style="padding:12px; font-size:0.75rem; color:#777; text-align:center;">要素がありません</div>';
         return;
       }
+
       geometry.bones.forEach((bone) => {
         if (bone._collapsed === undefined) bone._collapsed = false;
+
         const boneItem = document.createElement('div');
         boneItem.className = 'tree-item bone-item';
         boneItem.userDataBone = bone;
+
         if (selectedBone === bone && !selectedCubeData) {
           boneItem.classList.add('selected');
         }
+
         const toggleIcon = document.createElement('div');
         toggleIcon.className = `toggle-icon ${bone._collapsed ? 'collapsed' : ''}`;
         toggleIcon.innerHTML = '▼';
+
         const folderIcon = document.createElement('span');
         folderIcon.innerHTML = FOLDER_SVG;
         folderIcon.style.display = 'flex';
+
         const nameSpan = document.createElement('span');
         nameSpan.className = 'tree-name';
         nameSpan.innerText = bone.name;
+
         // Bone単位の表示/非表示切り替え(配下の全Cubeがまとめて表示/非表示になる)
         const boneEntry = boneGroupList.find(e => e.bone === bone);
         const boneVisBtn = document.createElement('button');
@@ -1631,8 +1844,10 @@
           const nextVis = boneEntry ? !boneEntry.group.visible : !!bone._hidden;
           bone._hidden = !nextVis;
           if (boneEntry) boneEntry.group.visible = nextVis;
+
           boneVisBtn.innerHTML = nextVis ? EYE_OPEN_SVG : EYE_CLOSED_SVG;
           boneVisBtn.classList.toggle('hidden', !nextVis);
+
           if (!nextVis && selectedBone === bone) {
             transformControls.detach();
             resizeGizmoGroup.visible = false;
@@ -1640,8 +1855,10 @@
             buildCubeListUI();
           }
         });
+
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'tree-actions';
+
         const moreBtn = document.createElement('button');
         moreBtn.className = 'icon-btn';
         moreBtn.innerHTML = MORE_SVG;
@@ -1653,51 +1870,66 @@
             { label: "Boneを削除", icon: TRASH_SVG, danger: true, onClick: () => deleteBone(bone, geometry) }
           ]);
         });
+
         actionsDiv.appendChild(moreBtn);
+
         boneItem.appendChild(toggleIcon);
         boneItem.appendChild(folderIcon);
         boneItem.appendChild(boneVisBtn);
         boneItem.appendChild(nameSpan);
         boneItem.appendChild(actionsDiv);
+
         boneItem.addEventListener('click', (e) => {
           e.stopPropagation();
           bone._collapsed = !bone._collapsed;
           selectBone(bone);
         });
+
         container.appendChild(boneItem);
+
         if (!bone._collapsed && bone.cubes) {
           const cubeCount = bone.cubes.length;
+
           bone.cubes.forEach((cube, index) => {
             const mesh = cubeMeshList.find(m => m.userData.cube === cube);
+
             const cubeItem = document.createElement('div');
             cubeItem.className = 'tree-item cube-item';
             cubeItem.userDataBone = bone;
             cubeItem.userDataCube = cube;
+
             if (selectedCubeData && selectedCubeData.cube === cube) {
               cubeItem.classList.add('selected');
             }
+
             const visBtn = document.createElement('button');
             visBtn.className = 'vis-btn icon-btn';
             const isVisible = mesh ? mesh.visible : !cube._hidden;
             visBtn.innerHTML = isVisible ? EYE_OPEN_SVG : EYE_CLOSED_SVG;
             if (!isVisible) visBtn.classList.add('hidden');
+
             visBtn.addEventListener('click', (e) => {
               e.stopPropagation();
               const nextVis = mesh ? !mesh.visible : !!cube._hidden;
               cube._hidden = !nextVis;
               if (mesh) mesh.visible = nextVis;
+
               visBtn.innerHTML = nextVis ? EYE_OPEN_SVG : EYE_CLOSED_SVG;
               visBtn.classList.toggle('hidden', !nextVis);
               if (!nextVis && selectedCubeData?.cube === cube) deselectCube();
             });
+
             const cIcon = document.createElement('span');
             cIcon.innerHTML = CUBE_SVG;
             cIcon.style.display = 'flex';
+
             const cNameSpan = document.createElement('span');
             cNameSpan.className = 'tree-name';
             cNameSpan.innerText = "cube";
+
             const cubeActionsDiv = document.createElement('div');
             cubeActionsDiv.className = 'tree-actions';
+
             const cubeMoreBtn = document.createElement('button');
             cubeMoreBtn.className = 'icon-btn';
             cubeMoreBtn.innerHTML = MORE_SVG;
@@ -1712,20 +1944,25 @@
                 { label: "削除", icon: TRASH_SVG, danger: true, onClick: () => deleteCube(bone, cube) }
               ]);
             });
+
             cubeActionsDiv.appendChild(cubeMoreBtn);
+
             cubeItem.appendChild(visBtn);
             cubeItem.appendChild(cIcon);
             cubeItem.appendChild(cNameSpan);
             cubeItem.appendChild(cubeActionsDiv);
+
             cubeItem.addEventListener('click', (e) => {
               e.stopPropagation();
               if (mesh) selectCube(mesh);
             });
+
             container.appendChild(cubeItem);
           });
         }
       });
     }
+
     function moveCubeUp(bone, cube) {
       if (!bone || !bone.cubes) return;
       const idx = bone.cubes.indexOf(cube);
@@ -1737,6 +1974,7 @@
         parseBedrockJSON(rawModelJSON, false);
       }
     }
+
     function moveCubeDown(bone, cube) {
       if (!bone || !bone.cubes) return;
       const idx = bone.cubes.indexOf(cube);
@@ -1748,6 +1986,7 @@
         parseBedrockJSON(rawModelJSON, false);
       }
     }
+
     async function moveCubeToAnotherBone(currentBone, cube) {
       if (!rawModelJSON) return;
       let geometry = rawModelJSON["minecraft:geometry"] ? rawModelJSON["minecraft:geometry"][0] : null;
@@ -1756,14 +1995,17 @@
         if (keys.length > 0) geometry = rawModelJSON[keys[0]];
       }
       if (!geometry || !geometry.bones || geometry.bones.length === 0) return;
+
       const options = geometry.bones.map(b => ({
         value: b.name,
         label: b.name + (b === currentBone ? " (現在のBone)" : "")
       }));
+
       const selectedName = await showSelectModal({
         message: "移動先の Bone を選択してください:",
         options: options
       });
+
       if (selectedName) {
         const targetBone = geometry.bones.find(b => b.name === selectedName);
         if (targetBone && targetBone !== currentBone) {
@@ -1771,39 +2013,53 @@
         }
       }
     }
+
     function duplicateCube(bone, cube) {
       saveState();
       const newCube = JSON.parse(JSON.stringify(cube));
+      
       if (!bone.cubes) bone.cubes = [];
       bone.cubes.push(newCube);
+
       parseBedrockJSON(rawModelJSON, false);
+
       const newMesh = cubeMeshList.find(m => m.userData.cube === newCube);
       if (newMesh) selectCube(newMesh);
     }
+
     function moveCubeToBone(sourceBone, targetBone, cube) {
       saveState();
+
       sourceBone.cubes = sourceBone.cubes.filter(c => c !== cube);
+
       if (!targetBone.cubes) targetBone.cubes = [];
       targetBone.cubes.push(cube);
+
       targetBone._collapsed = false;
+
       parseBedrockJSON(rawModelJSON, false);
     }
+
     function selectBone(bone) {
       deselectCube();
       selectedBone = bone;
       buildCubeListUI();
       attachModeGizmoForBone(bone);
     }
+
     function selectCube(mesh) {
       if (!mesh) return;
+
       selectedCubeData = mesh.userData;
       selectedBone = selectedCubeData.bone;
       attachModeGizmo(mesh);
+
       buildCubeListUI();
       updateOverlayInfo();
       updateUVSelectionGlow();
       redrawUVEditor();
     }
+
     function deselectCube() {
       transformControls.detach();
       resizeGizmoGroup.visible = false;
@@ -1813,13 +2069,16 @@
       updateUVSelectionGlow();
       redrawUVEditor();
     }
+
     /* ===== UV設定エディタ(選択Cubeの発光ハイライト + 全6面UVのドラッグ編集) ===== */
     let uvHighlightActive = false;
     let uvGlowMesh = null;
+
     function setUVHighlight(active) {
       uvHighlightActive = active;
       updateUVSelectionGlow();
     }
+
     // 選択中のCubeのジオメトリに沿った発光する枠線(EdgesGeometry)を表示/更新する
     function updateUVSelectionGlow() {
       if (uvGlowMesh) {
@@ -1830,6 +2089,7 @@
       }
       const shouldGlow = uvHighlightActive || currentMode === 'select';
       if (!shouldGlow || !selectedCubeData || !selectedCubeData.mesh) return;
+
       const mesh = selectedCubeData.mesh;
       const edges = new THREE.EdgesGeometry(mesh.geometry);
       const mat = new THREE.LineBasicMaterial({
@@ -1839,19 +2099,15 @@
         depthTest: false
       });
       uvGlowMesh = new THREE.LineSegments(edges, mat);
-      // 以前はここでscale.setScalar(1.03)によって枠線を一回り拡大し、キューブ本体との
-      // Zファイティングを避けていたが、この拡大はローカル原点(箱の中心)基準にかかるため、
-      // 立方体でない(縦横奥行きの比率が違う)Cubeでは軸ごとの拡大量が異なり、枠線が
-      // キューブの実際の辺からズレて見える不具合の原因になっていた。
-      // このマテリアルはdepthTest:falseかつrenderOrderを非常に大きくしているため、
-      // 深度バッファに関係なく必ず手前に描画される。拡大しなくてもZファイティングは
-      // 起きないため、この拡大処理自体を廃止し、キューブの実寸そのままの枠線にする。
+      uvGlowMesh.scale.setScalar(1.03);
       uvGlowMesh.renderOrder = 999;
       mesh.add(uvGlowMesh);
     }
+
     const UV_FACE_ORDER = ['east', 'west', 'up', 'down', 'south', 'north'];
     const UV_FACE_LABELS = { east: '+X', west: '-X', up: '+Y', down: '-Y', south: '+Z', north: '-Z' };
     const UV_FACE_COLORS = { east: '#ff5252', west: '#ffd740', up: '#eeeeee', down: '#9e9e9e', south: '#448aff', north: '#69f0ae' };
+
     // cube.uv(配列形式 or 面ごとのオブジェクト形式のどちらでも)から、6面それぞれのUV矩形を計算して返す(非破壊)
     function getUVFaceMapForCube(cube, size) {
       const w = size[0], h = size[1], d = size[2];
@@ -1874,21 +2130,26 @@
       });
       return result;
     }
+
     // UV設定エディタでのドラッグ編集を開始する際、box形式(配列)なら面ごとの個別UVに変換する(見た目は変わらない)
     function convertCubeUVToPerFaceIfNeeded(cube, size) {
       if (!cube.uv || Array.isArray(cube.uv)) {
         cube.uv = getUVFaceMapForCube(cube, size);
       }
     }
+
     const uvEditorCanvas = document.getElementById('uv-editor-canvas');
     const uvEditorCtx = uvEditorCanvas ? uvEditorCanvas.getContext('2d') : null;
     let uvEditorScale = 1;
     let uvDrag = null;
+
     function redrawUVEditor() {
       if (!uvEditorCanvas || !uvEditorCtx) return;
       const viewUVEl = document.getElementById('view-uv');
       if (!viewUVEl || viewUVEl.style.display === 'none') return;
+
       const hint = document.getElementById('uv-editor-hint');
+
       if (!selectedCubeData) {
         uvEditorCanvas.width = 2; uvEditorCanvas.height = 2;
         uvEditorCanvas.style.width = ''; uvEditorCanvas.style.height = '';
@@ -1896,10 +2157,12 @@
         return;
       }
       if (hint) hint.style.display = 'none';
+
       const cube = selectedCubeData.cube;
       const geometry = getActiveGeometry();
       const tw = (geometry && geometry.description && geometry.description.texture_width) || paintCanvas.width || 64;
       const th = (geometry && geometry.description && geometry.description.texture_height) || paintCanvas.height || 64;
+
       const container = document.getElementById('uv-editor-container');
       const cw = (container && container.clientWidth) || 400;
       const ch = (container && container.clientHeight) || 300;
@@ -1907,10 +2170,12 @@
       const scale = Math.max(1, Math.floor(Math.min((cw - pad * 2) / tw, (ch - pad * 2) / th)) || 1);
       uvEditorScale = scale;
       const dw = tw * scale, dh = th * scale;
+
       uvEditorCanvas.width = dw;
       uvEditorCanvas.height = dh;
       uvEditorCanvas.style.width = dw + 'px';
       uvEditorCanvas.style.height = dh + 'px';
+
       const ctx = uvEditorCtx;
       ctx.imageSmoothingEnabled = false;
       ctx.fillStyle = '#2a2a2a';
@@ -1922,14 +2187,15 @@
         }
       }
       if (paintTexture) ctx.drawImage(paintCanvas, 0, 0, tw, th, 0, 0, dw, dh);
+
       const size = cube.size || [1, 1, 1];
       const faceMap = getUVFaceMapForCube(cube, size);
+
       UV_FACE_ORDER.forEach(face => {
         const f = faceMap[face];
-        if (!f) return;
-        const nr = normalizedFaceRect(f);
-        if (nr.w <= 0 || nr.h <= 0) return;
-        const x = nr.x * scale, y = nr.y * scale, w = nr.w * scale, h = nr.h * scale;
+        if (!f || f.uv_size[0] <= 0 || f.uv_size[1] <= 0) return;
+        const x = f.uv[0] * scale, y = f.uv[1] * scale, w = f.uv_size[0] * scale, h = f.uv_size[1] * scale;
+
         ctx.save();
         ctx.shadowColor = UV_FACE_COLORS[face];
         ctx.shadowBlur = 10;
@@ -1939,11 +2205,13 @@
         ctx.strokeStyle = UV_FACE_COLORS[face];
         ctx.strokeRect(x + 1, y + 1, Math.max(0, w - 2), Math.max(0, h - 2));
         ctx.restore();
+
         if (w > 20 && h > 12) {
           ctx.fillStyle = 'rgba(0,0,0,0.85)';
           ctx.font = `bold ${Math.max(8, Math.min(12, scale * 1.1))}px sans-serif`;
           ctx.fillText(UV_FACE_LABELS[face], x + 3, y + 12);
         }
+
         const hs = Math.max(9, Math.min(18, scale));
         ctx.fillStyle = UV_FACE_COLORS[face];
         ctx.fillRect(x + w - hs, y + h - hs, hs, hs);
@@ -1952,32 +2220,21 @@
         ctx.strokeRect(x + w - hs + 0.5, y + h - hs + 0.5, hs - 1, hs - 1);
       });
     }
+
     function uvEditorPointToTexel(e) {
       const rect = uvEditorCanvas.getBoundingClientRect();
       const mx = (e.clientX - rect.left) * (uvEditorCanvas.width / rect.width);
       const my = (e.clientY - rect.top) * (uvEditorCanvas.height / rect.height);
       return { mx, my };
     }
-    // Bedrockの仕様ではuv_sizeの各成分は負数(テクスチャの反転)を許容しているが、
-    // 以前はこの負数を「不正なサイズ」とみなしてUVエディタでの描画/判定を丸ごとスキップしていたため、
-    // 全面が負のuv_sizeで書かれているCube(回転する蓋など)を選択すると何も表示されなかった。
-    // ここで符号を含めた(uv, uv_size)を、常に正の幅/高さを持つ矩形(左上原点)に正規化する。
-    function normalizedFaceRect(f) {
-      const rawW = f.uv_size[0], rawH = f.uv_size[1];
-      const w = Math.abs(rawW), h = Math.abs(rawH);
-      const x = rawW < 0 ? f.uv[0] + rawW : f.uv[0];
-      const y = rawH < 0 ? f.uv[1] + rawH : f.uv[1];
-      return { x, y, w, h };
-    }
+
     function hitTestUVFace(mx, my, faceMap, wantHandle) {
       const scale = uvEditorScale;
       for (let i = UV_FACE_ORDER.length - 1; i >= 0; i--) {
         const face = UV_FACE_ORDER[i];
         const f = faceMap[face];
-        if (!f) continue;
-        const nr = normalizedFaceRect(f);
-        if (nr.w <= 0 || nr.h <= 0) continue;
-        const x = nr.x * scale, y = nr.y * scale, w = nr.w * scale, h = nr.h * scale;
+        if (!f || f.uv_size[0] <= 0 || f.uv_size[1] <= 0) continue;
+        const x = f.uv[0] * scale, y = f.uv[1] * scale, w = f.uv_size[0] * scale, h = f.uv_size[1] * scale;
         const hs = Math.max(9, Math.min(18, scale));
         if (wantHandle) {
           if (mx >= x + w - hs && mx <= x + w + 4 && my >= y + h - hs && my <= y + h + 4) return face;
@@ -1987,6 +2244,7 @@
       }
       return null;
     }
+
     if (uvEditorCanvas) {
       uvEditorCanvas.addEventListener('pointerdown', (e) => {
         if (!selectedCubeData) return;
@@ -1996,15 +2254,18 @@
         convertCubeUVToPerFaceIfNeeded(cube, size);
         const faceMap = getUVFaceMapForCube(cube, size);
         const { mx, my } = uvEditorPointToTexel(e);
+
         let face = hitTestUVFace(mx, my, faceMap, true);
         let mode = 'resize';
         if (!face) { face = hitTestUVFace(mx, my, faceMap, false); mode = 'move'; }
         if (!face) return;
+
         saveState();
         const f = faceMap[face];
         uvDrag = { face, mode, startMx: mx, startMy: my, origUV: [...f.uv], origSize: [...f.uv_size] };
         try { uvEditorCanvas.setPointerCapture(e.pointerId); } catch (err) {}
       });
+
       uvEditorCanvas.addEventListener('pointermove', (e) => {
         if (!uvDrag || !selectedCubeData) return;
         e.stopPropagation();
@@ -2012,12 +2273,15 @@
         const scale = uvEditorScale;
         const dxTex = Math.round((mx - uvDrag.startMx) / scale);
         const dyTex = Math.round((my - uvDrag.startMy) / scale);
+
         const cube = selectedCubeData.cube;
         const geometry = getActiveGeometry();
         const tw = (geometry && geometry.description && geometry.description.texture_width) || 64;
         const th = (geometry && geometry.description && geometry.description.texture_height) || 64;
+
         if (!cube.uv[uvDrag.face]) cube.uv[uvDrag.face] = { uv: [0, 0], uv_size: [1, 1] };
         const target = cube.uv[uvDrag.face];
+
         if (uvDrag.mode === 'move') {
           let nx = uvDrag.origUV[0] + dxTex;
           let ny = uvDrag.origUV[1] + dyTex;
@@ -2031,15 +2295,19 @@
           nh = Math.min(nh, Math.max(1, th - uvDrag.origUV[1]));
           target.uv_size = [nw, nh];
         }
+
         parseBedrockJSON(rawModelJSON, false);
         redrawUVEditor();
       });
+
       const endUVDrag = () => { uvDrag = null; };
       uvEditorCanvas.addEventListener('pointerup', endUVDrag);
       uvEditorCanvas.addEventListener('pointercancel', endUVDrag);
     }
     /* ===== UV設定エディタここまで ===== */
+
     /* ===== Bone単位でのまとめて移動/回転/変形 ===== */
+
     // Bone配下の全Cubeを包む、軸に沿ったバウンディングボックス(origin/size基準)を計算する
     function getBoneBoundingBox(bone) {
       const min = [Infinity, Infinity, Infinity];
@@ -2055,6 +2323,7 @@
       if (!isFinite(min[0])) return null;
       return { min, max };
     }
+
     // Bone配下の全Cube(と可能ならBone自身のpivot)を、指定した1軸方向についてanchor(固定点)を基準に
     // scale倍だけ伸縮させる。単体Cubeのリサイズと同じ「片側の面を固定して反対側を伸ばす」考え方をBone全体に拡張したもの。
     function scaleBoneAlongAxis(bone, axisIndex, anchor, scale) {
@@ -2077,6 +2346,7 @@
         bone.pivot = bp;
       }
     }
+
     // Bone選択時の変形(リサイズ)ギズモを、Bone配下全Cubeの合成バウンディングボックスの中心に表示する
     function updateResizeGizmoForBone(bone) {
       const entry = boneGroupList.find(e => e.bone === bone);
@@ -2086,6 +2356,7 @@
         return;
       }
       resizeGizmoGroup.visible = true;
+
       const centerLocal = new THREE.Vector3(
         -((bbox.min[0] + bbox.max[0]) / 2),
         (bbox.min[1] + bbox.max[1]) / 2,
@@ -2094,11 +2365,14 @@
       const worldCenter = entry.group.localToWorld(centerLocal);
       const worldQuat = new THREE.Quaternion();
       entry.group.getWorldQuaternion(worldQuat);
+
       resizeGizmoGroup.position.copy(worldCenter);
       resizeGizmoGroup.quaternion.copy(worldQuat);
+
       const hx = (bbox.max[0] - bbox.min[0]) / 2;
       const hy = (bbox.max[1] - bbox.min[1]) / 2;
       const hz = (bbox.max[2] - bbox.min[2]) / 2;
+
       const offset = 1.5;
       const positions = {
         '+X': new THREE.Vector3(-hx - offset, 0, 0),
@@ -2108,6 +2382,7 @@
         '+Z': new THREE.Vector3(0, 0, hz + offset),
         '-Z': new THREE.Vector3(0, 0, -hz - offset)
       };
+
       resizeGizmoGroup.children.forEach(handleGroup => {
         const targetPos = positions[handleGroup.name];
         if (targetPos) {
@@ -2122,11 +2397,13 @@
         }
       });
     }
+
     // ドラッグ中のリサイズ量(delta)を、ドラッグ開始時点のバウンディングボックスからの相対値として適用する
     function applyResizeDeltaForBone(dirName, delta) {
       if (!selectedBone || !boneResizeInitial) return;
       const bone = selectedBone;
       const { bbox } = boneResizeInitial;
+
       let axisIndex, anchor, initSize;
       if (dirName === '+X' || dirName === '-X') {
         axisIndex = 0; initSize = bbox.max[0] - bbox.min[0];
@@ -2138,11 +2415,14 @@
         axisIndex = 2; initSize = bbox.max[2] - bbox.min[2];
         anchor = dirName === '+Z' ? bbox.min[2] : bbox.max[2];
       }
+
       const newSize = Math.max(0, initSize + delta);
       const scale = initSize > 0 ? newSize / initSize : 1;
+
       // 差分が累積しないよう、毎回ドラッグ開始時点のスナップショットへ戻してから今回のscaleを適用する
       restoreBoneResizeSnapshot();
       scaleBoneAlongAxis(bone, axisIndex, anchor, scale);
+
       parseBedrockJSON(rawModelJSON, false);
       updateResizeGizmoForBone(bone);
       // Cube側と同様に、parseBedrockJSONで再構築されたBoneの新しいTHREE.Groupへ参照を更新する。
@@ -2153,6 +2433,7 @@
         if (refreshedEntry) activeResizeWorldObject = refreshedEntry.group;
       }
     }
+
     function restoreBoneResizeSnapshot() {
       if (!boneResizeInitial) return;
       boneResizeInitial.cubes.forEach(snap => {
@@ -2164,6 +2445,7 @@
         selectedBone.pivot = [...boneResizeInitial.bonePivot];
       }
     }
+
     // TransformControlsの回転ギズモがBoneグループへ適用した現在の総回転量を、bone.rotationへ書き戻す
     // (単体Cubeのrotationと全く同じ符号規則: parseBedrockJSON内でのbone.rotation→group.rotationの変換の逆)
     function syncBoneRotationFromGroup(bone, group) {
@@ -2173,6 +2455,7 @@
       bone.rotation = [Math.round(rx), Math.round(ry), Math.round(rz)];
       if (!bone.pivot) bone.pivot = [0, 0, 0];
     }
+
     // 選択中のBoneに対して、現在のモード(移動/回転/変形)に応じたギズモをアタッチする
     function attachModeGizmoForBone(bone) {
       const entry = boneGroupList.find(e => e.bone === bone);
@@ -2181,6 +2464,7 @@
         resizeGizmoGroup.visible = false;
         return;
       }
+
       if (currentMode === 'scale') {
         transformControls.detach();
         updateResizeGizmoForBone(bone);
@@ -2213,6 +2497,7 @@
         resizeGizmoGroup.visible = false;
       }
     }
+
     function attachModeGizmo(mesh) {
       if (currentMode === 'scale') {
         transformControls.detach();
@@ -2228,6 +2513,7 @@
           mesh.getWorldPosition(worldPos);
           worldDummyObject.position.copy(worldPos);
           worldDummyObject.rotation.set(0, 0, 0);
+
           transformControls.setMode('translate');
           transformControls.setSpace('world');
           transformControls.setTranslationSnap(1);
@@ -2246,6 +2532,7 @@
             parseBedrockJSON(rawModelJSON, false);
             return;
           }
+
           transformControls.setMode('rotate');
           transformControls.setSpace('local');
           transformControls.setRotationSnap(THREE.MathUtils.degToRad(15));
@@ -2253,37 +2540,48 @@
         }
       }
     }
+
     function updateOverlayInfo() {
       if (!selectedCubeData) return;
       const overlay = document.getElementById('info-overlay');
       overlay.style.display = 'block';
+
       document.getElementById('info-name').innerText = "cube";
+
       const cube = selectedCubeData.cube;
       const pos = cube.origin || [0, 0, 0];
       const size = cube.size || [1, 1, 1];
       const rot = cube.rotation || [0, 0, 0];
+
       if (document.activeElement !== document.getElementById('input-pos-x')) document.getElementById('input-pos-x').value = pos[0];
       if (document.activeElement !== document.getElementById('input-pos-y')) document.getElementById('input-pos-y').value = pos[1];
       if (document.activeElement !== document.getElementById('input-pos-z')) document.getElementById('input-pos-z').value = pos[2];
+
       if (document.activeElement !== document.getElementById('input-size-x')) document.getElementById('input-size-x').value = size[0];
       if (document.activeElement !== document.getElementById('input-size-y')) document.getElementById('input-size-y').value = size[1];
       if (document.activeElement !== document.getElementById('input-size-z')) document.getElementById('input-size-z').value = size[2];
+
       if (document.activeElement !== document.getElementById('input-rot-x')) document.getElementById('input-rot-x').value = rot[0];
       if (document.activeElement !== document.getElementById('input-rot-y')) document.getElementById('input-rot-y').value = rot[1];
       if (document.activeElement !== document.getElementById('input-rot-z')) document.getElementById('input-rot-z').value = rot[2];
     }
+
     function applyDirectInput() {
       if (!selectedCubeData) return;
       saveState();
+
       const cube = selectedCubeData.cube;
+
       const px = parseFloat(document.getElementById('input-pos-x').value) || 0;
       const py = parseFloat(document.getElementById('input-pos-y').value) || 0;
       const pz = parseFloat(document.getElementById('input-pos-z').value) || 0;
       cube.origin = [px, py, pz];
+
       const sx = Math.max(0, parseFloat(document.getElementById('input-size-x').value) || 0);
       const sy = Math.max(0, parseFloat(document.getElementById('input-size-y').value) || 0);
       const sz = Math.max(0, parseFloat(document.getElementById('input-size-z').value) || 0);
       cube.size = [sx, sy, sz];
+
       const rx = parseFloat(document.getElementById('input-rot-x').value) || 0;
       const ry = parseFloat(document.getElementById('input-rot-y').value) || 0;
       const rz = parseFloat(document.getElementById('input-rot-z').value) || 0;
@@ -2299,8 +2597,10 @@
       } else {
         delete cube.rotation;
       }
+
       parseBedrockJSON(rawModelJSON, false);
     }
+
     const infoInputs = document.querySelectorAll('#info-overlay input[type="number"]');
     infoInputs.forEach(input => {
       input.addEventListener('change', applyDirectInput);
@@ -2311,13 +2611,16 @@
         }
       });
     });
+
     function syncGizmoToCubeData() {
       if (!selectedCubeData || !selectedCubeData.rotGroup) return;
       const { cube, rotGroup } = selectedCubeData;
+
       if (currentMode === 'rotate') {
         const rx = -THREE.MathUtils.radToDeg(rotGroup.rotation.x);
         const ry = -THREE.MathUtils.radToDeg(rotGroup.rotation.y);
         const rz = THREE.MathUtils.radToDeg(rotGroup.rotation.z);
+        
         cube.rotation = [Math.round(rx), Math.round(ry), Math.round(rz)];
         if (!cube.pivot) {
           cube.pivot = [
@@ -2328,16 +2631,19 @@
         }
       }
     }
+
     document.getElementById('mode-translate').addEventListener('click', (e) => { e.stopPropagation(); setGizmoMode('translate', e.target); });
     document.getElementById('mode-rotate').addEventListener('click', (e) => { e.stopPropagation(); setGizmoMode('rotate', e.target); });
     document.getElementById('mode-scale').addEventListener('click', (e) => { e.stopPropagation(); setGizmoMode('scale', e.target); });
     document.getElementById('mode-select').addEventListener('click', (e) => { e.stopPropagation(); setGizmoMode('select', e.target); });
     document.getElementById('mode-paint').addEventListener('click', (e) => { e.stopPropagation(); setGizmoMode('paint', e.target); });
+
     function setGizmoMode(mode, targetBtn) {
       const wasPaint = currentMode === 'paint';
       currentMode = mode;
       document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
       targetBtn.classList.add('active');
+
       if (mode === 'paint') {
         transformControls.detach();
         resizeGizmoGroup.visible = false;
@@ -2352,6 +2658,7 @@
       }
       updateUVSelectionGlow();
     }
+
     const paintColorSwatch = document.getElementById('paint-color-swatch');
     const paintColorInput = document.getElementById('paint-color-input');
     paintColorSwatch.style.background = paintColor;
@@ -2363,11 +2670,13 @@
       paintColor = e.target.value;
       paintColorSwatch.style.background = paintColor;
     });
+
     const brushSizeInput = document.getElementById('paint-brush-size');
     brushSizeInput.addEventListener('change', () => {
       brushSize = Math.max(1, parseInt(brushSizeInput.value) || 1);
       brushSizeInput.value = brushSize;
     });
+
     document.querySelectorAll('.paint-tool-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -2376,45 +2685,57 @@
         btn.classList.add('active');
       });
     });
+
     document.getElementById('btn-add-bone').addEventListener('click', async (e) => {
       e.stopPropagation();
       if (!rawModelJSON) {
         rawModelJSON = createEmptyModel();
       }
+
       let geometry = rawModelJSON["minecraft:geometry"] ? rawModelJSON["minecraft:geometry"][0] : null;
       if (!geometry) {
         const keys = Object.keys(rawModelJSON).filter(k => k.startsWith("geometry."));
         if (keys.length > 0) geometry = rawModelJSON[keys[0]];
       }
       if (!geometry) return;
+
       const boneName = await customPrompt("新しいBoneの名前を入力してください:", "bone");
       if (!boneName || !boneName.trim()) return;
+
       saveState();
+
       if (!geometry.bones) geometry.bones = [];
       const uniqueName = getUniqueBoneName(boneName.trim(), geometry);
+
       const newBone = {
         name: uniqueName,
         pivot: [0, 0, 0],
         cubes: [],
         _collapsed: false
       };
+
       geometry.bones.push(newBone);
       selectedBone = newBone;
       parseBedrockJSON(rawModelJSON, false);
     });
+
     document.getElementById('btn-add-cube').addEventListener('click', (e) => {
       e.stopPropagation();
       if (!rawModelJSON) {
         rawModelJSON = createEmptyModel();
       }
+
       let geometry = rawModelJSON["minecraft:geometry"] ? rawModelJSON["minecraft:geometry"][0] : null;
       if (!geometry) {
         const keys = Object.keys(rawModelJSON).filter(k => k.startsWith("geometry."));
         if (keys.length > 0) geometry = rawModelJSON[keys[0]];
       }
       if (!geometry) return;
+
       saveState();
+
       let targetBone = null;
+
       if (selectedCubeData) {
         targetBone = selectedCubeData.bone;
       } else if (selectedBone) {
@@ -2430,20 +2751,27 @@
         };
         geometry.bones.push(targetBone);
       }
+
       if (!targetBone.cubes) targetBone.cubes = [];
       targetBone._collapsed = false;
+
       const newCube = {
         origin: [-1, 0, -1],
         size: [2, 2, 2],
         uv: [0, 0]
       };
+
       targetBone.cubes.push(newCube);
       parseBedrockJSON(rawModelJSON, false);
+
       const newMesh = cubeMeshList.find(m => m.userData.cube === newCube);
       if (newMesh) selectCube(newMesh);
     });
+
     // ========== テクスチャ新規作成機能 ==========
+
     const texModalOverlay = document.getElementById('texture-modal-overlay');
+    
     document.getElementById('btn-new-texture').addEventListener('click', (e) => {
       e.stopPropagation();
       if (!rawModelJSON) {
@@ -2452,31 +2780,39 @@
       }
       texModalOverlay.style.display = 'flex';
     });
+
     document.getElementById('tex-modal-cancel').addEventListener('click', () => {
       texModalOverlay.style.display = 'none';
     });
+
     document.getElementById('tex-modal-ok').addEventListener('click', () => {
       const width = parseInt(document.getElementById('tex-width').value) || 64;
       const height = parseInt(document.getElementById('tex-height').value) || 64;
       const autoUV = document.getElementById('tex-auto-uv').checked;
       const densityStr = document.getElementById('tex-density').value;
       let density = densityStr ? parseFloat(densityStr) : null;
+
       if (width <= 0 || height <= 0) {
         showError("幅と高さは1以上にしてください。");
         return;
       }
+
       texModalOverlay.style.display = 'none';
       createNewTexture(width, height, autoUV, density);
     });
+
     function createNewTexture(width, height, autoUV, fixedDensity) {
       if (!rawModelJSON) return;
+
       let geometry = rawModelJSON["minecraft:geometry"] ? rawModelJSON["minecraft:geometry"][0] : null;
       if (!geometry) {
         const keys = Object.keys(rawModelJSON).filter(k => k.startsWith("geometry."));
         if (keys.length > 0) geometry = rawModelJSON[keys[0]];
       }
+
       if (autoUV) {
         saveState();
+        
         let allCubes = [];
         if (geometry.bones) {
           geometry.bones.forEach(bone => {
@@ -2485,17 +2821,20 @@
             }
           });
         }
+
         if (allCubes.length === 0) {
           showError("パッキングするキューブが存在しません。");
           undoStack.pop();
           updateUndoRedoButtons();
           return;
         }
+
         const tryPack = (t) => {
           let rects = [];
           allCubes.forEach(cube => {
             const size = cube.size || [1, 1, 1];
             const w = size[0], h = size[1], d = size[2];
+            
             // 各面の指定色 (全体的に薄めのパステルカラー)
             // +x: 赤 / +y: 白 / +z: 青 / -x: 黄色 / -y: 灰色 / -z: 緑
             const faces = [
@@ -2506,15 +2845,20 @@
               { name: 'south', w: w, h: h, color: '#b3d9ff' }, // +z 青 (薄め)
               { name: 'north', w: w, h: h, color: '#b3ffb3' }  // -z 緑 (薄め)
             ];
+
             faces.forEach(f => {
               if (f.w <= 0 || f.h <= 0) return; // 面積が0の面はパッキング対象から除外
+
               let pw = Math.round(f.w * t);
               let ph = Math.round(f.h * t);
               if (pw <= 0 || ph <= 0) return; // スケール適用後も0の場合は除外
+
               rects.push({ cube, face: f.name, w: pw, h: ph, color: f.color });
             });
           });
+
           rects.sort((a, b) => Math.max(b.w, b.h) - Math.max(a.w, a.h));
+
           class Packer {
             constructor(w, h) { this.root = { x: 0, y: 0, w: w, h: h, used: false }; }
             insert(node, w, h) {
@@ -2531,6 +2875,7 @@
               return null;
             }
           }
+
           let packer = new Packer(width, height);
           let success = true;
           for (let i = 0; i < rects.length; i++) {
@@ -2544,8 +2889,10 @@
           }
           return success ? rects : null;
         };
+
         let finalRects = null;
         let finalT = 1;
+
         if (fixedDensity !== null && fixedDensity > 0) {
           finalRects = tryPack(fixedDensity);
           if (!finalRects) {
@@ -2558,12 +2905,14 @@
         } else {
           let bestT = 1;
           let bestRects = tryPack(1);
+          
           if (!bestRects) {
             showError(`エラー：画像サイズが小さすぎて、全ての面を配置できません。`);
             undoStack.pop();
             updateUndoRedoButtons();
             return;
           }
+
           for (let t = 2; t <= 256; t++) {
             let res = tryPack(t);
             if (res) {
@@ -2576,15 +2925,19 @@
           finalT = bestT;
           finalRects = bestRects;
         }
+
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
+        
         ctx.fillStyle = 'rgba(0,0,0,0)';
         ctx.clearRect(0, 0, width, height);
+
         if (!geometry.description) geometry.description = {};
         geometry.description.texture_width = width;
         geometry.description.texture_height = height;
+
         allCubes.forEach(cube => {
           cube.uv = {
             east:  { uv: [0, 0], uv_size: [0, 0] },
@@ -2595,6 +2948,7 @@
             north: { uv: [0, 0], uv_size: [0, 0] }
           }; 
         });
+
         // 面同士がキツキツに隣接していると、ctx.strokeRect()の半透明な線が
         // 隣の面の塗りと二重に合成され、境界ごとに枠線の濃さ(色)が変わってしまう。
         // そこで先に全ての面を塗りつぶし、その後で「1px単位・一度描いたピクセルは再描画しない」
@@ -2603,11 +2957,13 @@
           const fit = r.fit;
           ctx.fillStyle = r.color;
           ctx.fillRect(fit.x, fit.y, r.w, r.h);
+
           r.cube.uv[r.face] = {
             uv: [fit.x, fit.y],
             uv_size: [r.w, r.h]
           };
         });
+
         // 枠線の色は各面の塗り色を濃くしたものにする(全面共通のグレーではなく、面ごとの色に追従させる)
         const drawnBorderPixels = new Set();
         finalRects.forEach(r => {
@@ -2627,24 +2983,29 @@
             });
           }
         });
+
         const texDataUrl = canvas.toDataURL("image/png");
         loadTextureFromDataURL(texDataUrl, width, height, () => {
           parseBedrockJSON(rawModelJSON, false);
           updateTexturePreviewFromCanvas();
         });
+
       } else {
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
+        
         ctx.fillStyle = '#222';
         ctx.fillRect(0, 0, width, height);
+        
         ctx.fillStyle = '#333';
         for (let y = 0; y < height; y += 8) {
           for (let x = 0; x < width; x += 8) {
             if ((x / 8 + y / 8) % 2 === 0) ctx.fillRect(x, y, 8, 8);
           }
         }
+
         const texDataUrl = canvas.toDataURL("image/png");
         loadTextureFromDataURL(texDataUrl, width, height, () => {
           if (geometry.description) {
@@ -2656,26 +3017,32 @@
         });
       }
     }
+
     function loadTextureFromDataURL(dataUrl, width, height, callback) {
       loadImageIntoPaintCanvas(dataUrl, width, height, callback);
     }
+
     function updateTexturePreview(dataUrl) {
       const previewContainer = document.getElementById('texture-preview-container');
       previewContainer.innerHTML = `<img src="${dataUrl}" style="max-height: 100%; image-rendering: pixelated; object-fit: contain;">`;
     }
+
     // ==========================================
+
     const modalOverlay = document.getElementById('modal-overlay');
     const modalMessage = document.getElementById('modal-message');
     const modalInput = document.getElementById('modal-input');
     const modalOkBtn = document.getElementById('modal-ok');
     const modalCancelBtn = document.getElementById('modal-cancel');
     const modalExtraBtn = document.getElementById('modal-extra');
+
     function showModal({ message, isPrompt = false, defaultValue = '' }) {
       return new Promise((resolve) => {
         modalMessage.innerText = message;
         modalInput.style.display = isPrompt ? 'block' : 'none';
         modalInput.value = isPrompt ? defaultValue : '';
         modalOverlay.style.display = 'flex';
+
         const cleanup = (result) => {
           modalOverlay.style.display = 'none';
           modalOkBtn.removeEventListener('click', onOk);
@@ -2692,13 +3059,16 @@
         modalOkBtn.addEventListener('click', onOk);
         modalCancelBtn.addEventListener('click', onCancel);
         modalInput.addEventListener('keydown', onKeydown);
+
         if (isPrompt) setTimeout(() => { modalInput.focus(); modalInput.select(); }, 50);
       });
     }
+
     function showSelectModal({ message, options }) {
       return new Promise((resolve) => {
         modalMessage.innerText = message;
         modalInput.style.display = 'none';
+
         let selectEl = document.getElementById('modal-select');
         if (!selectEl) {
           selectEl = document.createElement('select');
@@ -2708,7 +3078,9 @@
         }
         selectEl.style.display = 'block';
         selectEl.innerHTML = options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+
         modalOverlay.style.display = 'flex';
+
         const cleanup = (result) => {
           modalOverlay.style.display = 'none';
           selectEl.style.display = 'none';
@@ -2718,12 +3090,15 @@
         };
         const onOk = (e) => { e.stopPropagation(); cleanup(selectEl.value); };
         const onCancel = (e) => { e.stopPropagation(); cleanup(null); };
+
         modalOkBtn.addEventListener('click', onOk);
         modalCancelBtn.addEventListener('click', onCancel);
       });
     }
+
     function customConfirm(message) { return showModal({ message, isPrompt: false }); }
     function customPrompt(message, defaultValue) { return showModal({ message, isPrompt: true, defaultValue }); }
+
     // 「キャンセル/いいえ/はい」の3択モーダル。既存モデルがある状態で新しいモデルを読み込む際など、
     // 「そもそも読み込みをやめる(キャンセル)」と「既存モデルを破棄する(いいえ)」を明確に分けたい場合に使う。
     // 戻り値は 'yes' | 'no' | 'cancel'。
@@ -2736,6 +3111,7 @@
         modalExtraBtn.innerText = noLabel;
         modalExtraBtn.style.display = 'inline-flex';
         modalOverlay.style.display = 'flex';
+
         const cleanup = (result) => {
           modalOverlay.style.display = 'none';
           modalExtraBtn.style.display = 'none';
@@ -2753,12 +3129,14 @@
         const onCancel = (e) => { e.stopPropagation(); cleanup('cancel'); };
         const onExtra = (e) => { e.stopPropagation(); cleanup('no'); };
         const onKeydown = (e) => { if (e.key === 'Escape') onCancel(e); };
+
         modalOkBtn.addEventListener('click', onOk);
         modalCancelBtn.addEventListener('click', onCancel);
         modalExtraBtn.addEventListener('click', onExtra);
         document.addEventListener('keydown', onKeydown, true);
       });
     }
+
     async function deleteCube(bone, cube) {
       const ok = await customConfirm(`この Cube を削除してもよろしいですか？`);
       if (ok) {
@@ -2767,11 +3145,13 @@
         parseBedrockJSON(rawModelJSON, false);
       }
     }
+
     async function renameBone(bone, geometry) {
       const newName = await customPrompt("新しいBone名を入力してください:", bone.name);
       if (newName && newName.trim() !== "" && newName !== bone.name) {
         saveState();
         const formattedName = getUniqueBoneName(newName.trim(), geometry);
+        
         const oldName = bone.name;
         bone.name = formattedName;
         if (geometry.bones) {
@@ -2782,6 +3162,7 @@
         parseBedrockJSON(rawModelJSON, false);
       }
     }
+
     async function deleteBone(bone, geometry) {
       const ok = await customConfirm(`Bone "${bone.name}" とその内容を削除してもよろしいですか？`);
       if (ok) {
@@ -2790,24 +3171,30 @@
         parseBedrockJSON(rawModelJSON, false);
       }
     }
+
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     const UI_EXCLUDE_SELECTOR = 'button, label, input, select, .tree-item, #resize-handle, #bottom-panel, #info-overlay, #paint-panel, header, .mode-selector-vertical, .zoom-btn-container, .dropdown-content, #modal-overlay, #texture-modal-overlay';
     let tapStart = null;
+
     window.addEventListener('pointerdown', (e) => {
       if (e.target.closest(UI_EXCLUDE_SELECTOR)) { tapStart = null; return; }
+
       if (currentMode === 'paint' && paintTool !== 'pan') {
         if (!textureLoaded || !paintTexture) {
           showError("先にテクスチャ画像を選択または新規作成してください。");
           tapStart = null;
           return;
         }
+
         const rect = renderer.domElement.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
         raycaster.setFromCamera(mouse, camera);
         const visibleCubes = cubeMeshList.filter(m => m.visible);
         const intersects = raycaster.intersectObjects(visibleCubes, false);
+
         if (intersects.length > 0) {
           isPaintStroke = true;
           controls.enabled = false;
@@ -2818,18 +3205,24 @@
         tapStart = null;
         return;
       }
+
       // ペイントモードの「視点移動」ツール選択時はキャンバスに描画せず、通常通りカメラ操作を行わせる
+
       if (currentMode === 'scale' && (selectedCubeData || selectedBone) && resizeGizmoGroup.visible) {
         const rect = renderer.domElement.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(resizeHandleMeshes, false);
+
         if (intersects.length > 0) {
           controls.enabled = false;
           activeResizeHandle = intersects[0].object.userData;
           activeResizeTargetIsBone = !selectedCubeData && !!selectedBone;
+
           saveState();
+
           if (activeResizeTargetIsBone) {
             const entry = boneGroupList.find(e => e.bone === selectedBone);
             activeResizeWorldObject = entry ? entry.group : null;
@@ -2850,23 +3243,30 @@
             initialCubeSize = [...(cube.size || [1, 1, 1])];
           }
           currentAppliedDelta = 0;
+
           const handleWorldPos = new THREE.Vector3();
           intersects[0].object.getWorldPosition(handleWorldPos);
+          
           const camDir = new THREE.Vector3();
           camera.getWorldDirection(camDir);
           dragPlane.setFromNormalAndCoplanarPoint(camDir.negate(), handleWorldPos);
+
           raycaster.ray.intersectPlane(dragPlane, dragStartWorldPos);
+
           tapStart = null;
           return;
         }
       }
+
       tapStart = { x: e.clientX, y: e.clientY };
     });
+
     window.addEventListener('pointermove', (e) => {
       if (isPaintStroke) {
         const rect = renderer.domElement.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
         raycaster.setFromCamera(mouse, camera);
         const visibleCubes = cubeMeshList.filter(m => m.visible);
         const intersects = raycaster.intersectObjects(visibleCubes, false);
@@ -2878,19 +3278,24 @@
         }
         return;
       }
+
       if (activeResizeHandle && activeResizeWorldObject) {
         const rect = renderer.domElement.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
         raycaster.setFromCamera(mouse, camera);
+
         const currentWorldPos = new THREE.Vector3();
         if (raycaster.ray.intersectPlane(dragPlane, currentWorldPos)) {
           const worldQuat = new THREE.Quaternion();
           activeResizeWorldObject.getWorldQuaternion(worldQuat);
           const worldAxis = activeResizeHandle.localAxis.clone().applyQuaternion(worldQuat).normalize();
+
           const deltaVec = currentWorldPos.clone().sub(dragStartWorldPos);
           const rawDelta = deltaVec.dot(worldAxis);
           const deltaInt = Math.round(rawDelta);
+
           if (deltaInt !== currentAppliedDelta) {
             currentAppliedDelta = deltaInt;
             if (activeResizeTargetIsBone) {
@@ -2902,6 +3307,7 @@
         }
       }
     });
+
     window.addEventListener('pointerup', (e) => {
       if (isPaintStroke) {
         isPaintStroke = false;
@@ -2911,6 +3317,7 @@
         updateTexturePreviewFromCanvas();
         return;
       }
+
       if (activeResizeHandle) {
         activeResizeHandle = null;
         activeResizeWorldObject = null;
@@ -2920,20 +3327,26 @@
         parseBedrockJSON(rawModelJSON, false);
         return;
       }
+
       if (!tapStart) return;
       const start = tapStart;
       tapStart = null;
+
       if (recentlyDragged) { recentlyDragged = false; return; }
       if (e.target.closest(UI_EXCLUDE_SELECTOR)) return;
+
       const dx = e.clientX - start.x;
       const dy = e.clientY - start.y;
       if (Math.sqrt(dx * dx + dy * dy) > 8) return;
+
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
       raycaster.setFromCamera(mouse, camera);
       const visibleCubes = cubeMeshList.filter(mesh => mesh.visible);
       const intersects = raycaster.intersectObjects(visibleCubes, false);
+
       if (intersects.length > 0) {
         selectCube(intersects[0].object);
       } else {
@@ -2942,11 +3355,14 @@
         buildCubeListUI();
       }
     });
+
     function applyResizeDelta(dirName, delta) {
       if (!selectedCubeData) return;
       const cube = selectedCubeData.cube;
+
       let newOrigin = [...initialCubeOrigin];
       let newSize = [...initialCubeSize];
+
       switch (dirName) {
         case '+X': {
           newSize[0] = Math.max(0, initialCubeSize[0] + delta);
@@ -2985,8 +3401,10 @@
           break;
         }
       }
+
       cube.origin = newOrigin;
       cube.size = newSize;
+
       parseBedrockJSON(rawModelJSON, false);
       updateResizeGizmo();
       // parseBedrockJSONでCubeのTHREE.Meshが毎回新しいインスタンスに作り直されるため、
@@ -2998,34 +3416,41 @@
         if (refreshedMesh) activeResizeWorldObject = refreshedMesh;
       }
     }
+
     const bottomPanel = document.getElementById('bottom-panel');
     const resizeHandle = document.getElementById('resize-handle');
     const modeSelector = document.querySelector('.mode-selector-vertical');
     const zoomContainer = document.querySelector('.zoom-btn-container');
     let isResizing = false, startY = 0, startHeight = 0;
+
     function startResize(e) {
       isResizing = true;
       const touch = e.touches ? e.touches[0] : e;
       startY = touch.clientY;
       startHeight = bottomPanel.offsetHeight;
       if (e.cancelable) e.preventDefault();
+
       window.addEventListener('mousemove', handleResize);
       window.addEventListener('mouseup', stopResize);
       window.addEventListener('touchmove', handleResize, { passive: false });
       window.addEventListener('touchend', stopResize);
     }
+
     function handleResize(e) {
       if (!isResizing) return;
       if (e.cancelable) e.preventDefault();
       const touch = e.touches ? e.touches[0] : e;
       if (!touch) return;
+
       const newHeight = startHeight + (startY - touch.clientY);
       const clampedHeight = Math.max(120, Math.min(newHeight, window.innerHeight * 0.8));
       bottomPanel.style.height = `${clampedHeight}px`;
+      
       const newBottomPos = clampedHeight + 16;
       modeSelector.style.bottom = `${newBottomPos}px`;
       zoomContainer.style.bottom = `${newBottomPos}px`;
     }
+
     function stopResize() {
       isResizing = false;
       window.removeEventListener('mousemove', handleResize);
@@ -3034,77 +3459,39 @@
       window.removeEventListener('touchend', stopResize);
       redrawUVEditor();
     }
+
     resizeHandle.addEventListener('mousedown', startResize);
     resizeHandle.addEventListener('touchstart', startResize, { passive: false });
-    // モデルのUV数値(cube.uv および 各面のuv/uv_size)を、texture_widthとtexture_heightの
-    // 変化に合わせて比例スケーリングする。Bedrockの本来の仕様ではUVは
-    // texture_width/heightを基準にした「割合」で解釈されるため、実際のテクスチャ画像を
-    // 元の解像度の整数倍(2倍・4倍など、いわゆるHDテクスチャ)で読み込んだだけでは
-    // 見た目上のズレは起きないはずだが、このツールは画像を毎回
-    // 「その時点のtexture_width/height」へ強制的に縮小/拡大してから描き込んでいたため、
-    // 例えば32×32宣言のモデルへ実寸64×64のPNGを読み込むと、画像がぼやけて縮小され
-    // 「違う画像に変わったように見える」不具合になっていた。
-    // ここでは画像を縮小せず実寸のまま読み込み、代わりにモデル側のUV数値と
-    // texture_width/heightを画像の実寸に合わせて再スケーリングすることで、
-    // 劣化なくどちらの解像度のテクスチャも正しく扱えるようにする。
-    function rescaleModelUVsToTexture(geometry, newW, newH) {
-      if (!geometry) return false;
-      if (!geometry.description) geometry.description = {};
-      const desc = geometry.description;
-      const oldW = desc.texture_width || newW;
-      const oldH = desc.texture_height || newH;
-      const sx = newW / oldW, sy = newH / oldH;
-      const changed = (sx !== 1 || sy !== 1);
-      if (changed) {
-        (geometry.bones || []).forEach(bone => {
-          (bone.cubes || []).forEach(cube => {
-            if (!cube.uv) return;
-            if (Array.isArray(cube.uv)) {
-              cube.uv = [(cube.uv[0] || 0) * sx, (cube.uv[1] || 0) * sy];
-            } else {
-              Object.keys(cube.uv).forEach(faceKey => {
-                const f = cube.uv[faceKey];
-                if (!f) return;
-                if (Array.isArray(f.uv)) f.uv = [(f.uv[0] || 0) * sx, (f.uv[1] || 0) * sy];
-                if (Array.isArray(f.uv_size)) f.uv_size = [(f.uv_size[0] || 0) * sx, (f.uv_size[1] || 0) * sy];
-              });
-            }
-          });
-        });
-      }
-      desc.texture_width = newW;
-      desc.texture_height = newH;
-      return changed;
-    }
+
     function readTexture(file) {
       const reader = new FileReader();
       reader.onload = (evt) => {
-        const dataUrl = evt.target.result;
-        // まず画像の実寸(naturalWidth/naturalHeight)を調べてから、その実寸をそのまま
-        // ペイントキャンバスの解像度として使う(宣言サイズへ無理に縮小/拡大しない)
-        const probe = new Image();
-        probe.onload = () => {
-          const naturalW = probe.naturalWidth || probe.width || 64;
-          const naturalH = probe.naturalHeight || probe.height || 64;
-          const geometry = getActiveGeometry();
+        let tw = 64, th = 64;
+        const geometry = getActiveGeometry();
+        if (geometry && geometry.description) {
+          tw = geometry.description.texture_width || 64;
+          th = geometry.description.texture_height || 64;
+        }
+        loadImageIntoPaintCanvas(evt.target.result, tw, th, (actualW, actualH) => {
+          // モデルが宣言しているテクスチャサイズ(texture_width/height)と、実際に読み込んだ
+          // PNGファイルの解像度が異なる場合、UVの座標(ピクセル単位)を正規化する時の基準が
+          // ズレてしまい、テクスチャの一部が本来と違う位置にマッピングされる
+          // (「UVの一部が読み込めていない」ように見える)バグの原因になっていた。
+          // 実際に読み込んだ画像の解像度に、モデル側の設定を合わせておく。
           if (geometry) {
-            const declaredW = (geometry.description && geometry.description.texture_width) || naturalW;
-            const declaredH = (geometry.description && geometry.description.texture_height) || naturalH;
-            if (declaredW !== naturalW || declaredH !== naturalH) {
-              saveState();
-              rescaleModelUVsToTexture(geometry, naturalW, naturalH);
-              showError(`テクスチャの解像度(${naturalW}x${naturalH})に合わせてUVを再スケーリングしました。`);
+            if (!geometry.description) geometry.description = {};
+            if (geometry.description.texture_width !== actualW || geometry.description.texture_height !== actualH) {
+              geometry.description.texture_width = actualW;
+              geometry.description.texture_height = actualH;
             }
           }
-          loadImageIntoPaintCanvas(dataUrl, naturalW, naturalH, () => {
-            if (rawModelJSON) parseBedrockJSON(rawModelJSON, false);
-            updateTexturePreviewFromCanvas();
-          });
-        };
-        probe.src = dataUrl;
+          if (rawModelJSON) parseBedrockJSON(rawModelJSON, false);
+          updateTexturePreviewFromCanvas();
+        });
       };
       reader.readAsDataURL(file);
     }
+
     // 既にモデルが読み込まれている場合、新しく読み込むJSONのBone/Cubeを既存モデルへ追加する(既存Cubeを維持する)
     function importModelKeepingExisting(loadedJson) {
       let loadedGeo = null;
@@ -3117,14 +3504,17 @@
         showError("有効なBedrock Geometry JSONではありません。");
         return;
       }
+
       if (!rawModelJSON) {
         parseBedrockJSON(loadedJson, true);
         return;
       }
+
       saveState();
       let geometry = getActiveGeometry();
       if (!geometry) { parseBedrockJSON(loadedJson, true); return; }
       if (!geometry.bones) geometry.bones = [];
+
       const loadedBones = (loadedGeo.bones || []).map(b => JSON.parse(JSON.stringify(b)));
       const nameMap = new Map();
       loadedBones.forEach(b => {
@@ -3138,9 +3528,11 @@
       loadedBones.forEach(b => {
         if (b.parent && nameMap.has(b.parent)) b.parent = nameMap.get(b.parent);
       });
+
       parseBedrockJSON(rawModelJSON, false);
       focusOnModel();
     }
+
     // モデル読み込み時、既にモデルがあれば「既存モデルを維持するか」を3択で確認する。
     // 「はい」= 既存モデルを維持したまま、読み込んだJSONを追加インポートする(importModelKeepingExisting)。
     // 「いいえ」= 既存モデルを破棄して、読み込んだJSONだけの新規モデルに置き換える。
@@ -3156,10 +3548,12 @@
         showError("有効なBedrock Geometry JSONではありません。");
         return;
       }
+
       if (!rawModelJSON) {
         parseBedrockJSON(loadedJson, true);
         return;
       }
+
       const choice = await showThreeWayModal({
         message: "既存のモデルを維持しますか？\n\n「はい」: 既存モデルを維持したまま追加で読み込みます\n「いいえ」: 既存モデルを破棄して読み込んだモデルに置き換えます\n「キャンセル」: 読み込みをやめます"
       });
@@ -3171,6 +3565,7 @@
       }
       // choice === 'cancel' の場合は何もしない(読み込み自体を中止)
     }
+
     document.getElementById('json-input').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -3183,38 +3578,71 @@
       }
       e.target.value = '';
     });
+
     document.getElementById('texture-input').addEventListener('change', (e) => {
       if (e.target.files[0]) readTexture(e.target.files[0]);
       e.target.value = '';
     });
+
+    // ダウンロード用ヘルパー。data:URIでのダウンロードはスマホ(iOS Safari/Android)や
+    // 大きいファイルで動かないことがあるため、Blob + ObjectURLを使い、
+    // スマホでは共有シート(Web Share API)も試す。
+    async function saveBlobAsFile(blob, filename) {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile && navigator.canShare && typeof File === 'function') {
+        try {
+          const file = new File([blob], filename, { type: blob.type });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: filename });
+            return;
+          }
+        } catch (err) {
+          if (err && err.name === 'AbortError') return; // ユーザーが共有をキャンセル
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 1500);
+    }
+
+    // エクスポート用にエディタ内部専用のキー(_hidden等)を取り除いたクリーンなJSONを作る
+    function buildExportJSON() {
+      return JSON.stringify(rawModelJSON, (key, value) => (key === '_hidden' ? undefined : value), 2);
+    }
+
     document.getElementById('btn-export').addEventListener('click', (e) => {
       e.stopPropagation();
+      document.getElementById('menu-dropdown').classList.remove('show');
       if (!rawModelJSON) {
         showError("エクスポートするモデルがありません。");
         return;
       }
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(rawModelJSON, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "model.geo.json");
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      try {
+        const blob = new Blob([buildExportJSON()], { type: 'application/json' });
+        saveBlobAsFile(blob, 'model.geo.json');
+      } catch (err) {
+        showError("エクスポートに失敗しました: " + err.message);
+      }
     });
+
     document.getElementById('btn-export-texture').addEventListener('click', (e) => {
       e.stopPropagation();
+      document.getElementById('menu-dropdown').classList.remove('show');
       if (!paintTexture) {
         showError("エクスポートするテクスチャがありません。");
         return;
       }
-      const dataUrl = paintCanvas.toDataURL('image/png');
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute('href', dataUrl);
-      downloadAnchor.setAttribute('download', 'texture.png');
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      paintCanvas.toBlob((blob) => {
+        if (!blob) { showError("テクスチャの書き出しに失敗しました。"); return; }
+        saveBlobAsFile(blob, 'texture.png');
+      }, 'image/png');
     });
+
     function focusOnModel() {
       const box = new THREE.Box3().setFromObject(currentModelGroup);
       if (box.isEmpty()) return;
@@ -3223,14 +3651,17 @@
       const maxDim = Math.max(size.x, size.y, size.z);
       const fov = camera.fov * (Math.PI / 180);
       let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 2.2;
+
       camera.position.set(center.x + cameraZ * 0.4, center.y + cameraZ * 0.4, center.z + cameraZ);
       controls.target.copy(center);
       controls.update();
     }
+
     document.getElementById('btn-focus').addEventListener('click', (e) => {
       e.stopPropagation();
       focusOnModel();
     });
+
     const dropZone = document.getElementById('drop-zone');
     window.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -3257,12 +3688,14 @@
         });
       }
     });
+
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
       redrawUVEditor();
     });
+
     function animate() {
       requestAnimationFrame(animate);
       controls.update();

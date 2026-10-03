@@ -1,0 +1,204 @@
+/* =====================================================================
+   テーマ変数
+   - 実際の値は index.html 内のテーマ処理(AddonTheme)が <html> に設定する。
+   - ここに書いているのは、JS が動く前に使われる初期値(ダークモード)。
+   - 値は「R G B」の空白区切り。rgb(var(--c-xxx) / 0.5) のように透明度付きで使える。
+   ===================================================================== */
+:root {
+    --c-bg: 13 14 17;
+    --c-card: 22 24 29;
+    --c-sidebar: 18 19 23;
+    --c-editor: 26 28 35;
+    --c-border: 38 41 51;
+    --c-border-hi: 59 63 79;
+    --c-ac-300: 110 231 183;
+    --c-ac-400: 52 211 153;
+    --c-ac-500: 16 185 129;
+    --c-ac-700: 4 120 87;
+    --c-ac-900: 6 78 59;
+    --c-on-ac: 2 6 23;
+    --c-logo-from: 52 211 153;
+    --c-logo-to: 4 120 87;
+    --c-logo-edge: 110 231 183;
+    --c-logo-shadow: 6 78 59;
+    --c-white: 255 255 255;
+    --c-s100: 241 245 249;
+    --c-s200: 226 232 240;
+    --c-s300: 203 213 225;
+    --c-s400: 148 163 184;
+    --c-s500: 100 116 139;
+    --c-s600: 71 85 105;
+    --c-s700: 51 65 85;
+}
+
+/* ライト系の背景のときだけ必要な微調整 */
+html.tone-light .bg-red-500.text-white,
+html.tone-light .bg-black\/70.text-white { color: #fff; }
+html.tone-light .bg-black\/40 { background-color: rgb(0 0 0 / .06); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgb(var(--c-bg)); }
+::-webkit-scrollbar-thumb { background: rgb(var(--c-border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--c-border-hi)); }
+.mc-bg-grid {
+    background-image: radial-gradient(rgb(var(--c-ac-500) / .08) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+.glass-panel {
+    background: rgb(var(--c-card) / .85);
+    backdrop-filter: blur(12px);
+}
+
+/* ===== モーダル共通: 画面が低い(横長)ときにはみ出さない =====
+   ・背景(オーバーレイ)自体をスクロール可能にする
+   ・中身は margin:auto で中央寄せ(はみ出す場合は上寄せになり、上端が切れない)
+   ・横長の端末ではさらにコンパクトにし、操作ボタンを画面下部に固定する */
+.modal-overlay {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+}
+.modal-overlay > div { margin: auto; max-width: 100%; }
+
+@media (max-height: 520px) {
+    .modal-overlay { padding-top: .5rem; padding-bottom: .5rem; }
+    .modal-overlay > div {
+        padding: .875rem 1rem !important;
+        gap: .625rem !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    #exportModal > div, #importScopeModal > div, #settingsModal > div { max-width: 36rem !important; }
+    #exportScopeRadios, #exportFormatRadios, #importScopeModal .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .modal-footer {
+        position: sticky; bottom: -.5rem; z-index: 1;
+        background: rgb(var(--c-card));
+        padding-bottom: .5rem !important; margin-bottom: -.5rem;
+    }
+}
+
+/* 行番号とコードエディタの行を完全一致させるための共通指標。
+   フォントサイズ・行高・上下パディングを両者で揃えることでズレを無くす。 */
+.editor-metrics {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 20px; /* 1行 = 20px 固定 */
+}
+.code-textarea {
+    tab-size: 2;
+    resize: none;
+    outline: none;
+    white-space: pre;
+    overflow-x: auto;
+    overflow-y: hidden; /* 縦スクロールは無効化し、内容に合わせて高さを自動調整する */
+}
+.line-numbers-box > div {
+    height: 20px; /* editor-metrics の line-height と一致 */
+}
+.image-render-pixelated {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+.tree-branch {
+    border-left: 1px dashed rgb(var(--c-white) / .15);
+    margin-left: 11px;
+    padding-left: 6px;
+}
+
+/* ===== 画像エディタ (PNG / JPG / JPEG / TGA) ===== */
+.imged-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    min-width: 32px; height: 32px; padding: 0 8px;
+    border-radius: 8px; border: 1px solid rgb(var(--c-border));
+    background: rgb(var(--c-bg)); color: rgb(var(--c-s300));
+    font-size: 11px; font-weight: 600; line-height: 1;
+    cursor: pointer; transition: all .12s; white-space: nowrap;
+    user-select: none; -webkit-user-select: none;
+}
+.imged-btn:hover { background: rgb(var(--c-border)); color: rgb(var(--c-white)); }
+.imged-btn.active { background: rgb(var(--c-ac-500) / .2); border-color: rgb(var(--c-ac-500) / .45); color: rgb(var(--c-ac-400)); }
+.imged-btn:disabled { opacity: .35; cursor: not-allowed; }
+.imged-btn:disabled:hover { background: rgb(var(--c-bg)); color: rgb(var(--c-s300)); }
+.imged-sep { width: 1px; height: 20px; background: rgb(var(--c-border)); margin: 0 2px; flex-shrink: 0; }
+.imged-lbl { font-size: 10px; color: rgb(var(--c-s400)); font-weight: 600; white-space: nowrap; }
+.imged-checker { background: repeating-conic-gradient(#3a3d48 0% 25%, #2a2d37 0% 50%) 50% / 16px 16px; }
+.imged-range { accent-color: rgb(var(--c-ac-500)); }
+.imged-cursor { outline: 1px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.7); }
+.imged-anchor {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid rgb(var(--c-border));
+    background: rgb(var(--c-bg)); color: rgb(var(--c-s500)); cursor: pointer; font-size: 14px;
+}
+.imged-anchor.active { background: rgb(var(--c-ac-500) / .25); border-color: rgb(var(--c-ac-500) / .6); color: rgb(var(--c-ac-400)); }
+#imgEdCanvas { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: none; }
+
+/* ---------- ファイルツリー: 行ごとの操作ボタン ----------
+   行の幅が狭くなったら(スマホ・深い階層)、ボタン群を「⋮」メニューにまとめる。
+   行そのものをコンテナにして、インデント後の実際の幅で判定する。 */
+.tree-row { container-type: inline-size; container-name: treerow; }
+.tree-actions-inline { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.tree-actions-more { display: none; align-items: center; flex-shrink: 0; }
+@container treerow (max-width: 250px) {
+    .tree-actions-inline { display: none; }
+    .tree-actions-more { display: flex; }
+}
+.tree-act-btn {
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px; border-radius: 4px; color: rgb(var(--c-s400)); background: transparent;
+}
+.tree-act-btn:hover { background: rgb(var(--c-border)); color: rgb(var(--c-white)); }
+.tree-act-btn.danger:hover { color: #f87171; }
+
+/* ⋮ メニュー(body直下に1つだけ生成し、位置を固定表示する) */
+.tree-menu {
+    position: fixed; z-index: 60; min-width: 168px; padding: 4px;
+    background: rgb(var(--c-card)); border: 1px solid rgb(var(--c-border)); border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .55);
+}
+.tree-menu-item {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    color: rgb(var(--c-s300)); background: transparent; text-align: left; white-space: nowrap;
+}
+.tree-menu-item:hover { background: rgb(var(--c-border)); color: rgb(var(--c-white)); }
+.tree-menu-item.danger { color: #f87171; }
+.tree-menu-item.danger:hover { background: rgba(239, 68, 68, .15); color: #fca5a5; }
+.tree-menu-item.active { color: rgb(var(--c-ac-400)); font-weight: 700; }
+
+/* 移動先フォルダの選択リスト */
+.move-dest-item {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 6px 8px; border-radius: 8px; font-size: 12px; color: rgb(var(--c-s300));
+    background: transparent; text-align: left; border: 1px solid transparent;
+}
+.move-dest-item:hover { background: rgb(var(--c-border)); color: rgb(var(--c-white)); }
+.move-dest-item.selected { background: rgb(var(--c-border)); border-color: rgb(var(--c-border)); color: rgb(var(--c-white)); font-weight: 700; }
+.move-dest-item:disabled { opacity: .35; cursor: not-allowed; }
+.move-dest-item:disabled:hover { background: transparent; color: rgb(var(--c-s300)); }
+
+/* 重複したスクリプト名の入力欄 */
+.script-entry-dup { border-color: #ef4444 !important; }
+
+/* ===== 設定: 外観のカスタマイズ ===== */
+.theme-color-input {
+    width: 40px; height: 40px; padding: 2px; flex-shrink: 0; cursor: pointer;
+    border-radius: 10px; border: 1px solid rgb(var(--c-border)); background: rgb(var(--c-bg));
+}
+
+/* 左上のロゴ: アクセントカラーに合わせて発色よくグラデーションさせる */
+.logo-grad {
+    background-image: linear-gradient(to bottom right, rgb(var(--c-logo-from)), rgb(var(--c-logo-to)));
+    border: 1px solid rgb(var(--c-logo-edge) / .2);
+    box-shadow: 0 10px 15px -3px rgb(var(--c-logo-shadow) / .3), 0 4px 6px -4px rgb(var(--c-logo-shadow) / .3);
+}
+
+/* ===== テクスチャモード: 表示切替ボタン(マニフェスト / ファイル階層・編集 / テクスチャ)を改行させない =====
+   アドオンモードでは .tex-mode-tabs が付かないので、見た目は変わらない。 */
+.tex-mode-tabs { width: 100%; overflow-x: auto; scrollbar-width: none; }
+.tex-mode-tabs::-webkit-scrollbar { display: none; }
+.tex-mode-tabs > button { flex: 1 1 auto; justify-content: center; white-space: nowrap; }
+@media (max-width: 420px) {
+    .tex-mode-tabs { gap: 2px; }
+    .tex-mode-tabs > button { padding-left: .5rem; padding-right: .5rem; gap: .25rem; font-size: 11px; }
+}
